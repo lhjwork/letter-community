@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant xxl (@media (min-width: 1400px));
 
 @theme inline {
   --color-background: var(--background);
@@ -122,7 +123,7 @@ body {
     box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     max-width: 1920px;
