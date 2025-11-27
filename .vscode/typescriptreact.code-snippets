@@ -1,0 +1,191 @@
+{
+  "React Arrow Function Component": {
+    "prefix": "rafce",
+    "body": [
+      "import React from 'react';",
+      "",
+      "const ${1:${TM_FILENAME_BASE}} = () => {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:${TM_FILENAME_BASE}};"
+    ],
+    "description": "React Arrow Function Component Export"
+  },
+  "React Arrow Function Component with Props": {
+    "prefix": "rafcp",
+    "body": [
+      "import React from 'react';",
+      "",
+      "interface ${1:${TM_FILENAME_BASE}}Props {",
+      "  $2",
+      "}",
+      "",
+      "const ${1:${TM_FILENAME_BASE}} = ({$3}: ${1:${TM_FILENAME_BASE}}Props) => {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:${TM_FILENAME_BASE}};"
+    ],
+    "description": "React Arrow Function Component with Props"
+  },
+  "React Functional Component": {
+    "prefix": "rfc",
+    "body": [
+      "import React from 'react';",
+      "",
+      "function ${1:${TM_FILENAME_BASE}}() {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "}",
+      "",
+      "export default ${1:${TM_FILENAME_BASE}};"
+    ],
+    "description": "React Functional Component"
+  },
+  "React Functional Component with Props": {
+    "prefix": "rfcp",
+    "body": [
+      "import React from 'react';",
+      "",
+      "interface ${1:${TM_FILENAME_BASE}}Props {",
+      "  $2",
+      "}",
+      "",
+      "function ${1:${TM_FILENAME_BASE}}({$3}: ${1:${TM_FILENAME_BASE}}Props) {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "}",
+      "",
+      "export default ${1:${TM_FILENAME_BASE}};"
+    ],
+    "description": "React Functional Component with Props"
+  },
+  "useState Hook": {
+    "prefix": "us",
+    "body": [
+      "const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState($2);"
+    ],
+    "description": "useState Hook"
+  },
+  "useEffect Hook": {
+    "prefix": "ue",
+    "body": ["useEffect(() => {", "  $0", "}, []);"],
+    "description": "useEffect Hook"
+  },
+  "useContext Hook": {
+    "prefix": "uc",
+    "body": ["const ${1:context} = useContext(${2:Context});"],
+    "description": "useContext Hook"
+  },
+  "useReducer Hook": {
+    "prefix": "ur",
+    "body": [
+      "const [${1:state}, ${2:dispatch}] = useReducer(${3:reducer}, ${4:initialState});"
+    ],
+    "description": "useReducer Hook"
+  },
+  "useCallback Hook": {
+    "prefix": "ucb",
+    "body": [
+      "const ${1:memoizedCallback} = useCallback(",
+      "  () => {",
+      "    $0",
+      "  },",
+      "  [${2:dependencies}]",
+      ");"
+    ],
+    "description": "useCallback Hook"
+  },
+  "useMemo Hook": {
+    "prefix": "um",
+    "body": [
+      "const ${1:memoizedValue} = useMemo(() => ${2:computeExpensiveValue}(${3:a}, ${4:b}), [${3:a}, ${4:b}]);"
+    ],
+    "description": "useMemo Hook"
+  },
+  "useRef Hook": {
+    "prefix": "uref",
+    "body": ["const ${1:ref} = useRef<${2:HTMLDivElement}>(null);"],
+    "description": "useRef Hook"
+  },
+  "Next.js Page Component": {
+    "prefix": "npage",
+    "body": [
+      "export default function ${1:${TM_FILENAME_BASE}}() {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Next.js Page Component"
+  },
+  "Next.js Page with Metadata": {
+    "prefix": "npagem",
+    "body": [
+      "import { Metadata } from 'next';",
+      "",
+      "export const metadata: Metadata = {",
+      "  title: '${1:Title}',",
+      "  description: '${2:Description}',",
+      "};",
+      "",
+      "export default function ${3:${TM_FILENAME_BASE}}() {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Next.js Page with Metadata"
+  },
+  "Next.js Layout Component": {
+    "prefix": "nlayout",
+    "body": [
+      "export default function ${1:${TM_FILENAME_BASE}}Layout({",
+      "  children,",
+      "}: {",
+      "  children: React.ReactNode;",
+      "}) {",
+      "  return (",
+      "    <div>",
+      "      {children}",
+      "    </div>",
+      "  );",
+      "}"
+    ],
+    "description": "Next.js Layout Component"
+  },
+  "TypeScript Interface": {
+    "prefix": "tsi",
+    "body": ["interface ${1:InterfaceName} {", "  $0", "}"],
+    "description": "TypeScript Interface"
+  },
+  "TypeScript Type": {
+    "prefix": "tst",
+    "body": ["type ${1:TypeName} = {", "  $0", "};"],
+    "description": "TypeScript Type"
+  },
+  "Console Log": {
+    "prefix": "cl",
+    "body": ["console.log('$1', $1);"],
+    "description": "Console Log"
+  }
+}
