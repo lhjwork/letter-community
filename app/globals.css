@@ -4,6 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 @custom-variant xxl (@media (min-width: 1400px));
 
+/* Desktop First용 커스텀 variants (max-width 사용) */
+@custom-variant tablet-down (@media (max-width: 1399px));
+@custom-variant mobile-down (@media (max-width: 767px));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
