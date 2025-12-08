@@ -1,15 +1,14 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-interface LoginModalProps {
+interface LoginDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  if (!isOpen) return null;
-
+export default function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
   const handleLogin = async (provider: "kakao" | "naver" | "instagram") => {
     try {
       await signIn(provider, { callbackUrl: "/" });
@@ -19,31 +18,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* 백드롭 */}
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
-
-      {/* 모달 */}
-      <div className="relative bg-white rounded-2xl p-6 sm:p-8 w-[90%] max-w-md shadow-2xl">
-        {/* 닫기 버튼 */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M18 6L6 18M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-
-        {/* 헤더 */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl text-black mb-2" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md bg-white">
+        <DialogHeader>
+          <DialogTitle className="text-3xl sm:text-4xl text-black text-center" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
             로그인
-          </h2>
-          <p className="text-sm text-gray-500">소셜 계정으로 간편하게 로그인하세요</p>
-        </div>
+          </DialogTitle>
+          <DialogDescription className="text-center">소셜 계정으로 간편하게 로그인하세요</DialogDescription>
+        </DialogHeader>
 
         {/* 로그인 버튼들 */}
-        <div className="space-y-3">
+        <div className="space-y-3 mt-4">
           {/* 카카오 로그인 */}
-          <button onClick={() => handleLogin("kakao")} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500] hover:bg-[#FDD835] rounded-lg transition-colors">
+          <button onClick={() => handleLogin("kakao")} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FEE500] hover:bg-[#FDD835] rounded-lg transition-colors cursor-pointer">
             <div className="w-6 h-6 relative">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M12 3C6.5 3 2 6.58 2 11C2 13.5 3.5 15.75 5.88 17.13L4.75 21L8.88 18.5C9.88 18.75 10.94 18.88 12 18.88C17.5 18.88 22 15.3 22 10.88C22 6.58 17.5 3 12 3Z" fill="#000000" />
@@ -53,7 +40,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </button>
 
           {/* 네이버 로그인 */}
-          <button onClick={() => handleLogin("naver")} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#03C75A] hover:bg-[#02B34F] rounded-lg transition-colors">
+          <button onClick={() => handleLogin("naver")} className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#03C75A] hover:bg-[#02B34F] rounded-lg transition-colors cursor-pointer">
             <div className="w-6 h-6 relative">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727v12.845z" fill="#FFFFFF" />
@@ -65,7 +52,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           {/* 인스타그램 로그인 */}
           <button
             onClick={() => handleLogin("instagram")}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-linear-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 rounded-lg transition-opacity"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-linear-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 rounded-lg transition-opacity cursor-pointer"
           >
             <div className="w-6 h-6 relative">
               <svg viewBox="0 0 24 24" fill="none">
@@ -84,7 +71,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <p>로그인하시면 이용약관 및 개인정보처리방침에</p>
           <p>동의하는 것으로 간주됩니다.</p>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

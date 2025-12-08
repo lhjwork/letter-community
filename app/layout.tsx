@@ -18,7 +18,9 @@ export default function RootLayout({
         <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumJangMiCe.css" rel="stylesheet" />
       </head>
       <body className="antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <div className="mx-auto max-w-[1920px]">{children}</div>
+        </SessionProvider>
       </body>
     </html>
   );

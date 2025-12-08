@@ -4,18 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
-import LoginModal from "./LoginModal";
+import LoginDialog from "./LoginDialog";
 
 export default function Header() {
   const { data: session, status } = useSession();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleLoginClick = () => {
     if (status === "authenticated") {
       setIsUserMenuOpen(!isUserMenuOpen);
     } else {
-      setIsLoginModalOpen(true);
+      setIsLoginDialogOpen(true);
     }
   };
 
@@ -55,7 +55,7 @@ export default function Header() {
 
           {/* 오른쪽 로그인/사용자 메뉴 */}
           <div className="relative flex items-center gap-1 sm:gap-2 shrink-0">
-            <button onClick={handleLoginClick} className="flex items-center gap-1 sm:gap-2">
+            <button onClick={handleLoginClick} className="flex items-center gap-1 sm:gap-2 cursor-pointer">
               <span className="text-lg sm:text-xl md:text-2xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
                 {status === "authenticated" && session?.user?.name ? session.user.name : "로그인"}
               </span>
@@ -70,10 +70,10 @@ export default function Header() {
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-sm text-gray-600">{session?.user?.email || ""}</p>
                 </div>
-                <Link href="/my-page" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsUserMenuOpen(false)}>
+                <Link href="/my-page" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setIsUserMenuOpen(false)}>
                   마이페이지
                 </Link>
-                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer">
                   로그아웃
                 </button>
               </div>
@@ -95,8 +95,8 @@ export default function Header() {
         </nav>
       </header>
 
-      {/* 로그인 모달 */}
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      {/* 로그인 다이얼로그 */}
+      <LoginDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
     </>
   );
 }
