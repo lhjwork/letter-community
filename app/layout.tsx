@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Letter Community",
@@ -14,13 +15,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <link
-          href="https://hangeul.pstatic.net/hangeul_static/css/NanumJangMiCe.css"
-          rel="stylesheet"
-        />
+        <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumJangMiCe.css" rel="stylesheet" />
       </head>
       <body className="antialiased">
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
