@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 
 export default function Footer() {
@@ -8,16 +7,14 @@ export default function Footer() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
           {/* 왼쪽: 로고 및 연락처 */}
           <div className="flex flex-col space-y-4">
-            <div className="text-3xl font-bold tracking-tight">
-              Letter
-            </div>
+            <div className="text-3xl font-bold tracking-tight">Letter</div>
 
             <div className="space-y-2">
               <div className="flex items-center space-x-3 text-sm">
                 <span className="font-medium text-gray-700">Contact</span>
                 <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                <a href="mailto:jin.come.up.business@gmail.com" className="text-blue-600 hover:text-blue-700 transition-colors duration-200 hover:underline">
-                  jin.come.up.business@gmail.com
+                <a href="mailto:letter-community@naver.com" className="text-blue-600 hover:text-blue-700 transition-colors duration-200 hover:underline">
+                  letter-community@naver.com
                 </a>
               </div>
 
