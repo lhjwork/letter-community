@@ -42,14 +42,13 @@ export const authConfig = {
         try {
           const oauthProfile = profile as OAuthProfile;
 
-          // 이메일 추출 로직 개선 및 미전달 처리
+          // 이메일 추출 로직 개선 (Kakao 등 중첩된 구조 대응)
           const email =
             (profile as any)?.kakao_account?.email || // Kakao
             (profile as any)?.response?.email || // Naver
             oauthProfile.email ||
             user?.email ||
-            token.email ||
-            "not-provided";
+            token.email;
 
           // 백엔드 API에 OAuth 정보 전달
           const response = await fetch(`${BACKEND_URL}/api/users/oauth/login`, {
