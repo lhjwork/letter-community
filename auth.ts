@@ -36,11 +36,20 @@ export const authConfig = {
     authorized() {
       return true; // 모든 페이지 접근 허용
     },
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, user }) {
       // OAuth 로그인 시 백엔드 API 호출
       if (account && profile) {
         try {
           const oauthProfile = profile as OAuthProfile;
+
+          // 이메일 추출 로직 개선 및 미전달 처리
+          const email =
+            (profile as any)?.kakao_account?.email || // Kakao
+            (profile as any)?.response?.email || // Naver
+            oauthProfile.email ||
+            user?.email ||
+            token.email ||
+            "not-provided";
 
           // 백엔드 API에 OAuth 정보 전달
           const response = await fetch(`${BACKEND_URL}/api/users/oauth/login`, {
@@ -51,7 +60,7 @@ export const authConfig = {
             body: JSON.stringify({
               provider: account.provider,
               providerId: account.providerAccountId,
-              email: oauthProfile.email || token.email,
+              email: email,
               name: oauthProfile.name || token.name,
               image: oauthProfile.picture || oauthProfile.profile_image || token.picture,
               accessToken: account.access_token,
