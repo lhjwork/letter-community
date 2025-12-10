@@ -1,4 +1,4 @@
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 interface ApiRequestOptions extends RequestInit {
   token?: string;
@@ -7,7 +7,10 @@ interface ApiRequestOptions extends RequestInit {
 /**
  * 백엔드 API 호출 유틸리티
  */
-export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  endpoint: string,
+  options: ApiRequestOptions = {}
+): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
   const defaultHeaders: Record<string, string> = {
@@ -56,7 +59,10 @@ export async function getCurrentUser(token: string) {
 /**
  * 사용자 정보 업데이트
  */
-export async function updateUser(token: string, data: { name?: string; email?: string; image?: string }) {
+export async function updateUser(
+  token: string,
+  data: { name?: string; email?: string; image?: string }
+) {
   return apiRequest("/api/users/me", {
     method: "PUT",
     token,
@@ -95,3 +101,21 @@ export async function unlinkOAuthAccount(token: string, provider: string) {
 }
 
 export { BACKEND_URL };
+
+/**
+ * 편지 등록
+ */
+export async function createLetter(
+  data: {
+    title: string;
+    content: string;
+    authorName: string;
+  },
+  token?: string
+) {
+  return apiRequest("/api/letters", {
+    method: "POST",
+    token,
+    body: JSON.stringify(data),
+  });
+}

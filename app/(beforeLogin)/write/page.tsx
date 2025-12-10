@@ -4,11 +4,17 @@ import { useState } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
+import { createLetter } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function WritePage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const editor = useLetterEditor({
     content,
@@ -16,9 +22,56 @@ export default function WritePage() {
     placeholder: "여기에 당신의 이야기를 작성해주세요...",
   });
 
-  const handleSubmit = () => {
-    console.log({ title, content, author });
-    // TODO: API 호출
+  const handleSubmit = async () => {
+    // 유효성 검사
+    if (!title.trim()) {
+      alert("제목을 입력해주세요.");
+      return;
+    }
+    if (!content.trim()) {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+    if (!author.trim()) {
+      alert("작성자를 입력해주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 세션에서 백엔드 토큰 가져오기
+      const token = session?.backendToken;
+
+      await createLetter(
+        {
+          title: title.trim(),
+          content: content.trim(),
+          authorName: author.trim(),
+        },
+        token
+      );
+
+      alert("편지가 성공적으로 등록되었습니다! 💌");
+
+      // 초기화
+      setTitle("");
+      setContent("");
+      setAuthor("");
+      editor?.commands.clearContent();
+
+      // 홈으로 이동
+      router.push("/");
+    } catch (error) {
+      console.error("편지 등록 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "편지 등록에 실패했습니다. 다시 시도해주세요."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const today = new Date().toLocaleDateString("ko-KR", {
@@ -32,8 +85,12 @@ export default function WritePage() {
       <main className="w-full flex flex-col items-center py-16 px-4 sm:px-8">
         {/* 페이지 타이틀 */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">당신의 이야기를 들려주세요</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">특별한 순간을 편지로 남겨보세요</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            당신의 이야기를 들려주세요
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            특별한 순간을 편지로 남겨보세요
+          </p>
         </div>
 
         {/* 편지지 스타일 컨테이너 */}
@@ -70,8 +127,12 @@ export default function WritePage() {
           >
             {/* 편지 헤더 */}
             <div className="mb-8">
-              <div className="text-right text-sm text-gray-500 mb-2">{today}</div>
-              <div className="text-left text-base text-gray-700 mb-4">To Letter</div>
+              <div className="text-right text-sm text-gray-500 mb-2">
+                {today}
+              </div>
+              <div className="text-left text-base text-gray-700 mb-4">
+                To Letter
+              </div>
 
               {/* 제목 입력 */}
               <input
@@ -116,13 +177,19 @@ export default function WritePage() {
               setTitle("");
               setContent("");
               setAuthor("");
+              editor?.commands.clearContent();
             }}
-            className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            disabled={isSubmitting}
+            className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             초기화
           </button>
-          <button onClick={handleSubmit} className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium">
-            사연 제출하기
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "제출 중..." : "사연 제출하기"}
           </button>
         </div>
       </main>
