@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
@@ -9,17 +9,15 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
-import { EditorToolbar } from "./EditorToolbar";
-import { useEffect } from "react";
 
-interface LetterEditorProps {
+interface UseLetterEditorProps {
   content: string;
   onChange: (content: string) => void;
   placeholder?: string;
 }
 
-export function LetterEditor({ content, onChange, placeholder = "여기에 당신의 이야기를 작성해주세요..." }: LetterEditorProps) {
-  const editor = useEditor({
+export function useLetterEditor({ content, onChange, placeholder = "여기에 당신의 이야기를 작성해주세요..." }: UseLetterEditorProps) {
+  return useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
@@ -46,13 +44,4 @@ export function LetterEditor({ content, onChange, placeholder = "여기에 당�
     },
     immediatelyRender: false,
   });
-
-  return (
-    <div className="border rounded-md overflow-hidden bg-white shadow-sm">
-      <EditorToolbar editor={editor} />
-      <div className="p-4">
-        <EditorContent editor={editor} />
-      </div>
-    </div>
-  );
 }
