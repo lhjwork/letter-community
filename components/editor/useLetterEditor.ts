@@ -3,7 +3,7 @@
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "./extensions/ImageExtension";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
@@ -23,9 +23,9 @@ export function useLetterEditor({ content, onChange, placeholder = "여기에 �
       Placeholder.configure({
         placeholder,
       }),
-      Image,
+      ResizableImage,
       TextAlign.configure({
-        types: ["heading", "paragraph"],
+        types: ["heading", "paragraph", "image"],
       }),
       TextStyle,
       Color,
