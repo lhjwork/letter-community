@@ -6,68 +6,55 @@ import { useCallback, useEffect, useState, useRef } from "react";
 export default function ResizableImageComponent(props: NodeViewProps) {
   const { node, updateAttributes, selected } = props;
 
-  // 초기 너비 설정 (기본값 100%)
-  const [width, setWidth] = useState<string | number>(node.attrs.width || "100%");
+  const [resizingWidth, setResizingWidth] = useState<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const resizeStartRef = useRef<{ x: number; width: number } | null>(null);
 
-  // 노드 속성이 외부에서 변경되면 상태 업데이트
   useEffect(() => {
-    setWidth(node.attrs.width || "100%");
-  }, [node.attrs.width]);
+    if (!isResizing) return;
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!resizeStartRef.current) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizeStartRef.current) return;
 
-    const dx = e.clientX - resizeStartRef.current.x;
-    const newWidth = Math.max(100, resizeStartRef.current.width + dx); // 최소 너비 100px
+      const dx = e.clientX - resizeStartRef.current.x;
+      const newWidth = Math.max(100, resizeStartRef.current.width + dx); // 최소 너비 100px
 
-    // 부모 컨테이너의 너비를 넘지 않도록 제한 (선택 사항)
-    // const parentWidth = imageRef.current?.parentElement?.offsetWidth || 1000;
-    // const constrainedWidth = Math.min(newWidth, parentWidth);
+      setResizingWidth(newWidth);
+    };
 
-    setWidth(newWidth);
-  }, []);
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      setResizingWidth(null);
+      resizeStartRef.current = null;
 
-  const handleMouseUp = useCallback(() => {
-    setIsResizing(false);
-    resizeStartRef.current = null;
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
+      // 리사이징이 끝나면 속성 업데이트
+      if (imageRef.current) {
+        updateAttributes({ width: imageRef.current.offsetWidth });
+      }
+    };
 
-    // 리사이징이 끝나면 속성 업데이트
-    if (imageRef.current) {
-      updateAttributes({ width: imageRef.current.offsetWidth });
-    }
-  }, [handleMouseMove, updateAttributes]);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation(); // 에디터의 다른 이벤트 방지
-
-      if (!imageRef.current) return;
-
-      setIsResizing(true);
-      resizeStartRef.current = {
-        x: e.clientX,
-        width: imageRef.current.offsetWidth,
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    },
-    [handleMouseMove, handleMouseUp]
-  );
-
-  // 컴포넌트 언마운트 시 이벤트 리스너 제거
-  useEffect(() => {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [handleMouseMove, handleMouseUp]);
+  }, [isResizing, updateAttributes]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation(); // 에디터의 다른 이벤트 방지
+
+    if (!imageRef.current) return;
+
+    setIsResizing(true);
+    resizeStartRef.current = {
+      x: e.clientX,
+      width: imageRef.current.offsetWidth,
+    };
+  }, []);
 
   const textAlign = node.attrs.textAlign || "left";
 
@@ -107,7 +94,7 @@ export default function ResizableImageComponent(props: NodeViewProps) {
           src={node.attrs.src}
           alt={node.attrs.alt}
           style={{
-            width: typeof width === "number" ? `${width}px` : width,
+            width: resizingWidth ? `${resizingWidth}px` : typeof node.attrs.width === "number" ? `${node.attrs.width}px` : node.attrs.width,
             maxWidth: "100%",
             height: "auto",
             display: "block",
