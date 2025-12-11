@@ -119,3 +119,50 @@ export async function createLetter(
     body: JSON.stringify(data),
   });
 }
+
+/**
+ * 편지 상세 조회
+ */
+export async function getLetter(letterId: string) {
+  return apiRequest(`/api/letters/${letterId}`, {
+    method: "GET",
+  });
+}
+
+/**
+ * OG 이미지 업로드 (커스텀)
+ */
+export async function uploadOgImage(formData: FormData) {
+  const response = await fetch(`${BACKEND_URL}/api/og/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      message: "Unknown error occurred",
+    }));
+    throw new Error(error.message || `API Error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * OG 이미지 자동 생성 기록
+ */
+export async function recordAutoOgImage(letterId: string, ogImageUrl: string) {
+  return apiRequest("/api/og/auto-generate", {
+    method: "PATCH",
+    body: JSON.stringify({ letterId, ogImageUrl }),
+  });
+}
+
+/**
+ * OG 이미지 URL 조회
+ */
+export async function getOgImageUrl(letterId: string) {
+  return apiRequest(`/api/og/${letterId}`, {
+    method: "GET",
+  });
+}

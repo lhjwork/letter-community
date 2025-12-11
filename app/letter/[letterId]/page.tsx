@@ -1,60 +1,125 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-type Props = {
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
+
+interface Letter {
+  _id: string;
+  title: string;
+  content: string;
+  authorName: string;
+  ogPreviewMessage?: string;
+  ogImageUrl?: string;
+  ogImageType?: "auto" | "custom";
+  createdAt: string;
+}
+
+async function getLetter(letterId: string): Promise<Letter | null> {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) return null;
+
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch letter:", error);
+    return null;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
   params: Promise<{ letterId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+}): Promise<Metadata> {
   const { letterId } = await params;
+  const letter = await getLetter(letterId);
 
-  // 실제로는 백엔드에서 편지 정보를 가져와야 함
-  // const letter = await fetchLetter(letterId);
+  if (!letter) {
+    return {
+      title: "편지를 찾을 수 없습니다",
+    };
+  }
 
-  // Mock Data
-  const letter = {
-    title: "특별한 편지가 도착했습니다",
-    description: "소중한 마음을 전하는 편지입니다.",
-    // 사용자가 커스텀한 OG 이미지가 있다면 그 URL을 사용하고, 없다면 동적 생성 API 사용
-    ogImageUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/og?letterId=${letterId}`,
-  };
+  const ogImageUrl =
+    letter.ogImageUrl ||
+    `${
+      process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
+    }/api/og?letterId=${letterId}`;
 
   return {
-    title: letter.title,
-    description: letter.description,
+    title: letter.ogPreviewMessage || letter.title || "당신에게 도착한 편지",
+    description: "Letter Community에서 특별한 편지를 확인하세요",
     openGraph: {
-      title: letter.title,
-      description: letter.description,
+      title: letter.ogPreviewMessage || letter.title || "당신에게 도착한 편지",
+      description: "Letter Community에서 특별한 편지를 확인하세요",
       images: [
         {
-          url: letter.ogImageUrl,
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: letter.title,
         },
       ],
+      type: "article",
     },
     twitter: {
       card: "summary_large_image",
-      title: letter.title,
-      description: letter.description,
-      images: [letter.ogImageUrl],
+      title: letter.ogPreviewMessage || letter.title || "당신에게 도착한 편지",
+      description: "Letter Community에서 특별한 편지를 확인하세요",
+      images: [ogImageUrl],
     },
   };
 }
 
-export default async function LetterPage({ params }: Props) {
+export default async function LetterDetailPage({
+  params,
+}: {
+  params: Promise<{ letterId: string }>;
+}) {
   const { letterId } = await params;
+  const letter = await getLetter(letterId);
+
+  if (!letter) {
+    notFound();
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">편지 상세 페이지</h1>
-        <p className="text-gray-600 mb-8">Letter ID: {letterId}</p>
-        <div className="p-4 bg-blue-50 rounded-md text-blue-800 mb-8">이 페이지는 공유될 때 동적으로 생성된 OG 이미지를 보여줍니다.</div>
-        <a href={`/letter/${letterId}/custom-og`} className="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-          OG 이미지 꾸미러 가기
-        </a>
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20 py-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* 편지 내용 */}
+        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-12">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              {letter.title}
+            </h1>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <span>작성자: {letter.authorName}</span>
+              <span>•</span>
+              <span>
+                {new Date(letter.createdAt).toLocaleDateString("ko-KR")}
+              </span>
+            </div>
+          </div>
+
+          <div
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: letter.content }}
+          />
+
+          {/* OG 이미지 커스터마이징 버튼 */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <a
+              href={`/letter/${letterId}/custom-og`}
+              className="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+            >
+              공유 이미지 커스터마이징 ✨
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

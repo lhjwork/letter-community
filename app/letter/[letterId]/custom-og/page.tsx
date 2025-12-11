@@ -1,27 +1,38 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { ColorPicker } from "@/components/og/ColorPicker";
 import { IllustrationSelector } from "@/components/og/IllustrationSelector";
 import { OgPreviewFrame } from "@/components/og/OgPreviewFrame";
 import { UploadToast } from "@/components/og/UploadToast";
-import { Button } from "@/components/ui/button";
 
-export default function CustomOgPage({ params }: { params: Promise<{ letterId: string }> }) {
-  const { letterId } = use(params);
-  const [message, setMessage] = useState("특별한 순간을 편지로 남겨보세요");
-  const [bgColor, setBgColor] = useState("#ffffff");
-  const [illustration, setIllustration] = useState("default");
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+
+export default function CustomOgPage() {
+  const params = useParams();
+  const letterId = params.letterId as string;
+  const router = useRouter();
+
+  const [message, setMessage] = useState("당신에게 도착한 편지");
+  const [bgColor, setBgColor] = useState("#FFF5F5");
+  const [illustration, setIllustration] = useState("💌");
   const [fontSize, setFontSize] = useState(48);
-  const [isSaving, setIsSaving] = useState(false);
-  const [toast, setToast] = useState<{ show: boolean; message: string; type: "success" | "error" }>({
+
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "loading";
+  }>({
     show: false,
     message: "",
     type: "success",
   });
 
   const handleSave = async () => {
-    setIsSaving(true);
+    setToast({ show: true, message: "OG 이미지 생성 중...", type: "loading" });
+
     try {
       // 1. 미리보기 이미지를 Blob으로 가져오기
       const params = new URLSearchParams({
@@ -30,101 +41,148 @@ export default function CustomOgPage({ params }: { params: Promise<{ letterId: s
         illustration,
         fontSize: fontSize.toString(),
       });
-      const previewRes = await fetch(`/api/og-preview?${params.toString()}`);
-      const blob = await previewRes.blob();
 
-      // 2. Blob을 Base64로 변환 (또는 FormData로 전송)
-      // 여기서는 요구사항대로 Base64로 변환하여 전송하는 예시
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = async () => {
-        const base64data = reader.result;
+      const imageResponse = await fetch(`/api/og-preview?${params.toString()}`);
+      if (!imageResponse.ok) throw new Error("이미지 생성 실패");
 
-        // 3. 백엔드에 업로드
-        // 실제 백엔드 엔드포인트가 없으므로 여기서는 성공했다고 가정하고 로그만 출력
-        console.log("Uploading to backend...", { letterId, base64data });
+      const imageBlob = await imageResponse.blob();
 
-        // const uploadRes = await fetch('/api/og/upload', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ letterId, image: base64data }),
-        // });
+      // 2. FormData로 백엔드에 업로드
+      const formData = new FormData();
+      formData.append("file", imageBlob, `og-${letterId}.png`);
+      formData.append("letterId", letterId);
+      formData.append("ogPreviewMessage", message);
+      formData.append(
+        "style",
+        JSON.stringify({
+          bgColor,
+          illustration,
+          fontSize,
+        })
+      );
 
-        // if (!uploadRes.ok) throw new Error('Upload failed');
+      const uploadResponse = await fetch(`${BACKEND_URL}/api/og/upload`, {
+        method: "POST",
+        body: formData,
+      });
 
-        setToast({ show: true, message: "OG 이미지가 저장되었습니다!", type: "success" });
-      };
+      if (!uploadResponse.ok) throw new Error("업로드 실패");
+
+      const result = await uploadResponse.json();
+
+      setToast({
+        show: true,
+        message: "OG 이미지가 저장되었습니다! 💌",
+        type: "success",
+      });
+
+      // 3초 후 편지 상세 페이지로 이동
+      setTimeout(() => {
+        router.push(`/letter/${letterId}`);
+      }, 2000);
     } catch (error) {
-      console.error(error);
-      setToast({ show: true, message: "저장에 실패했습니다.", type: "error" });
-    } finally {
-      setIsSaving(false);
+      console.error("OG 이미지 저장 실패:", error);
+      setToast({
+        show: true,
+        message: error instanceof Error ? error.message : "저장에 실패했습니다",
+        type: "error",
+      });
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">편지 미리보기 카드 꾸미기</h1>
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20 py-16 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* 헤더 */}
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            OG 이미지 커스터마이징
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            공유 시 표시될 이미지를 꾸며보세요
+          </p>
+        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 space-y-8">
-            {/* 미리보기 영역 */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">미리보기</h2>
-              <OgPreviewFrame message={message} bgColor={bgColor} illustration={illustration} fontSize={fontSize} />
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* 왼쪽: 설정 패널 */}
+          <div className="space-y-6 bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+            {/* 메시지 입력 */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">
+                메시지 (한 줄)
+              </label>
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="당신에게 도착한 편지"
+                maxLength={50}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <p className="text-xs text-gray-500">{message.length}/50자</p>
             </div>
 
-            {/* 편집 컨트롤 영역 */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">메시지 입력</label>
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  placeholder="공유될 때 보여질 메시지를 입력하세요"
-                  maxLength={40}
-                />
-                <div className="text-right text-xs text-gray-500 mt-1">{message.length}/40</div>
-              </div>
+            {/* 배경색 선택 */}
+            <ColorPicker value={bgColor} onChange={setBgColor} />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">배경 색상</label>
-                <ColorPicker selectedColor={bgColor} onColorChange={setBgColor} />
-              </div>
+            {/* 일러스트 선택 */}
+            <IllustrationSelector
+              value={illustration}
+              onChange={setIllustration}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">일러스트 선택</label>
-                <IllustrationSelector selectedIllustration={illustration} onIllustrationChange={setIllustration} />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">글자 크기: {fontSize}px</label>
-                <input
-                  type="range"
-                  min="24"
-                  max="72"
-                  step="4"
-                  value={fontSize}
-                  onChange={(e) => setFontSize(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
+            {/* 글꼴 크기 */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">
+                글꼴 크기: {fontSize}px
+              </label>
+              <input
+                type="range"
+                min="32"
+                max="72"
+                step="4"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="w-full"
+              />
             </div>
 
-            {/* 저장 버튼 */}
-            <div className="pt-6 border-t border-gray-100 flex justify-end">
-              <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
-                {isSaving ? "저장 중..." : "이미지 저장하기"}
-              </Button>
+            {/* 버튼 */}
+            <div className="flex gap-4 pt-4">
+              <button
+                onClick={() => router.back()}
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+              >
+                저장하기
+              </button>
             </div>
+          </div>
+
+          {/* 오른쪽: 미리보기 */}
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+            <OgPreviewFrame
+              message={message}
+              bgColor={bgColor}
+              illustration={illustration}
+              fontSize={fontSize}
+            />
           </div>
         </div>
       </div>
 
-      <UploadToast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
+      {/* 토스트 알림 */}
+      <UploadToast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
     </div>
   );
 }
