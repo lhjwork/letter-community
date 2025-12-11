@@ -29,7 +29,7 @@ export default function Header() {
       <header className="w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[52px] py-3 sm:py-4 xxl:py-[14px] pb-4 sm:pb-6 xxl:pb-[26px] rounded-2xl xxl:rounded-[24px] border-2 border-[#C4C4C4]">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           {/* 왼쪽 로고 */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 xxl:gap-4 shrink-0">
+          <Link href={status === "authenticated" ? "/home" : "/"} className="flex items-center gap-2 sm:gap-3 xxl:gap-4 shrink-0">
             <Image src="/icons/letter-logo.svg" alt="Letter Logo" width={88} height={60} className="w-12 h-8 sm:w-16 sm:h-11 md:w-[70px] md:h-[48px] xxl:w-[88px] xxl:h-[60px]" priority />
             <span className="text-2xl sm:text-3xl md:text-[32px] xxl:text-[40px] text-black whitespace-nowrap" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
               Letter
@@ -38,19 +38,55 @@ export default function Header() {
 
           {/* 중간 네비게이션 - 태블릿 이상에서만 표시 */}
           <nav className="hidden md:flex items-center gap-4 md:gap-6 xxl:gap-[120px] flex-1 justify-center">
-            <Link href="/write" className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-              사연 작성
-            </Link>
-            <Link href="/stories" className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-              사연 목록
-            </Link>
-            <Link
-              href="/community"
-              className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-              style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            >
-              커뮤니티
-            </Link>
+            {status === "authenticated" ? (
+              <>
+                <Link
+                  href="/write"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  편지 쓰기
+                </Link>
+                <Link
+                  href="/my-page"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  내 편지함
+                </Link>
+                <Link
+                  href="/stories"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  사연 목록
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/write"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  사연 작성
+                </Link>
+                <Link
+                  href="/stories"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  사연 목록
+                </Link>
+                <Link
+                  href="/community"
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  커뮤니티
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* 오른쪽 로그인/사용자 메뉴 */}
@@ -70,6 +106,9 @@ export default function Header() {
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-sm text-gray-600">{session?.user?.email || ""}</p>
                 </div>
+                <Link href="/home" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setIsUserMenuOpen(false)}>
+                  홈
+                </Link>
                 <Link href="/my-page" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setIsUserMenuOpen(false)}>
                   마이페이지
                 </Link>
@@ -83,15 +122,31 @@ export default function Header() {
 
         {/* 모바일 네비게이션 - 모바일에서만 표시 */}
         <nav className="md:hidden flex items-center justify-around gap-4 mt-4 pt-4 border-t border-gray-200">
-          <Link href="/write" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-            사연 작성
-          </Link>
-          <Link href="/stories" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-            사연 목록
-          </Link>
-          <Link href="/community" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-            커뮤니티
-          </Link>
+          {status === "authenticated" ? (
+            <>
+              <Link href="/write" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                편지 쓰기
+              </Link>
+              <Link href="/my-page" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                내 편지함
+              </Link>
+              <Link href="/stories" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                사연 목록
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/write" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                사연 작성
+              </Link>
+              <Link href="/stories" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                사연 목록
+              </Link>
+              <Link href="/community" className="text-base text-[#757575] hover:text-black transition-colors" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                커뮤니티
+              </Link>
+            </>
+          )}
         </nav>
       </header>
 

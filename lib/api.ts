@@ -7,10 +7,7 @@ interface ApiRequestOptions extends RequestInit {
 /**
  * 백엔드 API 호출 유틸리티
  */
-export async function apiRequest<T>(
-  endpoint: string,
-  options: ApiRequestOptions = {}
-): Promise<T> {
+export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
   const defaultHeaders: Record<string, string> = {
@@ -59,10 +56,7 @@ export async function getCurrentUser(token: string) {
 /**
  * 사용자 정보 업데이트
  */
-export async function updateUser(
-  token: string,
-  data: { name?: string; email?: string; image?: string }
-) {
+export async function updateUser(token: string, data: { name?: string; email?: string; image?: string }) {
   return apiRequest("/api/users/me", {
     method: "PUT",
     token,
@@ -164,5 +158,25 @@ export async function recordAutoOgImage(letterId: string, ogImageUrl: string) {
 export async function getOgImageUrl(letterId: string) {
   return apiRequest(`/api/og/${letterId}`, {
     method: "GET",
+  });
+}
+
+/**
+ * 내가 쓴 편지 목록 조회
+ */
+export async function getMyLetters(token: string) {
+  return apiRequest("/api/letters/my", {
+    method: "GET",
+    token,
+  });
+}
+
+/**
+ * 편지 삭제
+ */
+export async function deleteLetter(letterId: string, token: string) {
+  return apiRequest(`/api/letters/${letterId}`, {
+    method: "DELETE",
+    token,
   });
 }
