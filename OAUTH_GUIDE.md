@@ -3,7 +3,7 @@
 ## 개요
 
 이 프로젝트는 Next.js 15 + Auth.js v5를 사용하여 카카오, 네이버, 인스타그램 OAuth 로그인을 구현합니다.
-백엔드 Express 서버(`http://localhost:5000`)와 통신하여 사용자 인증을 처리합니다.
+백엔드 Express 서버(`http://localhost:5001`)와 통신하여 사용자 인증을 처리합니다.
 
 ## 아키텍처
 
@@ -97,7 +97,7 @@ INSTAGRAM_CLIENT_ID=your-instagram-client-id
 INSTAGRAM_CLIENT_SECRET=your-instagram-client-secret
 
 # Backend API
-BACKEND_URL=http://localhost:5000
+BACKEND_URL=http://localhost:5001
 ```
 
 ## 백엔드 API 명세
@@ -232,7 +232,7 @@ Auth.js 세션에 저장되는 데이터:
 
 ### 1. 로그인 버튼 클릭 시 아무 반응이 없음
 
-- 백엔드 서버가 `http://localhost:5000`에서 실행 중인지 확인
+- 백엔드 서버가 `http://localhost:5001`에서 실행 중인지 확인
 - 브라우저 콘솔에서 네트워크 에러 확인
 
 ### 2. OAuth 인증 후 에러 발생

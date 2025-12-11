@@ -4,7 +4,7 @@ import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
 import Instagram from "next-auth/providers/instagram";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 interface OAuthProfile {
   email?: string;

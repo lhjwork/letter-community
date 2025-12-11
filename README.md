@@ -17,11 +17,11 @@ cp .env.example .env.local
 - `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET`: 카카오 OAuth 앱 정보
 - `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`: 네이버 OAuth 앱 정보
 - `INSTAGRAM_CLIENT_ID`, `INSTAGRAM_CLIENT_SECRET`: 인스타그램 OAuth 앱 정보
-- `BACKEND_URL`: 백엔드 API URL (기본값: `http://localhost:5000`)
+- `BACKEND_URL`: 백엔드 API URL (기본값: `http://localhost:5001`)
 
 ### 2. 백엔드 서버 실행
 
-백엔드 서버가 `http://localhost:5000`에서 실행되고 있어야 합니다.
+백엔드 서버가 `http://localhost:5001`에서 실행되고 있어야 합니다.
 백엔드는 Express 기반으로 다음 OAuth 관련 API를 제공해야 합니다:
 
 - `POST /api/users/oauth/login` - OAuth 로그인/회원가입
@@ -70,7 +70,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Backend API 엔드포인트:
 
-백엔드 서버(`http://localhost:5000`)는 다음 API를 제공합니다:
+백엔드 서버(`http://localhost:5001`)는 다음 API를 제공합니다:
 
 #### OAuth 로그인
 
