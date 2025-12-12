@@ -1,4 +1,5 @@
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
+// 클라이언트와 서버 모두에서 사용 가능하도록 NEXT_PUBLIC_ 환경 변수 사용
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface ApiRequestOptions extends RequestInit {
   token?: string;
@@ -7,7 +8,10 @@ interface ApiRequestOptions extends RequestInit {
 /**
  * 백엔드 API 호출 유틸리티
  */
-export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  endpoint: string,
+  options: ApiRequestOptions = {}
+): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
   const defaultHeaders: Record<string, string> = {
@@ -56,7 +60,10 @@ export async function getCurrentUser(token: string) {
 /**
  * 사용자 정보 업데이트
  */
-export async function updateUser(token: string, data: { name?: string; email?: string; image?: string }) {
+export async function updateUser(
+  token: string,
+  data: { name?: string; email?: string; image?: string }
+) {
   return apiRequest("/api/users/me", {
     method: "PUT",
     token,
@@ -181,7 +188,9 @@ export interface GetMyLettersResponse {
 /**
  * 내가 쓴 편지 목록 조회
  */
-export async function getMyLetters(token: string): Promise<GetMyLettersResponse> {
+export async function getMyLetters(
+  token: string
+): Promise<GetMyLettersResponse> {
   return apiRequest<GetMyLettersResponse>("/api/letters/my", {
     method: "GET",
     token,
@@ -191,7 +200,10 @@ export async function getMyLetters(token: string): Promise<GetMyLettersResponse>
 /**
  * 편지 삭제
  */
-export async function deleteLetter(letterId: string, token: string): Promise<void> {
+export async function deleteLetter(
+  letterId: string,
+  token: string
+): Promise<void> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
     token,
