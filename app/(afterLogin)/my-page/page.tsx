@@ -2,18 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getMyLetters, deleteLetter } from "@/lib/api";
+import { getMyLetters, deleteLetter, type Letter } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-interface Letter {
-  _id: string;
-  title: string;
-  content: string;
-  authorName: string;
-  createdAt: string;
-  ogPreviewMessage?: string;
-}
 
 export default function MyPage() {
   const { data: session, status } = useSession();

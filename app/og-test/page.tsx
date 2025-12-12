@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function OGPreviewPage() {
+function OGPreviewContent() {
   const searchParams = useSearchParams();
   const letterIdParam = searchParams.get("letterId") || "";
   const [letterId, setLetterId] = useState(letterIdParam);
@@ -150,5 +150,22 @@ export default function OGPreviewPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function OGPreviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <OGPreviewContent />
+    </Suspense>
   );
 }

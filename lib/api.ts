@@ -161,11 +161,28 @@ export async function getOgImageUrl(letterId: string) {
   });
 }
 
+export interface Letter {
+  _id: string;
+  title: string;
+  content: string;
+  authorName: string;
+  createdAt: string;
+  ogPreviewMessage?: string;
+  ogBgColor?: string;
+  ogIllustration?: string;
+  ogFontSize?: number;
+}
+
+export interface GetMyLettersResponse {
+  success: boolean;
+  data: Letter[];
+}
+
 /**
  * 내가 쓴 편지 목록 조회
  */
-export async function getMyLetters(token: string) {
-  return apiRequest("/api/letters/my", {
+export async function getMyLetters(token: string): Promise<GetMyLettersResponse> {
+  return apiRequest<GetMyLettersResponse>("/api/letters/my", {
     method: "GET",
     token,
   });
@@ -174,7 +191,7 @@ export async function getMyLetters(token: string) {
 /**
  * 편지 삭제
  */
-export async function deleteLetter(letterId: string, token: string) {
+export async function deleteLetter(letterId: string, token: string): Promise<void> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
     token,
