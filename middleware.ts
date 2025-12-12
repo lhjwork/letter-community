@@ -6,7 +6,7 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
 
   // 로그인이 필요한 페이지들
-  const protectedRoutes = ["/write", "/my-page"];
+  const protectedRoutes = ["/write", "/my-page", "/home"];
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
   // 로그인 전용 페이지들
@@ -18,9 +18,9 @@ export default auth((req) => {
   }
 
   // 로그인했는데 루트 페이지 접근 시 (afterLogin)으로 리다이렉트
-  if (isLoggedIn && pathname === "/") {
-    return NextResponse.redirect(new URL("/home", req.url));
-  }
+  // if (isLoggedIn && pathname === "/") {
+  //   return NextResponse.redirect(new URL("/home", req.url));
+  // }
 
   return NextResponse.next();
 });

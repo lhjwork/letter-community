@@ -32,6 +32,7 @@ export const authConfig = {
   pages: {
     signIn: "/",
   },
+  trustHost: true,
   callbacks: {
     authorized() {
       return true; // 모든 페이지 접근 허용
