@@ -6,7 +6,7 @@ export const runtime = "edge";
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 /**
- * OG 이미지 자동 생성 API
+ * OG 이미지 고정 포맷 생성 API (MVP)
  * URL: /api/og?letterId=xxx
  */
 export async function GET(request: NextRequest) {
@@ -26,10 +26,13 @@ export async function GET(request: NextRequest) {
 
     const { data: letter } = await response.json();
 
-    const bgColor = letter.ogBgColor || "#FFF5F5";
-    const gradientColor = adjustColor(bgColor, -10);
+    const ogTitle = letter.ogTitle || "당신에게 도착한 편지";
+    const ogPreviewText =
+      letter.ogPreviewText ||
+      letter.content?.slice(0, 60) ||
+      "특별한 편지가 도착했습니다.";
 
-    // OG 이미지 생성 (엽서 형태)
+    // 고정 포맷 OG 이미지 생성
     return new ImageResponse(
       (
         <div
@@ -40,79 +43,75 @@ export async function GET(request: NextRequest) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: bgColor,
-            backgroundImage: `linear-gradient(135deg, ${bgColor} 0%, ${gradientColor} 100%)`,
+            backgroundColor: "#FFF5F5",
+            backgroundImage:
+              "linear-gradient(135deg, #FFF5F5 0%, #FFE4E1 100%)",
             padding: "60px",
             fontFamily: "sans-serif",
           }}
         >
+          {/* 브랜드 로고/타이틀 */}
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              backgroundColor: "white",
-              borderRadius: "24px",
-              padding: "60px",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-              maxWidth: "900px",
-              border: "2px solid #FFB6C1",
+              fontSize: "32px",
+              fontWeight: "bold",
+              color: "#FF6B9D",
+              marginBottom: "40px",
+              letterSpacing: "2px",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: "40px",
-                right: "40px",
-                width: "80px",
-                height: "80px",
-                border: "3px dashed #FFB6C1",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "40px",
-              }}
-            >
-              💌
-            </div>
+            LETTER
+          </div>
 
+          {/* 중앙 봉투 일러스트 */}
+          <div
+            style={{
+              fontSize: "120px",
+              marginBottom: "40px",
+            }}
+          >
+            💌
+          </div>
+
+          {/* 편지 제목 */}
+          {ogTitle && (
             <div
               style={{
-                fontSize: letter.ogFontSize || 48,
+                fontSize: "48px",
                 fontWeight: "bold",
                 color: "#333",
                 textAlign: "center",
-                marginBottom: "30px",
-                lineHeight: 1.4,
+                marginBottom: "20px",
+                maxWidth: "900px",
               }}
             >
-              {letter.ogPreviewMessage ||
-                letter.title ||
-                "당신에게 도착한 편지"}
+              {ogTitle}
             </div>
+          )}
 
-            {letter.ogIllustration && (
-              <div
-                style={{
-                  fontSize: "80px",
-                  textAlign: "center",
-                  marginBottom: "20px",
-                }}
-              >
-                {letter.ogIllustration}
-              </div>
-            )}
+          {/* 편지 미리보기 텍스트 */}
+          <div
+            style={{
+              fontSize: "28px",
+              color: "#666",
+              textAlign: "center",
+              maxWidth: "800px",
+              lineHeight: 1.5,
+            }}
+          >
+            {ogPreviewText}
+          </div>
 
-            <div
-              style={{
-                fontSize: "24px",
-                color: "#999",
-                textAlign: "center",
-                marginTop: "20px",
-              }}
-            >
-              Letter Community
-            </div>
+          {/* 하단 안내 */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: "40px",
+              fontSize: "20px",
+              color: "#999",
+            }}
+          >
+            편지를 확인하려면 클릭하세요
           </div>
         </div>
       ),
@@ -125,19 +124,4 @@ export async function GET(request: NextRequest) {
     console.error("OG Image generation error:", error);
     return new Response("Failed to generate image", { status: 500 });
   }
-}
-
-// 색상 밝기 조절 헬퍼 함수
-function adjustColor(color: string, amount: number): string {
-  const clamp = (num: number) => Math.min(Math.max(num, 0), 255);
-
-  if (color.startsWith("#")) {
-    const hex = color.slice(1);
-    const num = parseInt(hex, 16);
-    const r = clamp((num >> 16) + amount);
-    const g = clamp(((num >> 8) & 0x00ff) + amount);
-    const b = clamp((num & 0x0000ff) + amount);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-  }
-  return color;
 }

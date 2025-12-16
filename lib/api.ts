@@ -104,17 +104,38 @@ export async function unlinkOAuthAccount(token: string, provider: string) {
 export { BACKEND_URL };
 
 /**
- * 편지 등록
+ * 사연 등록 (story)
+ * 백엔드 엔드포인트: POST /api/letters/story
  */
-export async function createLetter(
+export async function createStory(
   data: {
     title: string;
     content: string;
     authorName: string;
+    category?: string; // AI 분류 카테고리
   },
   token?: string
-) {
-  return apiRequest("/api/letters", {
+): Promise<{ data: { _id: string } }> {
+  return apiRequest("/api/letters/story", {
+    method: "POST",
+    token,
+    body: JSON.stringify(data),
+  });
+}
+
+/**
+ * 친구에게 편지 보내기 (friend)
+ * TODO: 백엔드 엔드포인트 확인 필요
+ */
+export async function sendLetterToFriend(
+  data: {
+    receiverEmail: string;
+    title: string;
+    content: string;
+  },
+  token?: string
+): Promise<{ data: { _id: string } }> {
+  return apiRequest("/api/letters/friend", {
     method: "POST",
     token,
     body: JSON.stringify(data),
@@ -178,6 +199,15 @@ export interface Letter {
   ogBgColor?: string;
   ogIllustration?: string;
   ogFontSize?: number;
+  // AI 분류 필드
+  category?: string;
+  aiMetadata?: {
+    confidence: number;
+    reason: string;
+    tags: string[];
+    classifiedAt: string;
+    model: string;
+  };
 }
 
 export interface GetMyLettersResponse {
@@ -207,5 +237,32 @@ export async function deleteLetter(
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
     token,
+  });
+}
+
+/**
+ * 사연 목록 조회 (공개 사연만)
+ */
+export async function getStories(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+}): Promise<{
+  success: boolean;
+  data: Letter[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}> {
+  const queryParams = new URLSearchParams();
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.search) queryParams.append("search", params.search);
+
+  return apiRequest(`/api/letters/stories?${queryParams.toString()}`, {
+    method: "GET",
   });
 }

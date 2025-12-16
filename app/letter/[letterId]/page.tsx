@@ -1,138 +1,101 @@
-"use client";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import LetterDetailClient from "./LetterDetailClient";
 
-import { useEffect, useState } from "react";
-import { useParams, notFound } from "next/navigation";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 interface Letter {
   _id: string;
-  title: string;
+  type: "story" | "friend";
+  senderUserId?: string;
+  receiverEmail?: string;
   content: string;
-  authorName: string;
-  ogPreviewMessage?: string;
-  ogImageUrl?: string;
-  ogImageType?: "auto" | "custom";
+  ogTitle?: string;
+  ogPreviewText: string;
+  status: string;
+  physicalRequested: boolean;
+  address?: {
+    name: string;
+    phone: string;
+    zipCode: string;
+    address1: string;
+    address2: string;
+  };
   createdAt: string;
 }
 
-export default function LetterDetailPage() {
-  const params = useParams();
-  const letterId = params.letterId as string;
-  const [letter, setLetter] = useState<Letter | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+async function getLetter(letterId: string): Promise<Letter | null> {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`, {
+      cache: "no-store",
+    });
 
-  useEffect(() => {
-    async function fetchLetter() {
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`);
-        if (!response.ok) {
-          setLetter(null);
-          return;
-        }
-        const { data } = await response.json();
-        setLetter(data);
-      } catch (error) {
-        console.error("Failed to fetch letter:", error);
-        setLetter(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+    if (!response.ok) return null;
 
-    fetchLetter();
-  }, [letterId]);
-
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/letter/${letterId}`;
-    navigator.clipboard.writeText(url);
-    alert("링크가 클립보드에 복사되었습니다!");
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-50 to-purple-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
-        </div>
-      </div>
-    );
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch letter:", error);
+    return null;
   }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ letterId: string }>;
+}): Promise<Metadata> {
+  const { letterId } = await params;
+  const letter = await getLetter(letterId);
 
   if (!letter) {
-    return notFound();
+    return {
+      title: "편지를 찾을 수 없습니다",
+    };
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-purple-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* 뒤로가기 버튼 */}
-        <div className="mb-6">
-          <a href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>목록으로</span>
-          </a>
-        </div>
+  const ogImageUrl = `${
+    process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
+  }/api/og?letterId=${letterId}`;
+  const title = letter.ogTitle || "당신에게 도착한 편지";
+  const description = letter.ogPreviewText || "특별한 편지가 도착했습니다.";
 
-        {/* 편지 내용 */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-pink-200 p-8 md:p-12">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
-              {letter.title}
-            </h1>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span>작성자: {letter.authorName}</span>
-              <span>•</span>
-              <span>
-                {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
-          </div>
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
+  };
+}
 
-          <div className="prose prose-lg max-w-none prose-headings:font-bold prose-p:leading-relaxed prose-img:rounded-lg prose-img:shadow-md" dangerouslySetInnerHTML={{ __html: letter.content }} />
+export default async function LetterDetailPage({
+  params,
+}: {
+  params: Promise<{ letterId: string }>;
+}) {
+  const { letterId } = await params;
+  const letter = await getLetter(letterId);
 
-          {/* 액션 버튼들 */}
-          <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap gap-4">
-            <a href={`/letter/${letterId}/custom-og`} className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium">
-              <span>✨</span>
-              <span>공유 이미지 편집</span>
-            </a>
-            <a
-              href={`/api/og?letterId=${letterId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-            >
-              <span>🖼️</span>
-              <span>OG 이미지 보기</span>
-            </a>
-          </div>
-        </div>
+  if (!letter) {
+    notFound();
+  }
 
-        {/* 공유 정보 */}
-        <div className="mt-6 bg-white rounded-xl shadow-md p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">이 편지 공유하기</h3>
-          <div className="flex items-center gap-3">
-            <input
-              type="text"
-              readOnly
-              value={`${typeof window !== "undefined" ? window.location.origin : ""}/letter/${letterId}`}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
-              onClick={(e) => e.currentTarget.select()}
-            />
-            <button onClick={handleCopyLink} className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium whitespace-nowrap">
-              복사
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <LetterDetailClient letter={letter} />;
 }

@@ -349,6 +349,81 @@ curl -X DELETE http://localhost:5001/api/letters/LETTER_ID \
 
 ---
 
+---
+
+### 3. 공개 사연 목록 조회
+
+**Endpoint:** `GET /api/letters/stories`
+
+**Headers:**
+
+```
+Content-Type: application/json
+```
+
+**Query Parameters:**
+
+- `page` (optional): 페이지 번호 (기본값: 1)
+- `limit` (optional): 페이지당 항목 수 (기본값: 20, 최대: 100)
+- `search` (optional): 검색어 (제목, 내용, 작성자명)
+- `sort` (optional): 정렬 방식 (latest, oldest, popular)
+
+**설명:**
+
+- type이 "story"인 공개 사연만 조회
+- 인증 불필요 (누구나 조회 가능)
+- 페이지네이션, 검색, 정렬 지원
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "story_id_1",
+      "type": "story",
+      "title": "엄마에게 보내는 편지",
+      "content": "엄마, 항상 고마워요...",
+      "authorName": "딸",
+      "ogTitle": "엄마에게 보내는 편지",
+      "ogPreviewText": "엄마, 항상 고마워요. 말로 표현하지 못했지만...",
+      "ogImageUrl": "https://example.com/og/story_id_1.png",
+      "ogImageType": "auto",
+      "status": "written",
+      "createdAt": "2025-12-17T10:30:00.000Z",
+      "updatedAt": "2025-12-17T10:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 45,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  }
+}
+```
+
+**Error Responses:**
+
+```json
+// 400 Bad Request
+{
+  "success": false,
+  "message": "Invalid page or limit parameter"
+}
+
+// 500 Internal Server Error
+{
+  "success": false,
+  "message": "사연 목록을 불러오는데 실패했습니다"
+}
+```
+
+---
+
 ## 환경 변수
 
 ```env
@@ -356,3 +431,9 @@ JWT_SECRET=your-jwt-secret-key
 MONGODB_URI=mongodb://localhost:27017/letter-community
 PORT=5001
 ```
+
+---
+
+## 상세 구현 가이드
+
+사연 목록 API의 상세한 구현 방법은 `BACKEND_STORIES_API_PROMPT.md` 파일을 참고하세요.
