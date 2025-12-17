@@ -105,13 +105,15 @@ export { BACKEND_URL };
 
 /**
  * 사연 등록 (story)
- * 백엔드 엔드포인트: POST /api/letters/story
+ * 백엔드 엔드포인트: POST /api/letters (type: "story")
  */
 export async function createStory(
   data: {
     title: string;
     content: string;
     authorName: string;
+    ogTitle?: string;
+    ogPreviewText?: string;
     category?: string; // AI 분류 카테고리
     aiMetadata?: {
       confidence: number;
@@ -123,29 +125,37 @@ export async function createStory(
   },
   token?: string
 ): Promise<{ data: { _id: string } }> {
-  return apiRequest("/api/letters/story", {
+  return apiRequest("/api/letters", {
     method: "POST",
     token,
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      type: "story",
+    }),
   });
 }
 
 /**
  * 친구에게 편지 보내기 (friend)
- * TODO: 백엔드 엔드포인트 확인 필요
+ * 백엔드 엔드포인트: POST /api/letters (type: "friend")
  */
 export async function sendLetterToFriend(
   data: {
     receiverEmail: string;
     title: string;
     content: string;
+    ogTitle?: string;
+    ogPreviewText?: string;
   },
   token?: string
 ): Promise<{ data: { _id: string } }> {
-  return apiRequest("/api/letters/friend", {
+  return apiRequest("/api/letters", {
     method: "POST",
     token,
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      type: "friend",
+    }),
   });
 }
 

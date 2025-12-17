@@ -119,11 +119,16 @@ export default function WritePage() {
         }
 
         // 2. 사연 등록 (카테고리 포함)
+        const ogPreviewText =
+          plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+
         result = await createStory(
           {
             title: title.trim(),
             content: plainContent,
             authorName: author.trim(),
+            ogTitle: title.trim(),
+            ogPreviewText,
             category: aiCategory,
             aiMetadata,
           },
@@ -132,11 +137,16 @@ export default function WritePage() {
         alert(`사연이 "${aiCategory}" 카테고리로 등록되었습니다! 💌`);
       } else {
         // 편지 보내기
+        const ogPreviewText =
+          plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+
         result = await sendLetterToFriend(
           {
             receiverEmail: receiverEmail.trim(),
             title: title.trim(),
             content: plainContent,
+            ogTitle: title.trim(),
+            ogPreviewText,
           },
           token
         );
