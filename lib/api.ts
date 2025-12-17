@@ -113,6 +113,13 @@ export async function createStory(
     content: string;
     authorName: string;
     category?: string; // AI 분류 카테고리
+    aiMetadata?: {
+      confidence: number;
+      reason: string;
+      tags: string[];
+      classifiedAt: string;
+      model: string;
+    };
   },
   token?: string
 ): Promise<{ data: { _id: string } }> {

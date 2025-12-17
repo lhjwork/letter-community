@@ -77,17 +77,59 @@ export default function WritePage() {
       let result: { data: { _id: string } } | undefined;
 
       if (letterType === "story") {
-        // 사연 등록 (POST /api/letters/story)
+        // 1. AI로 카테고리 자동 분류
+        let aiCategory = "기타";
+        let aiMetadata:
+          | {
+              confidence: number;
+              reason: string;
+              tags: string[];
+              classifiedAt: string;
+              model: string;
+            }
+          | undefined = undefined;
+
+        try {
+          const categoryResponse = await fetch("/api/ai/categorize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: title.trim(),
+              content: plainContent,
+            }),
+          });
+
+          const categoryResult = await categoryResponse.json();
+
+          if (categoryResult.success) {
+            aiCategory = categoryResult.data.category;
+            aiMetadata = {
+              confidence: categoryResult.data.confidence,
+              reason: categoryResult.data.reason,
+              tags: categoryResult.data.tags,
+              classifiedAt: new Date().toISOString(),
+              model: "gemini-1.5-flash",
+            };
+          } else if (categoryResult.fallback) {
+            aiCategory = categoryResult.fallback.category;
+          }
+        } catch (error) {
+          console.error("AI 분류 실패:", error);
+          // AI 실패해도 계속 진행 (기본 카테고리 사용)
+        }
+
+        // 2. 사연 등록 (카테고리 포함)
         result = await createStory(
           {
             title: title.trim(),
             content: plainContent,
             authorName: author.trim(),
-            category: "기타", // TODO: AI 자동 분류 (추후 활성화)
+            category: aiCategory,
+            aiMetadata,
           },
           token
         );
-        alert("사연이 성공적으로 등록되었습니다! 💌");
+        alert(`사연이 "${aiCategory}" 카테고리로 등록되었습니다! 💌`);
       } else {
         // 편지 보내기
         result = await sendLetterToFriend(
@@ -292,7 +334,9 @@ export default function WritePage() {
             className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting
-              ? "전송 중..."
+              ? letterType === "story"
+                ? "AI 분류 중..."
+                : "전송 중..."
               : letterType === "story"
               ? "사연 제출하기"
               : "편지 보내기"}
