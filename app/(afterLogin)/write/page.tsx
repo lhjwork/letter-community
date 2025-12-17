@@ -7,13 +7,8 @@ import { EditorContent } from "@tiptap/react";
 import { createStory, sendLetterToFriend } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { classifyCategory } from "@/lib/categoryClassifier";
 
 type LetterType = "story" | "friend";
 
@@ -30,10 +25,7 @@ export default function WritePage() {
   const editor = useLetterEditor({
     content,
     onChange: setContent,
-    placeholder:
-      letterType === "story"
-        ? "여기에 당신의 이야기를 작성해주세요..."
-        : "여기에 당신의 마음을 담아주세요...",
+    placeholder: letterType === "story" ? "여기에 당신의 이야기를 작성해주세요..." : "여기에 당신의 마음을 담아주세요...",
   });
 
   const handleSubmit = async () => {
@@ -77,50 +69,20 @@ export default function WritePage() {
       let result: { data: { _id: string } } | undefined;
 
       if (letterType === "story") {
-        // 1. AI로 카테고리 자동 분류
-        let aiCategory = "기타";
-        let aiMetadata:
-          | {
-              confidence: number;
-              reason: string;
-              tags: string[];
-              classifiedAt: string;
-              model: string;
-            }
-          | undefined = undefined;
+        // 1. 프론트엔드에서 키워드 기반 카테고리 자동 분류
+        const classificationResult = classifyCategory(title.trim(), plainContent);
 
-        try {
-          const categoryResponse = await fetch("/api/ai/categorize", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              title: title.trim(),
-              content: plainContent,
-            }),
-          });
-
-          const categoryResult = await categoryResponse.json();
-
-          if (categoryResult.success) {
-            aiCategory = categoryResult.data.category;
-            aiMetadata = {
-              confidence: categoryResult.data.confidence,
-              reason: categoryResult.data.reason,
-              tags: categoryResult.data.tags,
-              classifiedAt: new Date().toISOString(),
-              model: "gemini-1.5-flash",
-            };
-          } else if (categoryResult.fallback) {
-            aiCategory = categoryResult.fallback.category;
-          }
-        } catch (error) {
-          console.error("AI 분류 실패:", error);
-          // AI 실패해도 계속 진행 (기본 카테고리 사용)
-        }
+        const aiCategory = classificationResult.category;
+        const aiMetadata = {
+          confidence: classificationResult.confidence,
+          reason: classificationResult.reason,
+          tags: classificationResult.tags,
+          classifiedAt: new Date().toISOString(),
+          model: "keyword-based-frontend",
+        };
 
         // 2. 사연 등록 (카테고리 포함)
-        const ogPreviewText =
-          plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+        const ogPreviewText = plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
         result = await createStory(
           {
@@ -137,8 +99,7 @@ export default function WritePage() {
         alert(`사연이 "${aiCategory}" 카테고리로 등록되었습니다! 💌`);
       } else {
         // 편지 보내기
-        const ogPreviewText =
-          plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+        const ogPreviewText = plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
         result = await sendLetterToFriend(
           {
@@ -150,9 +111,7 @@ export default function WritePage() {
           },
           token
         );
-        alert(
-          "편지가 성공적으로 전송되었습니다! 💌\n받는 사람에게 이메일이 발송됩니다."
-        );
+        alert("편지가 성공적으로 전송되었습니다! 💌\n받는 사람에게 이메일이 발송됩니다.");
       }
 
       // 편지 상세 페이지로 이동
@@ -163,11 +122,7 @@ export default function WritePage() {
       }
     } catch (error) {
       console.error("등록 실패:", error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : "등록에 실패했습니다. 다시 시도해주세요."
-      );
+      alert(error instanceof Error ? error.message : "등록에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
@@ -192,27 +147,14 @@ export default function WritePage() {
       <main className="w-full flex flex-col items-center py-16 px-4 sm:px-8">
         {/* 페이지 타이틀 */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            {letterType === "story"
-              ? "당신의 사연을 들려주세요"
-              : "친구에게 편지 쓰기"}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            {letterType === "story"
-              ? "특별한 이야기를 사연으로 남겨보세요"
-              : "소중한 사람에게 마음을 전하세요"}
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">{letterType === "story" ? "당신의 사연을 들려주세요" : "친구에게 편지 쓰기"}</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">{letterType === "story" ? "특별한 이야기를 사연으로 남겨보세요" : "소중한 사람에게 마음을 전하세요"}</p>
         </div>
 
         {/* 타입 선택 */}
         <div className="w-full max-w-4xl mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            편지 유형
-          </label>
-          <Select
-            value={letterType}
-            onValueChange={(value) => setLetterType(value as LetterType)}
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-2">편지 유형</label>
+          <Select value={letterType} onValueChange={(value) => setLetterType(value as LetterType)}>
             <SelectTrigger className="w-full h-12 text-base">
               <SelectValue placeholder="편지 유형을 선택하세요" />
             </SelectTrigger>
@@ -257,21 +199,13 @@ export default function WritePage() {
           >
             {/* 편지 헤더 */}
             <div className="mb-8">
-              <div className="text-right text-sm text-gray-500 mb-2">
-                {today}
-              </div>
-              <div className="text-left text-base text-gray-700 mb-4">
-                {letterType === "story"
-                  ? "To Letter"
-                  : `To ${receiverEmail || "..."}`}
-              </div>
+              <div className="text-right text-sm text-gray-500 mb-2">{today}</div>
+              <div className="text-left text-base text-gray-700 mb-4">{letterType === "story" ? "To Letter" : `To ${receiverEmail || "..."}`}</div>
 
               {/* 받는 사람 이메일 (편지 타입일 때만) */}
               {letterType === "friend" && (
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    받는 사람 이메일
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">받는 사람 이메일</label>
                   <input
                     type="email"
                     value={receiverEmail}
@@ -319,9 +253,7 @@ export default function WritePage() {
                 </>
               ) : (
                 <>
-                  <span className="text-gray-600">
-                    From. {session?.user?.name || "익명"}
-                  </span>
+                  <span className="text-gray-600">From. {session?.user?.name || "익명"}</span>
                   <span className="ml-2 text-2xl">💌</span>
                 </>
               )}
@@ -343,13 +275,7 @@ export default function WritePage() {
             disabled={isSubmitting}
             className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting
-              ? letterType === "story"
-                ? "AI 분류 중..."
-                : "전송 중..."
-              : letterType === "story"
-              ? "사연 제출하기"
-              : "편지 보내기"}
+            {isSubmitting ? (letterType === "story" ? "AI 분류 중..." : "전송 중...") : letterType === "story" ? "사연 제출하기" : "편지 보내기"}
           </button>
         </div>
 
@@ -357,9 +283,7 @@ export default function WritePage() {
         {letterType === "friend" && (
           <div className="mt-8 max-w-2xl text-center text-sm text-gray-500">
             <p>💡 편지를 보내면 받는 사람의 이메일로 링크가 전송됩니다.</p>
-            <p className="mt-2">
-              링크를 클릭하면 웹에서 편지를 확인할 수 있습니다.
-            </p>
+            <p className="mt-2">링크를 클릭하면 웹에서 편지를 확인할 수 있습니다.</p>
           </div>
         )}
       </main>
