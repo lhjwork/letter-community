@@ -19,23 +19,23 @@ export default function MyPage() {
       return;
     }
 
+    const fetchMyLetters = async () => {
+      try {
+        setIsLoading(true);
+        const token = session?.backendToken as string;
+        const response = await getMyLetters(token);
+        setLetters(response.data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "편지를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (status === "authenticated" && session?.backendToken) {
       fetchMyLetters();
     }
   }, [status, session, router]);
-
-  const fetchMyLetters = async () => {
-    try {
-      setIsLoading(true);
-      const token = session?.backendToken as string;
-      const response = await getMyLetters(token);
-      setLetters(response.data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "편지를 불러오는데 실패했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleDelete = async (letterId: string) => {
     if (!confirm("정말 이 편지를 삭제하시겠습니까?")) {
@@ -147,6 +147,27 @@ export default function MyPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* 메뉴 */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+            관리
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link href="/my-page/addresses" className="flex items-center gap-3 p-4 border border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-colors">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">배송지 관리</p>
+                <p className="text-sm text-gray-500">배송지 추가, 수정, 삭제</p>
+              </div>
+            </Link>
+          </div>
         </div>
 
         {/* 계정 정보 */}
