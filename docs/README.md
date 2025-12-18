@@ -13,11 +13,21 @@ docs/
 │   ├── DEBUG_VERCEL.md         # Vercel 디버깅 가이드
 │   └── QUICK_FIX_CHECKLIST.md  # 빠른 문제 해결 체크리스트
 ├── development/                 # 개발 관련 문서
+│   ├── backend/                # 백엔드 개발 문서
+│   │   ├── BACKEND_API_SPEC.md # 백엔드 API 명세서
+│   │   ├── BACKEND_QUICK_PROMPT.md # 백엔드 빠른 개발 프롬프트
+│   │   ├── BACKEND_STORIES_API_PROMPT.md # 사연 목록 API 프롬프트
+│   │   └── BACKEND_CATEGORY_CHANGE_PROMPT.md # 카테고리 분류 로직 변경 가이드
 │   ├── MVP_IMPLEMENTATION.md   # MVP 구현 가이드
 │   ├── OG_IMAGE_GUIDE.md       # OG 이미지 시스템 가이드
 │   ├── PAGES_GUIDE.md          # 페이지 구조 가이드
 │   └── STORIES_PAGE_GUIDE.md   # 사연 목록 페이지 가이드
 └── guides/                      # 디자인 & 협업 가이드
+    ├── ai/                     # AI 개발 프롬프트
+    │   ├── AI_BACKEND_PROMPT.md # AI 백엔드 개발 프롬프트
+    │   ├── AI_CATEGORY_BACKEND_PROMPT.md # AI 백엔드 카테고리 분류 프롬프트
+    │   ├── AI_CATEGORY_FRONTEND_PROMPT.md # AI 프론트엔드 카테고리 분류 프롬프트
+    │   └── AI_CATEGORY_IMPLEMENTATION_GUIDE.md # AI 자동 분류 구현 가이드
     ├── DESIGN_SYSTEM.md        # 디자인 시스템
     ├── WORKFLOW.md             # 개발 워크플로우
     ├── RESPONSIVE_GUIDE.md     # 반응형 디자인 가이드
@@ -103,6 +113,58 @@ docs/
 
 ### 2️⃣ 개발 (Development)
 
+#### 백엔드 개발 문서
+
+##### [백엔드 API 명세서](development/backend/BACKEND_API_SPEC.md)
+
+- 필요한 API 엔드포인트 정의
+- 요청/응답 스펙
+- 인증 방식
+
+**언제 읽어야 하나요?**
+
+- 백엔드 API를 구현할 때
+- 프론트엔드에서 API를 연동할 때
+
+---
+
+##### [백엔드 빠른 개발 프롬프트](development/backend/BACKEND_QUICK_PROMPT.md)
+
+- 공개 사연 목록 조회 API 구현 가이드
+- 빠른 개발을 위한 프롬프트
+
+**언제 읽어야 하나요?**
+
+- 백엔드 개발자가 빠르게 API를 구현해야 할 때
+
+---
+
+##### [사연 목록 API 프롬프트](development/backend/BACKEND_STORIES_API_PROMPT.md)
+
+- 사연 목록 조회 API 상세 구현 가이드
+- 페이지네이션, 검색, 정렬 기능 포함
+
+**언제 읽어야 하나요?**
+
+- 사연 목록 API를 구현할 때
+- 검색 및 필터 기능을 추가할 때
+
+---
+
+##### [카테고리 분류 로직 변경 가이드](development/backend/BACKEND_CATEGORY_CHANGE_PROMPT.md)
+
+- AI API에서 프론트엔드 키워드 기반 분류로 변경
+- 비용 최적화를 위한 로직 변경
+
+**언제 읽어야 하나요?**
+
+- 카테고리 분류 로직을 변경할 때
+- 비용 최적화가 필요할 때
+
+---
+
+#### 프론트엔드 개발 문서
+
 #### [MVP 구현 가이드](development/MVP_IMPLEMENTATION.md)
 
 - 전체 기능 개요
@@ -163,6 +225,55 @@ docs/
 ---
 
 ### 3️⃣ 가이드 (Guides)
+
+#### AI 개발 프롬프트
+
+##### [AI 백엔드 개발 프롬프트](guides/ai/AI_BACKEND_PROMPT.md)
+
+- Express.js + MongoDB 백엔드 API 구현 가이드
+- 프로젝트 구조 및 기본 설정
+
+**언제 읽어야 하나요?**
+
+- AI를 활용해 백엔드를 빠르게 구현할 때
+
+---
+
+##### [AI 백엔드 카테고리 분류 프롬프트](guides/ai/AI_CATEGORY_BACKEND_PROMPT.md)
+
+- Node.js + Express + MongoDB에 AI 자동 분류 기능 추가
+- 백엔드 AI 분류 로직 구현
+
+**언제 읽어야 하나요?**
+
+- 백엔드에 AI 카테고리 분류 기능을 추가할 때
+
+---
+
+##### [AI 프론트엔드 카테고리 분류 프롬프트](guides/ai/AI_CATEGORY_FRONTEND_PROMPT.md)
+
+- Next.js + Vercel AI SDK + Google Gemini 구현
+- 프론트엔드 AI 분류 기능
+
+**언제 읽어야 하나요?**
+
+- 프론트엔드에 AI 카테고리 분류 기능을 추가할 때
+
+---
+
+##### [AI 자동 분류 구현 가이드](guides/ai/AI_CATEGORY_IMPLEMENTATION_GUIDE.md)
+
+- Vercel AI SDK + Google Gemini 전체 구현 가이드
+- 백엔드와 프론트엔드 통합 구현
+
+**언제 읽어야 하나요?**
+
+- AI 자동 분류 기능을 처음부터 구현할 때
+- 전체적인 구현 흐름을 이해하고 싶을 때
+
+---
+
+#### 디자인 & 협업 가이드
 
 #### [디자인 시스템](guides/DESIGN_SYSTEM.md)
 
@@ -383,4 +494,4 @@ NAVER_CLIENT_SECRET=your-naver-client-secret
 
 ---
 
-**마지막 업데이트:** 2024년 12월 17일
+**마지막 업데이트:** 2024년 12월 18일
