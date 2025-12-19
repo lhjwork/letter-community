@@ -24,8 +24,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* 오른쪽: 링크들 */}
-          <div className="flex flex-col sm:flex-row gap-6 lg:gap-8">
+          {/* 오른쪽: 링크들 - TODO: 페이지 기획 완료 후 주석 해제 */}
+          {/* <div className="flex flex-col sm:flex-row gap-6 lg:gap-8">
             <div className="flex flex-col space-y-3">
               <h4 className="text-sm font-semibold text-gray-800 mb-1">서비스</h4>
               <Link href="/service" className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 hover:translate-x-1 transform">
@@ -45,7 +45,7 @@ export default function Footer() {
                 개인정보처리방침
               </Link>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* 하단 구분선 */}
