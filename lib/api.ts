@@ -8,10 +8,7 @@ interface ApiRequestOptions extends RequestInit {
 /**
  * 백엔드 API 호출 유틸리티
  */
-export async function apiRequest<T>(
-  endpoint: string,
-  options: ApiRequestOptions = {}
-): Promise<T> {
+export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
   const defaultHeaders: Record<string, string> = {
@@ -60,10 +57,7 @@ export async function getCurrentUser(token: string) {
 /**
  * 사용자 정보 업데이트
  */
-export async function updateUser(
-  token: string,
-  data: { name?: string; email?: string; image?: string }
-) {
+export async function updateUser(token: string, data: { name?: string; email?: string; image?: string }) {
   return apiRequest("/api/users/me", {
     method: "PUT",
     token,
@@ -235,9 +229,7 @@ export interface GetMyLettersResponse {
 /**
  * 내가 쓴 편지 목록 조회
  */
-export async function getMyLetters(
-  token: string
-): Promise<GetMyLettersResponse> {
+export async function getMyLetters(token: string): Promise<GetMyLettersResponse> {
   return apiRequest<GetMyLettersResponse>("/api/letters/my", {
     method: "GET",
     token,
@@ -247,39 +239,145 @@ export async function getMyLetters(
 /**
  * 편지 삭제
  */
-export async function deleteLetter(
-  letterId: string,
-  token: string
-): Promise<void> {
+export async function deleteLetter(letterId: string, token: string): Promise<void> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
     token,
   });
 }
 
-/**
- * 사연 목록 조회 (공개 사연만)
- */
-export async function getStories(params?: {
+// 사연 관련 타입
+export interface Story {
+  _id: string;
+  type: "story";
+  title: string;
+  content: string;
+  authorName: string;
+  category: string;
+  status: string;
+  viewCount: number;
+  likeCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface StoriesResponse {
+  success: boolean;
+  data: Story[];
+  pagination: Pagination;
+}
+
+export interface CategoryStats {
+  total: number;
+  categories: {
+    category: string;
+    count: number;
+    percentage: string;
+  }[];
+}
+
+export type SortOption = "latest" | "oldest" | "popular";
+
+export interface GetStoriesParams {
   page?: number;
   limit?: number;
   search?: string;
-}): Promise<{
-  success: boolean;
-  data: Letter[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}> {
+  sort?: SortOption;
+  category?: string;
+}
+
+/**
+ * 사연 목록 조회 (공개 사연만)
+ */
+export async function getStories(params?: GetStoriesParams): Promise<StoriesResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
   if (params?.search) queryParams.append("search", params.search);
+  if (params?.sort) queryParams.append("sort", params.sort);
+  if (params?.category) queryParams.append("category", params.category);
 
   return apiRequest(`/api/letters/stories?${queryParams.toString()}`, {
     method: "GET",
+  });
+}
+
+/**
+ * 카테고리 통계 조회
+ */
+export async function getCategoryStats(): Promise<{ success: boolean; data: CategoryStats }> {
+  return apiRequest("/api/letters/categories/stats", {
+    method: "GET",
+  });
+}
+
+// 좋아요 관련 타입
+export interface LikeStatus {
+  isLiked: boolean;
+  likeCount: number;
+}
+
+export interface LikeResponse {
+  success: boolean;
+  message?: string;
+  data: LikeStatus;
+}
+
+export interface MyLikesResponse {
+  success: boolean;
+  data: Story[];
+  pagination: Pagination;
+}
+
+/**
+ * 좋아요 추가
+ */
+export async function addLike(letterId: string, token: string): Promise<LikeResponse> {
+  return apiRequest(`/api/letters/${letterId}/like`, {
+    method: "POST",
+    token,
+  });
+}
+
+/**
+ * 좋아요 취소
+ */
+export async function removeLike(letterId: string, token: string): Promise<LikeResponse> {
+  return apiRequest(`/api/letters/${letterId}/like`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+/**
+ * 좋아요 상태 확인
+ */
+export async function checkLikeStatus(letterId: string, token: string): Promise<LikeResponse> {
+  return apiRequest(`/api/letters/${letterId}/like`, {
+    method: "GET",
+    token,
+  });
+}
+
+/**
+ * 내가 좋아요한 목록 조회
+ */
+export async function getMyLikes(token: string, params?: { page?: number; limit?: number }): Promise<MyLikesResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+  return apiRequest(`/api/users/me/likes?${queryParams.toString()}`, {
+    method: "GET",
+    token,
   });
 }
