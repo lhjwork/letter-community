@@ -10,7 +10,14 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({ story }: StoryCardProps) {
-  const theme = getCategoryTheme(story.category);
+  const theme = getCategoryTheme(story.category || "기타");
+
+  // 안전한 텍스트 추출 함수
+  const getPreviewText = (htmlContent?: string) => {
+    if (!htmlContent) return "내용이 없습니다.";
+    const text = htmlContent.replace(/<[^>]*>/g, "");
+    return text.length > 100 ? text.substring(0, 100) + "..." : text;
+  };
 
   return (
     <Link href={`/letter/${story._id}`} className="block">
@@ -29,13 +36,13 @@ export default function StoryCard({ story }: StoryCardProps) {
         )}
 
         {/* 제목 */}
-        <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-primary transition-colors mb-2">{story.title}</h3>
+        <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-primary transition-colors mb-2">{story.title || "제목 없음"}</h3>
 
         {/* 작성자 */}
-        <p className="text-sm text-gray-500 mb-3">{story.authorName}</p>
+        <p className="text-sm text-gray-500 mb-3">{story.authorName || "익명"}</p>
 
         {/* 본문 미리보기 */}
-        <p className="text-gray-600 text-sm line-clamp-3 mb-4">{story.content.replace(/<[^>]*>/g, "")}</p>
+        <p className="text-gray-600 text-sm line-clamp-3 mb-4">{getPreviewText(story.content)}</p>
 
         {/* 푸터 */}
         <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
@@ -54,7 +61,7 @@ export default function StoryCard({ story }: StoryCardProps) {
             </span>
             <LikeButton letterId={story._id} initialLikeCount={story.likeCount || 0} size="sm" showCount />
           </div>
-          <span>{new Date(story.createdAt).toLocaleDateString("ko-KR")}</span>
+          <span>{story.createdAt ? new Date(story.createdAt).toLocaleDateString("ko-KR") : "날짜 없음"}</span>
         </div>
       </div>
     </Link>

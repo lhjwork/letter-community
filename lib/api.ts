@@ -224,13 +224,20 @@ export interface Letter {
 export interface GetMyLettersResponse {
   success: boolean;
   data: Letter[];
+  pagination: Pagination;
 }
 
 /**
- * 내가 쓴 편지 목록 조회
+ * 내가 쓴 편지 목록 조회 (페이지네이션 지원)
  */
-export async function getMyLetters(token: string): Promise<GetMyLettersResponse> {
-  return apiRequest<GetMyLettersResponse>("/api/letters/my", {
+export async function getMyLetters(token: string, params?: { page?: number; limit?: number }): Promise<GetMyLettersResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+  const endpoint = params && (params.page || params.limit) ? `/api/letters/my?${queryParams.toString()}` : "/api/letters/my";
+
+  return apiRequest<GetMyLettersResponse>(endpoint, {
     method: "GET",
     token,
   });
@@ -250,15 +257,15 @@ export async function deleteLetter(letterId: string, token: string): Promise<voi
 export interface Story {
   _id: string;
   type: "story";
-  title: string;
-  content: string;
-  authorName: string;
-  category: string;
-  status: string;
-  viewCount: number;
-  likeCount: number;
+  title?: string;
+  content?: string;
+  authorName?: string;
+  category?: string;
+  status?: string;
+  viewCount?: number;
+  likeCount?: number;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface Pagination {
