@@ -130,26 +130,41 @@ export async function createStory(
 }
 
 /**
- * 친구에게 편지 보내기 (friend)
- * 백엔드 엔드포인트: POST /api/letters (type: "friend")
+ * 편지 생성 (URL 공유용)
+ * 백엔드 엔드포인트: POST /api/letters/create
  */
-export async function sendLetterToFriend(
+export async function createLetter(
   data: {
-    receiverEmail: string;
     title: string;
     content: string;
+    type: "friend" | "story";
     ogTitle?: string;
     ogPreviewText?: string;
+    authorName?: string; // 사연용
+    category?: string; // 사연용 AI 분류 카테고리
+    aiMetadata?: {
+      confidence: number;
+      reason: string;
+      tags: string[];
+      classifiedAt: string;
+      model: string;
+    };
   },
   token?: string
-): Promise<{ data: { _id: string } }> {
-  return apiRequest("/api/letters", {
+): Promise<{
+  message: string;
+  data: {
+    _id: string;
+    title: string;
+    url: string;
+    type: string;
+    createdAt: string;
+  };
+}> {
+  return apiRequest("/api/letters/create", {
     method: "POST",
     token,
-    body: JSON.stringify({
-      ...data,
-      type: "friend",
-    }),
+    body: JSON.stringify(data),
   });
 }
 
