@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
@@ -21,6 +21,8 @@ export default function WritePage() {
   const [author, setAuthor] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   // URL 공유 모달 상태
   const [showShareModal, setShowShareModal] = useState(false);
@@ -37,6 +39,62 @@ export default function WritePage() {
     onChange: setContent,
     placeholder: letterType === "story" ? "여기에 당신의 이야기를 작성해주세요..." : "여기에 당신의 마음을 담아주세요...",
   });
+
+  // 일반 편지에서 내용이 변경될 때마다 AI 제목 생성
+  useEffect(() => {
+    if (letterType === "friend" && content && !isEditingTitle) {
+      const plainContent = content.replace(/<[^>]*>/g, "").trim();
+
+      if (canGenerateTitle(plainContent)) {
+        const debounceTimer = setTimeout(async () => {
+          setIsGeneratingTitle(true);
+          try {
+            const generatedTitle = await generateTitle(plainContent);
+            setAiGeneratedTitle(generatedTitle);
+            setTitle(generatedTitle);
+          } catch (error) {
+            console.error("제목 생성 실패:", error);
+          } finally {
+            setIsGeneratingTitle(false);
+          }
+        }, 1000); // 1초 디바운스
+
+        return () => clearTimeout(debounceTimer);
+      }
+    }
+  }, [content, letterType, isEditingTitle]);
+
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    setIsEditingTitle(true);
+  };
+
+  const handleTitleBlur = () => {
+    // 제목 편집이 끝나면 잠시 후 다시 AI 생성 활성화
+    setTimeout(() => {
+      setIsEditingTitle(false);
+    }, 2000);
+  };
+
+  const regenerateTitle = async () => {
+    if (letterType === "friend" && content) {
+      const plainContent = content.replace(/<[^>]*>/g, "").trim();
+
+      if (canGenerateTitle(plainContent)) {
+        setIsGeneratingTitle(true);
+        try {
+          const generatedTitle = await generateTitle(plainContent);
+          setAiGeneratedTitle(generatedTitle);
+          setTitle(generatedTitle);
+          setIsEditingTitle(false);
+        } catch (error) {
+          console.error("제목 재생성 실패:", error);
+        } finally {
+          setIsGeneratingTitle(false);
+        }
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     // 내용 유효성 검사
@@ -59,9 +117,8 @@ export default function WritePage() {
         return;
       }
     } else {
-      // 일반 편지는 AI 제목 생성 가능 여부 확인
-      if (!canGenerateTitle(plainContent)) {
-        alert("편지 내용이 너무 짧습니다. 최소 10자 이상 작성해주세요.");
+      if (!title.trim()) {
+        alert("제목이 생성되지 않았습니다. 편지 내용을 더 작성해주세요.");
         return;
       }
     }
@@ -108,38 +165,27 @@ export default function WritePage() {
           router.push("/");
         }
       } else {
-        // 일반 편지 - AI 제목 생성 후 URL 공유
-        setIsGeneratingTitle(true);
+        // 일반 편지 - URL 공유
+        const ogPreviewText = plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
-        try {
-          // AI로 제목 생성
-          const generatedTitle = await generateTitle(plainContent);
-          const ogPreviewText = plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+        // 편지 생성
+        result = await createLetter(
+          {
+            title: title.trim(),
+            content: plainContent,
+            type: "friend",
+            ogTitle: title.trim(),
+            ogPreviewText,
+          },
+          token
+        );
 
-          // 편지 생성
-          result = await createLetter(
-            {
-              title: generatedTitle,
-              content: plainContent,
-              type: "friend",
-              ogTitle: generatedTitle,
-              ogPreviewText,
-            },
-            token
-          );
-
-          // 공유 모달 표시
-          setShareData({
-            url: result.data.url,
-            title: result.data.title,
-          });
-          setShowShareModal(true);
-        } catch (titleError) {
-          console.error("제목 생성 실패:", titleError);
-          alert("제목 생성에 실패했습니다. 다시 시도해주세요.");
-        } finally {
-          setIsGeneratingTitle(false);
-        }
+        // 공유 모달 표시
+        setShareData({
+          url: result.data.url,
+          title: result.data.title,
+        });
+        setShowShareModal(true);
       }
     } catch (error) {
       console.error("등록 실패:", error);
@@ -153,6 +199,8 @@ export default function WritePage() {
     setTitle("");
     setContent("");
     setAuthor("");
+    setAiGeneratedTitle("");
+    setIsEditingTitle(false);
     editor?.commands.clearContent();
   };
 
@@ -198,9 +246,9 @@ export default function WritePage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center gap-2 text-blue-700 mb-2">
                 <span>🤖</span>
-                <span className="font-medium">AI 제목 자동 생성 + URL 공유</span>
+                <span className="font-medium">AI 제목 자동 생성</span>
               </div>
-              <p className="text-sm text-blue-600">편지 내용을 바탕으로 제목을 자동 생성하고, 공유 가능한 링크를 만들어드립니다</p>
+              <p className="text-sm text-blue-600">편지 내용을 작성하면 AI가 자동으로 제목을 생성합니다. 마음에 들지 않으면 직접 수정할 수 있어요.</p>
             </div>
           </div>
         )}
@@ -242,30 +290,54 @@ export default function WritePage() {
               <div className="text-right text-sm text-gray-500 mb-2">{today}</div>
               <div className="text-left text-base text-gray-700 mb-4">{letterType === "story" ? "To Letter" : "To Someone Special"}</div>
 
-              {/* 제목 입력 (사연일 때만) */}
-              {letterType === "story" && (
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="제목을 입력하세요"
-                  className="w-full bg-transparent border-none outline-none text-xl font-semibold text-gray-800 placeholder-gray-400 mb-6"
-                  style={{
-                    fontFamily: "'Noto Sans KR', sans-serif",
-                    lineHeight: "28px",
-                  }}
-                />
-              )}
+              {/* 제목 입력 */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    onBlur={handleTitleBlur}
+                    placeholder={letterType === "story" ? "제목을 입력하세요" : "AI가 제목을 생성 중입니다..."}
+                    className="flex-1 bg-transparent border-none outline-none text-xl font-semibold text-gray-800 placeholder-gray-400"
+                    style={{
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                      lineHeight: "28px",
+                    }}
+                  />
 
-              {/* AI 제목 생성 안내 (일반 편지일 때만) */}
-              {letterType === "friend" && (
-                <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-700 flex items-center gap-2">
-                    <span>✨</span>
-                    AI가 편지 내용을 바탕으로 제목을 자동 생성합니다
-                  </p>
+                  {/* AI 제목 생성 관련 버튼들 (일반 편지일 때만) */}
+                  {letterType === "friend" && (
+                    <div className="flex items-center gap-2">
+                      {isGeneratingTitle && <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>}
+
+                      {aiGeneratedTitle && !isGeneratingTitle && (
+                        <button onClick={regenerateTitle} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 transition-colors" title="제목 다시 생성">
+                          🔄 재생성
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* AI 제목 생성 상태 표시 */}
+                {letterType === "friend" && (
+                  <div className="text-xs text-gray-500">
+                    {isGeneratingTitle ? (
+                      <span className="flex items-center gap-1">
+                        <span className="animate-pulse">🤖</span>
+                        AI가 제목을 생성하고 있습니다...
+                      </span>
+                    ) : aiGeneratedTitle ? (
+                      <span className="text-green-600">✨ AI가 생성한 제목입니다. 마음에 들지 않으면 직접 수정하세요.</span>
+                    ) : content.replace(/<[^>]*>/g, "").trim().length > 0 ? (
+                      <span className="text-orange-600">💡 더 많은 내용을 작성하면 더 좋은 제목을 생성할 수 있어요.</span>
+                    ) : (
+                      <span className="text-gray-400">편지 내용을 작성하면 AI가 제목을 자동으로 생성합니다.</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Tiptap 에디터 */}
@@ -299,29 +371,21 @@ export default function WritePage() {
           </div>
         </div>
 
-        {/* 로딩 상태 표시 */}
-        {isGeneratingTitle && (
-          <div className="mt-6 flex items-center gap-2 text-sm text-gray-500">
-            <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
-            AI가 제목을 생성하고 있습니다...
-          </div>
-        )}
-
         {/* 제출 버튼 */}
         <div className="mt-8 flex gap-4">
           <button
             onClick={handleReset}
-            disabled={isSubmitting || isGeneratingTitle}
+            disabled={isSubmitting}
             className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             초기화
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isSubmitting || isGeneratingTitle}
+            disabled={isSubmitting}
             className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting || isGeneratingTitle ? (letterType === "story" ? "AI 분류 중..." : "편지 생성 중...") : letterType === "story" ? "사연 제출하기" : "편지 만들기"}
+            {isSubmitting ? (letterType === "story" ? "AI 분류 중..." : "편지 생성 중...") : letterType === "story" ? "사연 제출하기" : "편지 만들기"}
           </button>
         </div>
 
