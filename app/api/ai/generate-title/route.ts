@@ -2,6 +2,9 @@ import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { z } from "zod";
 
+// Disable telemetry for Vercel AI SDK
+process.env.VERCEL_AI_TELEMETRY_OPT_OUT = "1";
+
 const TITLE_GENERATION_PROMPT = `
 편지 내용을 분석하여 적절한 제목을 생성해주세요.
 

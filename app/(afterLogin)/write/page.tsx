@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
@@ -22,7 +22,6 @@ export default function WritePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   // URL 공유 모달 상태
   const [showShareModal, setShowShareModal] = useState(false);
@@ -40,43 +39,8 @@ export default function WritePage() {
     placeholder: letterType === "story" ? "여기에 당신의 이야기를 작성해주세요..." : "여기에 당신의 마음을 담아주세요...",
   });
 
-  // 일반 편지에서 내용이 변경될 때마다 AI 제목 생성
-  useEffect(() => {
-    if (letterType === "friend" && content && !isEditingTitle) {
-      const plainContent = content.replace(/<[^>]*>/g, "").trim();
-
-      if (canGenerateTitle(plainContent)) {
-        const debounceTimer = setTimeout(async () => {
-          setIsGeneratingTitle(true);
-          try {
-            const generatedTitle = await generateTitle(plainContent);
-            setAiGeneratedTitle(generatedTitle);
-            setTitle(generatedTitle);
-          } catch (error) {
-            console.error("제목 생성 실패:", error);
-          } finally {
-            setIsGeneratingTitle(false);
-          }
-        }, 1000); // 1초 디바운스
-
-        return () => clearTimeout(debounceTimer);
-      }
-    }
-  }, [content, letterType, isEditingTitle]);
-
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    setIsEditingTitle(true);
-  };
-
-  const handleTitleBlur = () => {
-    // 제목 편집이 끝나면 잠시 후 다시 AI 생성 활성화
-    setTimeout(() => {
-      setIsEditingTitle(false);
-    }, 2000);
-  };
-
-  const regenerateTitle = async () => {
+  // AI 제목 생성 함수 (버튼 클릭 시 호출)
+  const generateAITitle = async () => {
     if (letterType === "friend" && content) {
       const plainContent = content.replace(/<[^>]*>/g, "").trim();
 
@@ -86,14 +50,24 @@ export default function WritePage() {
           const generatedTitle = await generateTitle(plainContent);
           setAiGeneratedTitle(generatedTitle);
           setTitle(generatedTitle);
-          setIsEditingTitle(false);
         } catch (error) {
-          console.error("제목 재생성 실패:", error);
+          console.error("제목 생성 실패:", error);
+          alert("제목 생성에 실패했습니다. 다시 시도해주세요.");
         } finally {
           setIsGeneratingTitle(false);
         }
+      } else {
+        alert("제목을 생성하기 위해서는 더 많은 내용을 작성해주세요.");
       }
     }
+  };
+
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+  };
+
+  const regenerateTitle = async () => {
+    await generateAITitle();
   };
 
   const handleSubmit = async () => {
@@ -117,9 +91,16 @@ export default function WritePage() {
         return;
       }
     } else {
+      // 일반 편지의 경우 제목이 없으면 사용자에게 안내
       if (!title.trim()) {
-        alert("제목이 생성되지 않았습니다. 편지 내용을 더 작성해주세요.");
-        return;
+        const shouldGenerate = confirm("제목이 없습니다. AI로 제목을 생성하시겠습니까?");
+        if (shouldGenerate) {
+          await generateAITitle();
+          return; // 제목 생성 후 다시 제출하도록 함
+        } else {
+          alert("제목을 입력하거나 AI 제목 생성을 사용해주세요.");
+          return;
+        }
       }
     }
 
@@ -200,7 +181,6 @@ export default function WritePage() {
     setContent("");
     setAuthor("");
     setAiGeneratedTitle("");
-    setIsEditingTitle(false);
     editor?.commands.clearContent();
   };
 
@@ -246,9 +226,9 @@ export default function WritePage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center gap-2 text-blue-700 mb-2">
                 <span>🤖</span>
-                <span className="font-medium">AI 제목 자동 생성</span>
+                <span className="font-medium">AI 제목 생성</span>
               </div>
-              <p className="text-sm text-blue-600">편지 내용을 작성하면 AI가 자동으로 제목을 생성합니다. 마음에 들지 않으면 직접 수정할 수 있어요.</p>
+              <p className="text-sm text-blue-600">편지 내용을 작성한 후 &ldquo;AI 제목 생성&rdquo; 버튼을 클릭하여 제목을 자동으로 생성할 수 있습니다.</p>
             </div>
           </div>
         )}
@@ -297,7 +277,6 @@ export default function WritePage() {
                     type="text"
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
-                    onBlur={handleTitleBlur}
                     placeholder={letterType === "story" ? "제목을 입력하세요" : "AI가 제목을 생성 중입니다..."}
                     className="flex-1 bg-transparent border-none outline-none text-xl font-semibold text-gray-800 placeholder-gray-400"
                     style={{
@@ -311,8 +290,17 @@ export default function WritePage() {
                     <div className="flex items-center gap-2">
                       {isGeneratingTitle && <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>}
 
+                      <button
+                        onClick={generateAITitle}
+                        disabled={isGeneratingTitle || !content.replace(/<[^>]*>/g, "").trim()}
+                        className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={"AI로 제목 생성"}
+                      >
+                        {isGeneratingTitle ? "생성 중..." : "🤖 AI 제목 생성"}
+                      </button>
+
                       {aiGeneratedTitle && !isGeneratingTitle && (
-                        <button onClick={regenerateTitle} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 transition-colors" title="제목 다시 생성">
+                        <button onClick={regenerateTitle} className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors" title={"제목 다시 생성"}>
                           🔄 재생성
                         </button>
                       )}
@@ -330,10 +318,8 @@ export default function WritePage() {
                       </span>
                     ) : aiGeneratedTitle ? (
                       <span className="text-green-600">✨ AI가 생성한 제목입니다. 마음에 들지 않으면 직접 수정하세요.</span>
-                    ) : content.replace(/<[^>]*>/g, "").trim().length > 0 ? (
-                      <span className="text-orange-600">💡 더 많은 내용을 작성하면 더 좋은 제목을 생성할 수 있어요.</span>
                     ) : (
-                      <span className="text-gray-400">편지 내용을 작성하면 AI가 제목을 자동으로 생성합니다.</span>
+                      <span className="text-gray-400">편지 내용을 작성한 후 &ldquo;AI 제목 생성&rdquo; 버튼을 클릭하세요.</span>
                     )}
                   </div>
                 )}
