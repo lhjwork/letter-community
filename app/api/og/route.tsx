@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
     const { data: letter } = await response.json();
 
     const ogTitle = letter.ogTitle || "당신에게 도착한 편지";
-    const ogPreviewText =
-      letter.ogPreviewText ||
-      letter.content?.slice(0, 60) ||
-      "특별한 편지가 도착했습니다.";
+
+    // HTML 태그 제거하여 순수 텍스트만 추출
+    const cleanContent = letter.content?.replace(/<[^>]*>/g, "").trim() || "";
+    const ogPreviewText = letter.ogPreviewText || cleanContent.slice(0, 60) + (cleanContent.length > 60 ? "..." : "") || "특별한 편지가 도착했습니다.";
 
     // 고정 포맷 OG 이미지 생성
     return new ImageResponse(
@@ -44,8 +44,7 @@ export async function GET(request: NextRequest) {
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: "#FFF5F5",
-            backgroundImage:
-              "linear-gradient(135deg, #FFF5F5 0%, #FFE4E1 100%)",
+            backgroundImage: "linear-gradient(135deg, #FFF5F5 0%, #FFE4E1 100%)",
             padding: "60px",
             fontFamily: "sans-serif",
           }}

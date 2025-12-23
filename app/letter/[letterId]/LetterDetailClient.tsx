@@ -33,41 +33,85 @@ export default function LetterDetailClient({ letter }: LetterDetailClientProps) 
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20 py-16 px-4">
       <div className="max-w-4xl mx-auto">
         {/* 편지 내용 */}
-        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-12 relative">
+        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
           {/* 편지지 장식 */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300"></div>
-          <div className="absolute left-6 top-8 w-3 h-3 bg-gray-200 rounded-full border border-gray-300"></div>
-          <div className="absolute left-6 top-16 w-3 h-3 bg-gray-200 rounded-full border border-gray-300"></div>
-          <div className="absolute left-6 top-24 w-3 h-3 bg-gray-200 rounded-full border border-gray-300"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+          <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
 
-          <div className="pl-8">
-            {/* 제목 */}
-            {letter.ogTitle && <h1 className="text-3xl font-bold text-gray-800 mb-8">{letter.ogTitle}</h1>}
+          {/* 편지지 내용 영역 */}
+          <div
+            className="pl-16 pr-8 py-12 min-h-[800px] relative"
+            style={{
+              backgroundImage: `repeating-linear-gradient(
+                transparent,
+                transparent 27px,
+                #e5e7eb 27px,
+                #e5e7eb 28px
+              )`,
+              backgroundSize: "100% 28px",
+              backgroundAttachment: "local",
+            }}
+          >
+            {/* 편지 헤더 */}
+            <div className="mb-8">
+              <div className="text-right text-sm text-gray-500 mb-2">
+                {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+              <div className="text-left text-base text-gray-700 mb-4">To Someone Special</div>
 
-            {/* 날짜 */}
-            <div className="text-sm text-gray-500 mb-8">
-              {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {/* 제목 */}
+              {letter.ogTitle && (
+                <div className="mb-6">
+                  <h1
+                    className="text-xl font-semibold text-gray-800"
+                    style={{
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                      lineHeight: "28px",
+                    }}
+                  >
+                    {letter.ogTitle}
+                  </h1>
+                </div>
+              )}
             </div>
 
             {/* 편지 본문 */}
-            <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed letter-content" style={{ lineHeight: "2" }} dangerouslySetInnerHTML={{ __html: letter.content }} />
-
-            {/* 좋아요 버튼 */}
-            <div className="mt-12 pt-8 border-t border-gray-200 flex items-center justify-center">
-              <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
-                <LikeButton letterId={letter._id} initialLikeCount={letter.likeCount || 0} size="lg" showCount />
-                <span className="text-gray-500 text-sm ml-2">좋아요</span>
-              </div>
+            <div className="relative z-10 mb-20">
+              <div
+                className="letter-content text-gray-800"
+                style={{
+                  fontFamily: "'Noto Sans KR', sans-serif",
+                  fontSize: "16px",
+                  lineHeight: "28px",
+                }}
+                dangerouslySetInnerHTML={{ __html: letter.content }}
+              />
             </div>
 
-            {/* 서명 */}
-            <div className="mt-8 text-right">
-              <span className="text-2xl">💌</span>
+            {/* 편지 마무리 */}
+            <div className="mt-12 flex justify-end items-center pb-8">
+              <span className="text-gray-600">From. Letter</span>
+              <span className="ml-2 text-2xl">💌</span>
             </div>
+          </div>
+        </div>
+
+        {/* 좋아요 버튼 */}
+        <div className="mt-8 flex items-center justify-center">
+          <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
+            <LikeButton letterId={letter._id} initialLikeCount={letter.likeCount || 0} size="lg" showCount />
+            <span className="text-gray-500 text-sm ml-2">좋아요</span>
           </div>
         </div>
 
