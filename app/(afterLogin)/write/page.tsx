@@ -77,7 +77,10 @@ export default function WritePage() {
       return;
     }
 
-    // HTML 태그 제거하여 순수 텍스트만 추출
+    // HTML 형식 그대로 사용
+    const htmlContent = content.trim();
+
+    // 미리보기용 일반 텍스트 (OG 이미지, 검색용)
     const plainContent = content.replace(/<[^>]*>/g, "").trim();
 
     // 타입별 유효성 검사
@@ -127,7 +130,7 @@ export default function WritePage() {
         result = await createStory(
           {
             title: title.trim(),
-            content: plainContent,
+            content: htmlContent,
             authorName: author.trim(),
             ogTitle: title.trim(),
             ogPreviewText,
@@ -153,7 +156,7 @@ export default function WritePage() {
         result = await createLetter(
           {
             title: title.trim(),
-            content: plainContent,
+            content: htmlContent,
             type: "friend",
             ogTitle: title.trim(),
             ogPreviewText,
