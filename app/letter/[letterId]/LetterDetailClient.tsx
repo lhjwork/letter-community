@@ -54,9 +54,7 @@ export default function LetterDetailClient({ letter }: LetterDetailClientProps) 
             </div>
 
             {/* 편지 본문 */}
-            <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap" style={{ lineHeight: "2" }}>
-              {letter.content}
-            </div>
+            <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed letter-content" style={{ lineHeight: "2" }} dangerouslySetInnerHTML={{ __html: letter.content }} />
 
             {/* 좋아요 버튼 */}
             <div className="mt-12 pt-8 border-t border-gray-200 flex items-center justify-center">
