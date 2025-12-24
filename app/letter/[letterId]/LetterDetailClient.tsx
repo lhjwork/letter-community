@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LikeButton } from "@/components/like";
+import PostcodeSearch, { PostcodeResult } from "@/components/address/PostcodeSearch";
 
 interface Letter {
   _id: string;
@@ -174,11 +175,27 @@ function AddressForm({ letterId, onClose }: { letterId: string; onClose: () => v
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Daum 주소 검색 완료 핸들러
+  const handleAddressComplete = (data: PostcodeResult) => {
+    setFormData((prev) => ({
+      ...prev,
+      zipCode: data.zipCode,
+      address1: data.address, // 도로명 주소 우선, 없으면 지번 주소
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.phone || !formData.zipCode || !formData.address1) {
       alert("필수 항목을 모두 입력해주세요.");
+      return;
+    }
+
+    // 연락처 형식 검증
+    const phoneRegex = /^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/;
+    if (!phoneRegex.test(formData.phone.replace(/-/g, ""))) {
+      alert("올바른 휴대폰 번호 형식을 입력해주세요. (예: 010-1234-5678)");
       return;
     }
 
@@ -194,13 +211,17 @@ function AddressForm({ letterId, onClose }: { letterId: string; onClose: () => v
         body: JSON.stringify({ address: formData }),
       });
 
-      if (!response.ok) throw new Error("신청 실패");
+      const result = await response.json();
 
-      alert("실물 편지 신청이 완료되었습니다! 💌");
+      if (!response.ok) {
+        throw new Error(result.error || "신청 실패");
+      }
+
+      alert("실물 편지 신청이 완료되었습니다! 💌\n\n배송까지 약 1~2주 소요될 수 있으며, 우편함을 확인해 주세요.");
       window.location.reload();
     } catch (error) {
       console.error("실물 편지 신청 실패:", error);
-      alert("신청에 실패했습니다. 다시 시도해주세요.");
+      alert(error instanceof Error ? error.message : "신청에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
@@ -228,20 +249,13 @@ function AddressForm({ letterId, onClose }: { letterId: string; onClose: () => v
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) => {
+                // 숫자와 하이픈만 허용
+                const value = e.target.value.replace(/[^\d-]/g, "");
+                setFormData({ ...formData, phone: value });
+              }}
               placeholder="010-1234-5678"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">우편번호 *</label>
-            <input
-              type="text"
-              value={formData.zipCode}
-              onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-              placeholder="12345"
+              maxLength={13}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
@@ -249,25 +263,26 @@ function AddressForm({ letterId, onClose }: { letterId: string; onClose: () => v
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">주소 *</label>
-            <input
-              type="text"
-              value={formData.address1}
-              onChange={(e) => setFormData({ ...formData, address1: e.target.value })}
-              placeholder="서울시 강남구 테헤란로 123"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">상세 주소</label>
-            <input
-              type="text"
-              value={formData.address2}
-              onChange={(e) => setFormData({ ...formData, address2: e.target.value })}
-              placeholder="101동 202호"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input type="text" value={formData.zipCode} readOnly placeholder="우편번호" className="w-32 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none" />
+                <PostcodeSearch onComplete={handleAddressComplete} buttonText="우편번호 찾기" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={formData.address1}
+                readOnly
+                placeholder="기본 주소 (우편번호 검색 후 자동 입력됩니다)"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none"
+              />
+              <input
+                type="text"
+                value={formData.address2}
+                onChange={(e) => setFormData({ ...formData, address2: e.target.value })}
+                placeholder="상세 주소 (동, 호수 등)"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
           </div>
 
           <div className="flex gap-4 pt-4">
