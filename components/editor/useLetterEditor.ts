@@ -14,24 +14,29 @@ interface UseLetterEditorProps {
   content: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  enableImages?: boolean; // 이미지 기능 활성화 여부
 }
 
-export function useLetterEditor({ content, onChange, placeholder = "여기에 당신의 이야기를 작성해주세요..." }: UseLetterEditorProps) {
+export function useLetterEditor({ content, onChange, placeholder = "여기에 당신의 이야기를 작성해주세요...", enableImages = true }: UseLetterEditorProps) {
+  // 기본 확장 기능들
+  const baseExtensions = [
+    StarterKit,
+    Placeholder.configure({
+      placeholder,
+    }),
+    TextAlign.configure({
+      types: enableImages ? ["heading", "paragraph", "image"] : ["heading", "paragraph"],
+    }),
+    TextStyle,
+    Color,
+    Highlight.configure({ multicolor: true }),
+    Underline,
+  ];
+
+  // 이미지 기능이 활성화된 경우에만 이미지 확장 추가
+  const extensions = enableImages ? [...baseExtensions, ResizableImage] : baseExtensions;
   return useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder,
-      }),
-      ResizableImage,
-      TextAlign.configure({
-        types: ["heading", "paragraph", "image"],
-      }),
-      TextStyle,
-      Color,
-      Highlight.configure({ multicolor: true }),
-      Underline,
-    ],
+    extensions,
     content,
     editorProps: {
       attributes: {

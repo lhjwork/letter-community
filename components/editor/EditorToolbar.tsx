@@ -7,9 +7,10 @@ import { useEffect, useState, useRef } from "react";
 
 interface EditorToolbarProps {
   editor: Editor | null;
+  enableImages?: boolean; // 이미지 기능 활성화 여부
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
+export function EditorToolbar({ editor, enableImages = true }: EditorToolbarProps) {
   // 에디터 상태 변경 시 강제 리렌더링을 위한 상태
   const [, forceUpdate] = useState(0);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -172,12 +173,14 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         </Button>
       </div>
 
-      <div className="flex items-center gap-1 border-r pr-2 mr-2">
-        <label className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
-          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-          <ImageIcon className="h-4 w-4" />
-        </label>
-      </div>
+      {enableImages && (
+        <div className="flex items-center gap-1 border-r pr-2 mr-2">
+          <label className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+            <ImageIcon className="h-4 w-4" />
+          </label>
+        </div>
+      )}
 
       <div className="flex items-center gap-3 border-l pl-2 ml-2">
         {/* Combined Color Picker (Text & Background) */}

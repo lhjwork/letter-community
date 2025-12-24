@@ -37,6 +37,7 @@ export default function WritePage() {
     content,
     onChange: setContent,
     placeholder: letterType === "story" ? "여기에 당신의 이야기를 작성해주세요..." : "여기에 당신의 마음을 담아주세요...",
+    enableImages: letterType === "story", // 사연에만 이미지 기능 활성화
   });
 
   // AI 제목 생성 함수 (버튼 클릭 시 호출)
@@ -240,7 +241,7 @@ export default function WritePage() {
         <div className="w-full max-w-4xl bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
           {/* 에디터 툴바 (상단 고정) */}
           <div className="relative z-20 bg-white border-b">
-            <EditorToolbar editor={editor} />
+            <EditorToolbar editor={editor} enableImages={letterType === "story"} />
           </div>
 
           {/* 편지지 구멍 (바인더 효과) */}
