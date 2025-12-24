@@ -95,15 +95,6 @@ export default function UserRequestsStatus({ requests, onRefresh }: UserRequests
                     </div>
                   </div>
                 )}
-
-                {/* 배송 추적 정보 */}
-                {request.shipping?.trackingNumber && (
-                  <div className="mt-3 p-3 bg-green-50 rounded border border-green-200">
-                    <div className="text-green-800 text-sm">
-                      <strong>배송 추적:</strong> {request.shipping.shippingCompany} - {request.shipping.trackingNumber}
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}

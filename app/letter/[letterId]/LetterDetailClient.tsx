@@ -59,26 +59,34 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
 
   const fetchUserRequests = useCallback(async () => {
     try {
-      const sessionId = getSessionId();
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
 
-      const response = await fetch(`${BACKEND_URL}/api/letters/${letter._id}/physical-requests/my-requests`, {
-        headers: {
-          "X-Session-ID": sessionId,
-        },
-        credentials: "include",
-      });
+      // 세션에서 저장된 신청 ID들을 가져와서 각각 조회
+      const sessionRequests = JSON.parse(localStorage.getItem("userRequests") || "[]");
+      const requests = [];
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setUserRequests(result.data.requests || []);
+      for (const requestId of sessionRequests) {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/letters/physical-requests/${requestId}/status`, {
+            credentials: "include",
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              requests.push(result.data);
+            }
+          }
+        } catch (error) {
+          console.error(`신청 ${requestId} 조회 실패:`, error);
         }
       }
+
+      setUserRequests(requests);
     } catch (error) {
       console.error("사용자 신청 목록 조회 실패:", error);
     }
-  }, [letter._id, getSessionId]);
+  }, [letter._id]);
 
   // 사용자의 신청 목록 조회 (컴포넌트 마운트 시)
   useEffect(() => {
@@ -314,15 +322,11 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
     setIsSubmitting(true);
 
     try {
-      const sessionId = localStorage.getItem("letterSessionId") || generateSessionId();
-      localStorage.setItem("letterSessionId", sessionId);
-
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
       const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Session-ID": sessionId,
         },
         credentials: "include",
         body: JSON.stringify({ address: formData }),
@@ -335,6 +339,11 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
       }
 
       if (result.success) {
+        // 신청 ID를 로컬 스토리지에 저장 (사용자 신청 추적용)
+        const existingRequests = JSON.parse(localStorage.getItem("userRequests") || "[]");
+        existingRequests.push(result.data.requestId);
+        localStorage.setItem("userRequests", JSON.stringify(existingRequests));
+
         alert(result.message);
         onSuccess();
       } else {

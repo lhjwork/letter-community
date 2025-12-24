@@ -45,7 +45,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
       const params = new URLSearchParams();
       if (filter !== "all") params.append("status", filter);
 
@@ -75,7 +75,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
 
   const handleApproval = async (requestId: string, action: "approve" | "reject", rejectionReason?: string) => {
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
       const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests/${requestId}/approval`, {
         method: "PATCH",
         headers: {
@@ -91,7 +91,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
         if (result.success) {
           fetchRequests(); // 목록 새로고침
           setSelectedRequest(null);
-          alert(action === "approve" ? "신청이 승인되었습니다." : "신청이 거절되었습니다.");
+          alert(result.message);
         }
       }
     } catch (error) {

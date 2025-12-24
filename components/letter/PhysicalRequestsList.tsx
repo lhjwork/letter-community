@@ -22,7 +22,7 @@ export default function PhysicalRequestsList({ letterId, stats, allowNewRequests
 
   const fetchApprovedRequests = useCallback(async () => {
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
       const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests/public?limit=${showAll ? 50 : 10}`, {
         credentials: "include",
       });
