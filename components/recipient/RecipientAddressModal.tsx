@@ -78,7 +78,7 @@ export default function RecipientAddressModal({ open, onOpenChange, letterId, ca
     } finally {
       setIsLoading(false);
     }
-  }, [token, letterId, isAuthor]);
+  }, [token, letterId, isAuthor]); // Remove unnecessary dependencies
 
   useEffect(() => {
     if (open) {
