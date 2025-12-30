@@ -1,8 +1,8 @@
-import { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse } from "@/types/recipient";
+import { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse, SimplePhysicalStatusResponse } from "@/types/recipient";
 import { apiRequest } from "./api";
 
 // 타입 재export
-export type { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse } from "@/types/recipient";
+export type { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse, SimplePhysicalStatusResponse } from "@/types/recipient";
 
 interface RecipientAddressListResponse {
   success: boolean;
@@ -14,7 +14,15 @@ interface RecipientResponse {
   data: RecipientAddress;
 }
 
-// RequestId 기반 배송 상태 조회 (새로 추가)
+// 간단한 실물 편지 상태 조회 (새로 추가)
+export async function getSimplePhysicalStatus(token: string, letterId: string): Promise<SimplePhysicalStatusResponse> {
+  return apiRequest<SimplePhysicalStatusResponse>(`/api/letters/${letterId}/physical-status/simple`, {
+    method: "GET",
+    token,
+  });
+}
+
+// RequestId 기반 배송 상태 조회 (기존 유지)
 export async function getPhysicalRequestStatus(requestId: string): Promise<PhysicalRequestStatusResponse> {
   return apiRequest<PhysicalRequestStatusResponse>(`/api/letters/physical-requests/${requestId}/status`, {
     method: "GET",

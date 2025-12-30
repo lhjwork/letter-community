@@ -81,7 +81,24 @@ export interface PhysicalRequestResponse {
   };
 }
 
-// RequestId 기반 배송 상태 조회 응답 타입 (새로 추가)
+// 간단한 실물 편지 상태 조회 응답 타입 (새로 추가)
+export interface SimplePhysicalStatusResponse {
+  success: boolean;
+  data: {
+    letterId: string;
+    letterTitle: string;
+    hasRequest: boolean;
+    currentStatus: {
+      status: "requested" | "approved" | "writing" | "sent" | "delivered";
+      statusLabel: string;
+      statusMessage: string;
+      lastUpdated: string;
+      estimatedDelivery?: string;
+    } | null;
+  };
+}
+
+// RequestId 기반 배송 상태 조회 응답 타입 (기존 유지)
 export interface PhysicalRequestStatusResponse {
   success: boolean;
   data: {
