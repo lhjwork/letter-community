@@ -1,10 +1,10 @@
-import { RecipientAddress, RecipientAddressInput } from "@/types/recipient";
+import { RecipientAddress, RecipientAddressInput, RecipientListResponse } from "@/types/recipient";
 import { apiRequest } from "./api";
 
 // 타입 재export
-export type { RecipientAddress, RecipientAddressInput } from "@/types/recipient";
+export type { RecipientAddress, RecipientAddressInput, RecipientListResponse } from "@/types/recipient";
 
-interface RecipientListResponse {
+interface RecipientAddressListResponse {
   success: boolean;
   data: RecipientAddress[];
 }
@@ -14,9 +14,17 @@ interface RecipientResponse {
   data: RecipientAddress;
 }
 
+// 편지 작성자용 수신자 목록 조회 (새로 추가된 API)
+export async function getLetterRecipients(token: string, letterId: string): Promise<RecipientListResponse> {
+  return apiRequest<RecipientListResponse>(`/api/letters/${letterId}/recipients`, {
+    method: "GET",
+    token,
+  });
+}
+
 // 편지의 수신자 주소 목록 조회
-export async function getRecipientAddresses(token: string, letterId: string): Promise<RecipientListResponse> {
-  return apiRequest<RecipientListResponse>(`/api/letters/${letterId}/recipient-addresses`, {
+export async function getRecipientAddresses(token: string, letterId: string): Promise<RecipientAddressListResponse> {
+  return apiRequest<RecipientAddressListResponse>(`/api/letters/${letterId}/recipient-addresses`, {
     method: "GET",
     token,
   });

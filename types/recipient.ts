@@ -21,6 +21,44 @@ export interface RecipientAddressInput {
   memo?: string;
 }
 
+// 편지 작성자용 수신자 목록 조회 응답 타입
+export interface RecipientListResponse {
+  success: boolean;
+  data: {
+    letterId: string;
+    letterTitle: string;
+    authorName: string;
+    totalRequests: number;
+    recipients: RecipientRequest[];
+    stats: {
+      total: number;
+      pending: number;
+      approved: number;
+      rejected: number;
+      completed: number;
+    };
+    authorSettings: {
+      allowPhysicalRequests: boolean;
+      autoApprove: boolean;
+      maxRequestsPerPerson: number;
+    };
+  };
+}
+
+export interface RecipientRequest {
+  requestId: string;
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  fullAddress: string;
+  status: "requested" | "approved" | "rejected" | "writing" | "sent" | "delivered";
+  requestedAt: string;
+  memo?: string;
+  sessionId: string; // 일부만 표시
+}
+
 // 편지 생성 시 수신자 주소 포함 타입
 export interface LetterWithRecipients {
   title: string;

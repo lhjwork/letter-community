@@ -371,7 +371,7 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
         )}
 
         {/* 수신자 주소 관리 모달 */}
-        <RecipientAddressModal open={showRecipientModal} onOpenChange={setShowRecipientModal} letterId={letter._id} canEdit={isAuthor} />
+        <RecipientAddressModal open={showRecipientModal} onOpenChange={setShowRecipientModal} letterId={letter._id} canEdit={isAuthor} isAuthor={isAuthor} />
 
         {/* 수신자 선택 모달 */}
         <RecipientSelectModal
