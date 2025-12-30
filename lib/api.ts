@@ -1,3 +1,5 @@
+import { RecipientAddressInput } from "@/types/recipient";
+
 // 클라이언트와 서버 모두에서 사용 가능하도록 NEXT_PUBLIC_ 환경 변수 사용
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -142,6 +144,7 @@ export async function createLetter(
     ogPreviewText?: string;
     authorName?: string; // 사연용
     category?: string; // 사연용 AI 분류 카테고리
+    recipientAddresses?: RecipientAddressInput[]; // 수신자 주소 목록
     aiMetadata?: {
       confidence: number;
       reason: string;

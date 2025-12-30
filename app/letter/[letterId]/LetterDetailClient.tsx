@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { LikeButton } from "@/components/like";
 import PostcodeSearch, { PostcodeResult } from "@/components/address/PostcodeSearch";
 import PhysicalRequestsList from "@/components/letter/PhysicalRequestsList";
 import AuthorRequestsManager from "@/components/letter/AuthorRequestsManager";
 import UserRequestsStatus from "@/components/letter/UserRequestsStatus";
+import RecipientAddressModal from "@/components/recipient/RecipientAddressModal";
+import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
+import { Button } from "@/components/ui/button";
+import { saveLetterRequest, getLetterRequests, cleanupOldRequests } from "@/lib/letter-requests";
 
 interface Letter {
   _id: string;
@@ -34,70 +38,152 @@ interface Letter {
 
 interface LetterDetailClientProps {
   letter: Letter;
-  currentUserId?: string; // 로그인한 사용자 ID
+  currentUserId?: string;
 }
 
 export default function LetterDetailClient({ letter, currentUserId }: LetterDetailClientProps) {
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showRecipientModal, setShowRecipientModal] = useState(false);
+  const [showRecipientSelect, setShowRecipientSelect] = useState(false);
   const [userRequests, setUserRequests] = useState<any[]>([]);
 
-  // 편지 작성자 여부를 직접 계산
   const isAuthor = currentUserId === letter.authorId;
+  const letterId = letter._id;
 
-  const generateSessionId = useCallback(() => {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36);
-  }, []);
-
-  const getSessionId = useCallback(() => {
-    let sessionId = localStorage.getItem("letterSessionId");
-    if (!sessionId) {
-      sessionId = generateSessionId();
-      localStorage.setItem("letterSessionId", sessionId);
-    }
-    return sessionId;
-  }, [generateSessionId]);
-
-  const fetchUserRequests = useCallback(async () => {
+  // 사용자 신청 목록 조회 함수
+  const loadUserRequests = useCallback(async () => {
     try {
       const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
 
-      // 세션에서 저장된 신청 ID들을 가져와서 각각 조회
-      const sessionRequests = JSON.parse(localStorage.getItem("userRequests") || "[]");
+      // 현재 편지에 대한 사용자 신청 목록을 직접 조회
+      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-request/user`, {
+        credentials: "include",
+        cache: "no-cache",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setUserRequests(result.data.requests || []);
+          return;
+        }
+      }
+
+      // API가 없는 경우 localStorage에서 편지별 신청 정보 조회
+      const letterRequests = getLetterRequests(letterId);
       const requests = [];
 
-      for (const requestId of sessionRequests) {
+      for (const letterRequest of letterRequests) {
         try {
-          const response = await fetch(`${BACKEND_URL}/api/letters/physical-requests/${requestId}/status`, {
+          const statusResponse = await fetch(`${BACKEND_URL}/api/letters/physical-requests/${letterRequest.requestId}/status`, {
             credentials: "include",
+            cache: "no-cache",
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
           });
 
-          if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-              requests.push(result.data);
+          if (statusResponse.ok) {
+            const statusResult = await statusResponse.json();
+            if (statusResult.success && statusResult.data.letterId === letterId) {
+              requests.push(statusResult.data);
             }
           }
         } catch (error) {
-          console.error(`신청 ${requestId} 조회 실패:`, error);
+          console.error(`신청 ${letterRequest.requestId} 조회 실패:`, error);
         }
       }
 
       setUserRequests(requests);
     } catch (error) {
       console.error("사용자 신청 목록 조회 실패:", error);
+      setUserRequests([]);
     }
-  }, [letter._id]);
+  }, [letterId]);
 
-  // 사용자의 신청 목록 조회 (컴포넌트 마운트 시)
+  // 컴포넌트 마운트 시 한 번만 정리 작업 수행
   useEffect(() => {
-    fetchUserRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [letter._id]);
+    cleanupOldRequests();
+  }, []);
 
-  const handleRequestSuccess = () => {
-    fetchUserRequests(); // 신청 목록 새로고침
+  // 편지 ID가 변경될 때 데이터 로드
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
+
+        // 현재 편지에 대한 사용자 신청 목록을 직접 조회
+        const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-request/user`, {
+          credentials: "include",
+          cache: "no-cache",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setUserRequests(result.data.requests || []);
+            return;
+          }
+        }
+
+        // API가 없는 경우 localStorage에서 편지별 신청 정보 조회
+        const letterRequests = getLetterRequests(letterId);
+        const requests = [];
+
+        for (const letterRequest of letterRequests) {
+          try {
+            const statusResponse = await fetch(`${BACKEND_URL}/api/letters/physical-request/${letterRequest.requestId}/status`, {
+              credentials: "include",
+              cache: "no-cache",
+              headers: {
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                Pragma: "no-cache",
+                Expires: "0",
+              },
+            });
+
+            if (statusResponse.ok) {
+              const statusResult = await statusResponse.json();
+              if (statusResult.success && statusResult.data.letterId === letterId) {
+                requests.push(statusResult.data);
+              }
+            }
+          } catch (error) {
+            console.error(`신청 ${letterRequest.requestId} 조회 실패:`, error);
+          }
+        }
+
+        setUserRequests(requests);
+      } catch (error) {
+        console.error("사용자 신청 목록 조회 실패:", error);
+        setUserRequests([]);
+      }
+    };
+
+    fetchData();
+  }, [letterId]);
+
+  const handleRequestSuccess = useCallback(() => {
+    loadUserRequests();
     setShowAddressForm(false);
-  };
+  }, [loadUserRequests]);
+
+  // 현재 활성 신청 개수 계산
+  const activeRequestCount = useMemo(() => {
+    return userRequests.filter((r) => r.status !== "cancelled" && r.status !== "rejected").length;
+  }, [userRequests]);
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20 py-16 px-4">
@@ -186,13 +272,24 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
         </div>
 
         {/* 편지 작성자용 신청 관리 */}
-        {isAuthor && <AuthorRequestsManager letterId={letter._id} letterStats={letter.physicalLetterStats} authorSettings={letter.authorSettings} />}
+        {isAuthor && (
+          <div className="mt-8 space-y-4">
+            <AuthorRequestsManager letterId={letter._id} letterStats={letter.physicalLetterStats} authorSettings={letter.authorSettings} />
+
+            {/* 수신자 주소 관리 버튼 */}
+            <div className="flex justify-center">
+              <Button onClick={() => setShowRecipientModal(true)} variant="outline" className="px-6 py-3">
+                📮 수신자 주소 관리
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* 공개 신청 현황 */}
         <PhysicalRequestsList letterId={letter._id} stats={letter.physicalLetterStats} allowNewRequests={letter.authorSettings.allowPhysicalRequests} />
 
         {/* 사용자 신청 현황 */}
-        {userRequests.length > 0 && <UserRequestsStatus requests={userRequests} onRefresh={fetchUserRequests} />}
+        {userRequests.length > 0 && <UserRequestsStatus requests={userRequests} onRefresh={loadUserRequests} />}
 
         {/* 실물 편지 신청 CTA */}
         {letter.authorSettings.allowPhysicalRequests && (
@@ -236,13 +333,13 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
               {/* 신청 제한 안내 */}
               {letter.authorSettings.maxRequestsPerPerson > 1 && (
                 <div className="mb-4 text-sm text-gray-600">
-                  1인당 최대 {letter.authorSettings.maxRequestsPerPerson}개까지 신청 가능 (현재 {userRequests.filter((r) => r.status !== "cancelled" && r.status !== "rejected").length}개 신청됨)
+                  1인당 최대 {letter.authorSettings.maxRequestsPerPerson}개까지 신청 가능 (현재 {activeRequestCount}개 신청됨)
                 </div>
               )}
 
               <button
-                onClick={() => setShowAddressForm(true)}
-                disabled={userRequests.filter((r) => r.status !== "cancelled" && r.status !== "rejected").length >= letter.authorSettings.maxRequestsPerPerson}
+                onClick={() => setShowRecipientSelect(true)}
+                disabled={activeRequestCount >= letter.authorSettings.maxRequestsPerPerson}
                 className="px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 실물 편지 신청하기 ✉️
@@ -269,9 +366,25 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
             onClose={() => setShowAddressForm(false)}
             onSuccess={handleRequestSuccess}
             maxRequests={letter.authorSettings.maxRequestsPerPerson}
-            currentRequests={userRequests.filter((r) => r.status !== "cancelled" && r.status !== "rejected").length}
+            currentRequests={activeRequestCount}
           />
         )}
+
+        {/* 수신자 주소 관리 모달 */}
+        <RecipientAddressModal open={showRecipientModal} onOpenChange={setShowRecipientModal} letterId={letter._id} canEdit={isAuthor} />
+
+        {/* 수신자 선택 모달 */}
+        <RecipientSelectModal
+          open={showRecipientSelect}
+          onOpenChange={setShowRecipientSelect}
+          letterId={letter._id}
+          onSelect={() => {
+            setShowAddressForm(true);
+          }}
+          onManualInput={() => {
+            setShowAddressForm(true);
+          }}
+        />
       </div>
     </div>
   );
@@ -288,7 +401,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Daum 주소 검색 완료 핸들러
   const handleAddressComplete = (data: PostcodeResult) => {
     setFormData((prev) => ({
       ...prev,
@@ -300,7 +412,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 신청 제한 확인
     if (currentRequests >= maxRequests) {
       alert(`1인당 최대 ${maxRequests}개까지만 신청할 수 있습니다.`);
       return;
@@ -311,7 +422,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
       return;
     }
 
-    // 연락처 형식 검증 및 자동 포맷팅
     const phoneNumbers = formData.phone.replace(/[^\d]/g, "");
     const phoneRegex = /^01[0-9][0-9]{3,4}[0-9]{4}$/;
     if (!phoneRegex.test(phoneNumbers)) {
@@ -323,7 +433,7 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
 
     try {
       const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
-      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests`, {
+      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -339,11 +449,8 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
       }
 
       if (result.success) {
-        // 신청 ID를 로컬 스토리지에 저장 (사용자 신청 추적용)
-        const existingRequests = JSON.parse(localStorage.getItem("userRequests") || "[]");
-        existingRequests.push(result.data.requestId);
-        localStorage.setItem("userRequests", JSON.stringify(existingRequests));
-
+        // 편지별 신청 정보 저장
+        saveLetterRequest(letterId, result.data.requestId);
         alert(result.message);
         onSuccess();
       } else {
@@ -355,10 +462,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const generateSessionId = () => {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36);
   };
 
   return (
@@ -384,10 +487,7 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
               type="tel"
               value={formData.phone}
               onChange={(e) => {
-                // 숫자만 추출
                 const numbers = e.target.value.replace(/[^\d]/g, "");
-
-                // 자동 하이픈 추가 포맷팅
                 let formatted = numbers;
                 if (numbers.length >= 3) {
                   formatted = numbers.slice(0, 3) + "-" + numbers.slice(3);
@@ -395,7 +495,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
                 if (numbers.length >= 7) {
                   formatted = numbers.slice(0, 3) + "-" + numbers.slice(3, 7) + "-" + numbers.slice(7, 11);
                 }
-
                 setFormData({ ...formData, phone: formatted });
               }}
               placeholder="010-1234-5678"
@@ -429,7 +528,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
             </div>
           </div>
 
-          {/* 메모 필드 추가 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">메모 (선택사항)</label>
             <input
@@ -441,7 +539,6 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
             />
           </div>
 
-          {/* 신청 제한 안내 */}
           <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded">
             현재 {currentRequests}/{maxRequests}개 신청됨
             {maxRequests > 1 && <div className="mt-1">여러 개의 주소로 신청할 수 있습니다.</div>}

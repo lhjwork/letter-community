@@ -49,7 +49,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
       const params = new URLSearchParams();
       if (filter !== "all") params.append("status", filter);
 
-      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests/author?${params}`, {
+      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-request/author?${params}`, {
         headers: {
           Authorization: `Bearer ${getAuthToken()}`,
         },
@@ -76,7 +76,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
   const handleApproval = async (requestId: string, action: "approve" | "reject", rejectionReason?: string) => {
     try {
       const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://letter-my-backend.onrender.com";
-      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-requests/${requestId}/approval`, {
+      const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}/physical-request/${requestId}/approval`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

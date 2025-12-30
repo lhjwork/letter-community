@@ -1,0 +1,56 @@
+// 편지 수신자 주소 타입 정의
+export interface RecipientAddress {
+  _id: string;
+  letterId: string;
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  memo?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecipientAddressInput {
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  memo?: string;
+}
+
+// 편지 생성 시 수신자 주소 포함 타입
+export interface LetterWithRecipients {
+  title: string;
+  content: string;
+  type: "friend" | "story";
+  category: string;
+  recipientAddresses?: RecipientAddressInput[];
+}
+
+// 수신자 주소 유효성 검증 규칙
+export const RECIPIENT_VALIDATION = {
+  name: {
+    minLength: 2,
+    maxLength: 50,
+    pattern: /^[가-힣a-zA-Z\s]+$/,
+  },
+  phone: {
+    pattern: /^010-\d{4}-\d{4}$/,
+  },
+  zipCode: {
+    pattern: /^\d{5}$/,
+  },
+  address1: {
+    minLength: 5,
+    maxLength: 200,
+  },
+  address2: {
+    maxLength: 200,
+  },
+  memo: {
+    maxLength: 500,
+  },
+} as const;
