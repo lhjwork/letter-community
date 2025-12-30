@@ -1,4 +1,4 @@
-// 편지별 실물 편지 신청 관리 유틸리티
+// RequestId 기반 실물 편지 추적 관리 유틸리티
 
 interface LetterRequest {
   requestId: string;
@@ -7,7 +7,51 @@ interface LetterRequest {
 }
 
 /**
- * 특정 편지의 사용자 신청 목록 조회
+ * 편지의 RequestId 저장 (새로운 방식)
+ */
+export function savePhysicalRequestId(letterId: string, requestId: string): void {
+  try {
+    localStorage.setItem(`physicalRequest_${letterId}`, requestId);
+
+    // 기존 방식도 유지 (호환성)
+    saveLetterRequest(letterId, requestId);
+  } catch (error) {
+    console.error("RequestId 저장 실패:", error);
+  }
+}
+
+/**
+ * 편지의 RequestId 조회 (새로운 방식)
+ */
+export function getPhysicalRequestId(letterId: string): string | null {
+  try {
+    return localStorage.getItem(`physicalRequest_${letterId}`);
+  } catch (error) {
+    console.error("RequestId 조회 실패:", error);
+    return null;
+  }
+}
+
+/**
+ * 편지의 RequestId 삭제 (새로운 방식)
+ */
+export function removePhysicalRequestId(letterId: string): void {
+  try {
+    localStorage.removeItem(`physicalRequest_${letterId}`);
+  } catch (error) {
+    console.error("RequestId 삭제 실패:", error);
+  }
+}
+
+/**
+ * 편지별 신청 여부 확인 (새로운 방식)
+ */
+export function hasPhysicalRequest(letterId: string): boolean {
+  return getPhysicalRequestId(letterId) !== null;
+}
+
+/**
+ * 특정 편지의 사용자 신청 목록 조회 (기존 방식 유지)
  */
 export function getLetterRequests(letterId: string): LetterRequest[] {
   try {

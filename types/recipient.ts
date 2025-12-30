@@ -68,7 +68,46 @@ export interface LetterWithRecipients {
   recipientAddresses?: RecipientAddressInput[];
 }
 
-// 편지별 실물 편지 발송 상태 조회 응답 타입
+// 실물 편지 신청 응답 타입 (업데이트)
+export interface PhysicalRequestResponse {
+  success: boolean;
+  data: {
+    requestId: string;
+    trackingInfo: {
+      requestId: string;
+      statusCheckUrl: string;
+      message: string;
+    };
+  };
+}
+
+// RequestId 기반 배송 상태 조회 응답 타입 (새로 추가)
+export interface PhysicalRequestStatusResponse {
+  success: boolean;
+  data: {
+    requestId: string;
+    letterId: string;
+    letterTitle: string;
+    status: "requested" | "approved" | "writing" | "sent" | "delivered";
+    recipientInfo: {
+      name: string;
+      address: string;
+    };
+    statusHistory: {
+      requested: string;
+      approved?: string;
+      writing?: string;
+      sent?: string;
+      delivered?: string;
+    };
+    trackingInfo: {
+      canTrack: boolean;
+      estimatedDelivery?: string;
+    };
+  };
+}
+
+// 편지별 실물 편지 발송 상태 조회 응답 타입 (기존 유지)
 export interface LetterPhysicalStatus {
   letterId: string;
   letterTitle: string;

@@ -8,8 +8,9 @@ import AuthorRequestsManager from "@/components/letter/AuthorRequestsManager";
 import UserRequestsStatus from "@/components/letter/UserRequestsStatus";
 import RecipientAddressModal from "@/components/recipient/RecipientAddressModal";
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
+import PhysicalRequestTracker from "@/components/letter/PhysicalRequestTracker";
 import { Button } from "@/components/ui/button";
-import { saveLetterRequest, getLetterRequests, cleanupOldRequests } from "@/lib/letter-requests";
+import { saveLetterRequest, getLetterRequests, cleanupOldRequests, savePhysicalRequestId, hasPhysicalRequest } from "@/lib/letter-requests";
 
 interface Letter {
   _id: string;
@@ -46,6 +47,7 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
   const [showRecipientModal, setShowRecipientModal] = useState(false);
   const [showRecipientSelect, setShowRecipientSelect] = useState(false);
   const [userRequests, setUserRequests] = useState<any[]>([]);
+  const [hasUserRequest, setHasUserRequest] = useState(false);
 
   const isAuthor = currentUserId === letter.authorId;
   const letterId = letter._id;
@@ -111,7 +113,9 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
   // 컴포넌트 마운트 시 한 번만 정리 작업 수행
   useEffect(() => {
     cleanupOldRequests();
-  }, []);
+    // 신청 여부 확인
+    setHasUserRequest(hasPhysicalRequest(letterId));
+  }, [letterId]);
 
   // 편지 ID가 변경될 때 데이터 로드
   useEffect(() => {
@@ -175,10 +179,18 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
     fetchData();
   }, [letterId]);
 
-  const handleRequestSuccess = useCallback(() => {
-    loadUserRequests();
-    setShowAddressForm(false);
-  }, [loadUserRequests]);
+  const handleRequestSuccess = useCallback(
+    (requestId?: string) => {
+      if (requestId) {
+        // 새로운 RequestId 기반 저장
+        savePhysicalRequestId(letterId, requestId);
+        setHasUserRequest(true);
+      }
+      loadUserRequests();
+      setShowAddressForm(false);
+    },
+    [loadUserRequests, letterId]
+  );
 
   // 현재 활성 신청 개수 계산
   const activeRequestCount = useMemo(() => {
@@ -288,8 +300,11 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
         {/* 공개 신청 현황 */}
         <PhysicalRequestsList letterId={letter._id} stats={letter.physicalLetterStats} allowNewRequests={letter.authorSettings.allowPhysicalRequests} />
 
-        {/* 사용자 신청 현황 */}
-        {userRequests.length > 0 && <UserRequestsStatus requests={userRequests} onRefresh={loadUserRequests} />}
+        {/* 사용자 신청 현황 - 새로운 추적 시스템 */}
+        {hasUserRequest && <PhysicalRequestTracker letterId={letter._id} />}
+
+        {/* 사용자 신청 현황 - 기존 방식 (호환성) */}
+        {!hasUserRequest && userRequests.length > 0 && <UserRequestsStatus requests={userRequests} onRefresh={loadUserRequests} />}
 
         {/* 실물 편지 신청 CTA */}
         {letter.authorSettings.allowPhysicalRequests && (
@@ -339,10 +354,10 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
 
               <button
                 onClick={() => setShowRecipientSelect(true)}
-                disabled={activeRequestCount >= letter.authorSettings.maxRequestsPerPerson}
+                disabled={activeRequestCount >= letter.authorSettings.maxRequestsPerPerson || hasUserRequest}
                 className="px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                실물 편지 신청하기 ✉️
+                {hasUserRequest ? "이미 신청됨 ✅" : "실물 편지 신청하기 ✉️"}
               </button>
             </div>
           </div>
@@ -390,7 +405,19 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
   );
 }
 
-function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequests }: { letterId: string; onClose: () => void; onSuccess: () => void; maxRequests: number; currentRequests: number }) {
+function AddressForm({
+  letterId,
+  onClose,
+  onSuccess,
+  maxRequests,
+  currentRequests,
+}: {
+  letterId: string;
+  onClose: () => void;
+  onSuccess: (requestId?: string) => void;
+  maxRequests: number;
+  currentRequests: number;
+}) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -449,10 +476,20 @@ function AddressForm({ letterId, onClose, onSuccess, maxRequests, currentRequest
       }
 
       if (result.success) {
-        // 편지별 신청 정보 저장
+        // 새로운 RequestId 기반 저장
+        savePhysicalRequestId(letterId, result.data.requestId);
+
+        // 기존 방식도 유지 (호환성)
         saveLetterRequest(letterId, result.data.requestId);
-        alert(result.message);
-        onSuccess();
+
+        // 추적 정보 표시
+        if (result.data.trackingInfo) {
+          alert(`${result.message}\n\n추적 ID: ${result.data.trackingInfo.requestId}\n${result.data.trackingInfo.message}`);
+        } else {
+          alert(result.message);
+        }
+
+        onSuccess(result.data.requestId);
       } else {
         throw new Error(result.error || "신청 실패");
       }
