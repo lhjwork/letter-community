@@ -1,8 +1,8 @@
-import { RecipientAddress, RecipientAddressInput, RecipientListResponse } from "@/types/recipient";
+import { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse } from "@/types/recipient";
 import { apiRequest } from "./api";
 
 // 타입 재export
-export type { RecipientAddress, RecipientAddressInput, RecipientListResponse } from "@/types/recipient";
+export type { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse } from "@/types/recipient";
 
 interface RecipientAddressListResponse {
   success: boolean;
@@ -12,6 +12,14 @@ interface RecipientAddressListResponse {
 interface RecipientResponse {
   success: boolean;
   data: RecipientAddress;
+}
+
+// 편지별 실물 편지 발송 상태 조회 (사용자용)
+export async function getLetterPhysicalStatus(token: string, letterId: string): Promise<LetterPhysicalStatusResponse> {
+  return apiRequest<LetterPhysicalStatusResponse>(`/api/letters/${letterId}/physical-status/user`, {
+    method: "GET",
+    token,
+  });
 }
 
 // 편지 작성자용 수신자 목록 조회 (새로 추가된 API)

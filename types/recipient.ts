@@ -68,6 +68,31 @@ export interface LetterWithRecipients {
   recipientAddresses?: RecipientAddressInput[];
 }
 
+// 편지별 실물 편지 발송 상태 조회 응답 타입
+export interface LetterPhysicalStatus {
+  letterId: string;
+  letterTitle: string;
+  totalUserRequests: number;
+  deliveryStatus: {
+    status: "requested" | "approved" | "writing" | "sent";
+    sentDate?: string;
+    trackingNumber?: string;
+  };
+  userRequests: {
+    requestId: string;
+    status: "requested" | "approved" | "writing" | "sent";
+    requestedAt: string;
+    approvedAt?: string;
+    writingStartedAt?: string;
+    sentDate?: string;
+  }[];
+}
+
+export interface LetterPhysicalStatusResponse {
+  success: boolean;
+  data: LetterPhysicalStatus;
+}
+
 // 수신자 주소 유효성 검증 규칙
 export const RECIPIENT_VALIDATION = {
   name: {
