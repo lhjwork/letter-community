@@ -149,6 +149,32 @@ export interface LetterPhysicalStatusResponse {
   data: LetterPhysicalStatus;
 }
 
+// 익명 사용자 실물 편지 신청 타입
+export interface AnonymousPhysicalRequest {
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  memo?: string;
+  sessionId: string;
+}
+
+// 익명 사용자 신청 응답 타입
+export interface AnonymousPhysicalRequestResponse {
+  success: boolean;
+  data: {
+    requestId: string;
+    isDuplicate: boolean;
+    duplicateOf?: string;
+    trackingInfo: {
+      requestId: string;
+      statusCheckUrl: string;
+      message: string;
+    };
+  };
+}
+
 // 수신자 주소 유효성 검증 규칙
 export const RECIPIENT_VALIDATION = {
   name: {

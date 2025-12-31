@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { LikeButton } from "@/components/like";
 import PostcodeSearch, { PostcodeResult } from "@/components/address/PostcodeSearch";
 import PhysicalRequestsList from "@/components/letter/PhysicalRequestsList";
@@ -47,6 +49,8 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
   const [showRecipientModal, setShowRecipientModal] = useState(false);
   const [showRecipientSelect, setShowRecipientSelect] = useState(false);
   const [userRequests, setUserRequests] = useState<any[]>([]);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const isAuthor = currentUserId === letter.authorId;
   const letterId = letter._id;
@@ -349,8 +353,16 @@ export default function LetterDetailClient({ letter, currentUserId }: LetterDeta
               )}
 
               <button
-                onClick={() => setShowRecipientSelect(true)}
-                disabled={activeRequestCount >= letter.authorSettings.maxRequestsPerPerson}
+                onClick={() => {
+                  // 로그인하지 않은 사용자는 익명 신청 페이지로 이동
+                  if (!session) {
+                    router.push(`/letter/${letter._id}/request`);
+                  } else {
+                    // 로그인한 사용자는 기존 방식 사용
+                    setShowRecipientSelect(true);
+                  }
+                }}
+                disabled={!!session && activeRequestCount >= letter.authorSettings.maxRequestsPerPerson}
                 className="px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 실물 편지 신청하기 ✉️

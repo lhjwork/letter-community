@@ -1,8 +1,26 @@
-import { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse, SimplePhysicalStatusResponse } from "@/types/recipient";
+import {
+  RecipientAddress,
+  RecipientAddressInput,
+  RecipientListResponse,
+  LetterPhysicalStatusResponse,
+  PhysicalRequestStatusResponse,
+  SimplePhysicalStatusResponse,
+  AnonymousPhysicalRequest,
+  AnonymousPhysicalRequestResponse,
+} from "@/types/recipient";
 import { apiRequest } from "./api";
 
 // 타입 재export
-export type { RecipientAddress, RecipientAddressInput, RecipientListResponse, LetterPhysicalStatusResponse, PhysicalRequestStatusResponse, SimplePhysicalStatusResponse } from "@/types/recipient";
+export type {
+  RecipientAddress,
+  RecipientAddressInput,
+  RecipientListResponse,
+  LetterPhysicalStatusResponse,
+  PhysicalRequestStatusResponse,
+  SimplePhysicalStatusResponse,
+  AnonymousPhysicalRequest,
+  AnonymousPhysicalRequestResponse,
+} from "@/types/recipient";
 
 interface RecipientAddressListResponse {
   success: boolean;
@@ -19,6 +37,26 @@ export async function getSimplePhysicalStatus(token: string, letterId: string): 
   return apiRequest<SimplePhysicalStatusResponse>(`/api/letters/${letterId}/physical-status/simple`, {
     method: "GET",
     token,
+  });
+}
+
+// 익명 사용자 실물 편지 신청 (새로 추가)
+export async function requestPhysicalLetterAnonymous(letterId: string, data: AnonymousPhysicalRequest): Promise<AnonymousPhysicalRequestResponse> {
+  const { sessionId, ...addressData } = data;
+
+  return apiRequest<AnonymousPhysicalRequestResponse>(`/api/letters/${letterId}/physical-request`, {
+    method: "POST",
+    body: JSON.stringify({
+      address: addressData,
+      sessionId,
+    }),
+  });
+}
+
+// 익명 사용자 신청 상태 조회 (새로 추가)
+export async function getPhysicalRequestStatusAnonymous(letterId: string, requestId: string): Promise<PhysicalRequestStatusResponse> {
+  return apiRequest<PhysicalRequestStatusResponse>(`/api/letters/${letterId}/physical-request/${requestId}`, {
+    method: "GET",
   });
 }
 
