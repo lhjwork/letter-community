@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { getDrafts, deleteDraft, publishDraft } from "@/lib/draft-api";
-import { DraftLetter } from "@/types/draft";
+import { handleApiError } from "@/lib/auth-utils";
 
 export function useDraftManagement() {
   const { data: session } = useSession();
@@ -29,9 +29,6 @@ export function useDraftManagement() {
 
       if (!token) {
         setError("로그인이 필요합니다.");
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
         return false;
       }
 
@@ -47,20 +44,15 @@ export function useDraftManagement() {
           return false;
         }
       } catch (err) {
-        let errorMessage = "삭제 중 오류가 발생했습니다.";
-
-        if (err instanceof Error) {
-          if (err.message.includes("Authentication required")) {
-            errorMessage = "로그인이 필요합니다.";
-            if (typeof window !== "undefined") {
-              window.location.href = "/login";
-            }
-          } else {
-            errorMessage = err.message;
+        try {
+          await handleApiError(err);
+        } catch (handledError) {
+          let errorMessage = "삭제 중 오류가 발생했습니다.";
+          if (handledError instanceof Error) {
+            errorMessage = handledError.message;
           }
+          setError(errorMessage);
         }
-
-        setError(errorMessage);
         return false;
       } finally {
         setLoading(false);
@@ -75,9 +67,6 @@ export function useDraftManagement() {
 
       if (!token) {
         setError("로그인이 필요합니다.");
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
         return { success: false };
       }
 
@@ -93,20 +82,15 @@ export function useDraftManagement() {
           return { success: false };
         }
       } catch (err) {
-        let errorMessage = "발행 중 오류가 발생했습니다.";
-
-        if (err instanceof Error) {
-          if (err.message.includes("Authentication required")) {
-            errorMessage = "로그인이 필요합니다.";
-            if (typeof window !== "undefined") {
-              window.location.href = "/login";
-            }
-          } else {
-            errorMessage = err.message;
+        try {
+          await handleApiError(err);
+        } catch (handledError) {
+          let errorMessage = "발행 중 오류가 발생했습니다.";
+          if (handledError instanceof Error) {
+            errorMessage = handledError.message;
           }
+          setError(errorMessage);
         }
-
-        setError(errorMessage);
         return { success: false };
       } finally {
         setLoading(false);
@@ -128,9 +112,6 @@ export function useDraftManagement() {
 
       if (!token) {
         setError("로그인이 필요합니다.");
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
         return null;
       }
 
@@ -146,20 +127,15 @@ export function useDraftManagement() {
           return null;
         }
       } catch (err) {
-        let errorMessage = "목록 조회 중 오류가 발생했습니다.";
-
-        if (err instanceof Error) {
-          if (err.message.includes("Authentication required")) {
-            errorMessage = "로그인이 필요합니다.";
-            if (typeof window !== "undefined") {
-              window.location.href = "/login";
-            }
-          } else {
-            errorMessage = err.message;
+        try {
+          await handleApiError(err);
+        } catch (handledError) {
+          let errorMessage = "목록 조회 중 오류가 발생했습니다.";
+          if (handledError instanceof Error) {
+            errorMessage = handledError.message;
           }
+          setError(errorMessage);
         }
-
-        setError(errorMessage);
         return null;
       } finally {
         setLoading(false);

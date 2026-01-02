@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { saveDraft } from "@/lib/draft-api";
 import { DraftSaveState } from "@/types/draft";
+import { handleApiError } from "@/lib/auth-utils";
 
 interface UseDraftManualSaveProps {
   content: string;
@@ -44,11 +45,6 @@ export function useDraftManualSave({ content, title, type, category, draftId, on
       const errorMessage = "로그인이 필요합니다.";
       onError?.(errorMessage);
       setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-
-      // 로그인 페이지로 리다이렉트
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
       return;
     }
 
@@ -84,20 +80,15 @@ export function useDraftManualSave({ content, title, type, category, draftId, on
     } catch (error) {
       let errorMessage = "저장 중 오류가 발생했습니다";
 
-      if (error instanceof Error) {
-        if (error.message.includes("Authentication required")) {
-          errorMessage = "로그인이 필요합니다.";
-          // 로그인 페이지로 리다이렉트
-          if (typeof window !== "undefined") {
-            window.location.href = "/login";
-          }
-        } else {
-          errorMessage = error.message;
+      try {
+        await handleApiError(error);
+      } catch (handledError) {
+        if (handledError instanceof Error) {
+          errorMessage = handledError.message;
         }
+        setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
+        onError?.(errorMessage);
       }
-
-      setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-      onError?.(errorMessage);
     }
   }, [getToken, content, title, type, category, draftId, onSave, onError]);
 

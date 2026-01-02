@@ -1,22 +1,8 @@
 import { DraftLetter, DraftListResponse, DraftSaveRequest, DraftPublishRequest } from "@/types/draft";
+import { handleTokenExpiration, checkAuthError } from "./auth-utils";
 
 // API Base URL 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
-
-// JWT 토큰 획득 함수
-const getAuthToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("authToken");
-};
-
-// 인증 에러 처리
-const handleAuthError = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("authToken");
-    window.location.href = "/login";
-  }
-  throw new Error("Authentication required");
-};
 
 // 임시저장 생성/수정
 export async function saveDraft(token: string, data: DraftSaveRequest): Promise<{ success: boolean; data: DraftLetter }> {
@@ -33,9 +19,7 @@ export async function saveDraft(token: string, data: DraftSaveRequest): Promise<
       body: JSON.stringify(data),
     });
 
-    if (response.status === 401) {
-      handleAuthError();
-    }
+    await checkAuthError(response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,6 +28,9 @@ export async function saveDraft(token: string, data: DraftSaveRequest): Promise<
     return await response.json();
   } catch (error) {
     console.error("Save draft error:", error);
+    if (error instanceof Error && error.message === "Authentication expired") {
+      throw error; // 인증 에러는 상위로 전파
+    }
     throw error;
   }
 }
@@ -73,9 +60,7 @@ export async function getDrafts(
       },
     });
 
-    if (response.status === 401) {
-      handleAuthError();
-    }
+    await checkAuthError(response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -84,6 +69,9 @@ export async function getDrafts(
     return await response.json();
   } catch (error) {
     console.error("Get drafts error:", error);
+    if (error instanceof Error && error.message === "Authentication expired") {
+      throw error; // 인증 에러는 상위로 전파
+    }
     throw error;
   }
 }
@@ -98,9 +86,7 @@ export async function getDraft(token: string, draftId: string): Promise<{ succes
       },
     });
 
-    if (response.status === 401) {
-      handleAuthError();
-    }
+    await checkAuthError(response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -109,6 +95,9 @@ export async function getDraft(token: string, draftId: string): Promise<{ succes
     return await response.json();
   } catch (error) {
     console.error("Get draft error:", error);
+    if (error instanceof Error && error.message === "Authentication expired") {
+      throw error; // 인증 에러는 상위로 전파
+    }
     throw error;
   }
 }
@@ -123,9 +112,7 @@ export async function deleteDraft(token: string, draftId: string): Promise<{ suc
       },
     });
 
-    if (response.status === 401) {
-      handleAuthError();
-    }
+    await checkAuthError(response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -134,6 +121,9 @@ export async function deleteDraft(token: string, draftId: string): Promise<{ suc
     return await response.json();
   } catch (error) {
     console.error("Delete draft error:", error);
+    if (error instanceof Error && error.message === "Authentication expired") {
+      throw error; // 인증 에러는 상위로 전파
+    }
     throw error;
   }
 }
@@ -150,9 +140,7 @@ export async function publishDraft(token: string, draftId: string, data?: DraftP
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    if (response.status === 401) {
-      handleAuthError();
-    }
+    await checkAuthError(response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -161,6 +149,9 @@ export async function publishDraft(token: string, draftId: string, data?: DraftP
     return await response.json();
   } catch (error) {
     console.error("Publish draft error:", error);
+    if (error instanceof Error && error.message === "Authentication expired") {
+      throw error; // 인증 에러는 상위로 전파
+    }
     throw error;
   }
 }
