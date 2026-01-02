@@ -1,20 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
 import { createStory, createLetter } from "@/lib/api";
 import { generateTitle, canGenerateTitle } from "@/lib/ai-title-generator";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { classifyCategory } from "@/lib/categoryClassifier";
 import ShareModal from "@/components/ShareModal";
+import { useDraftManualSave } from "@/hooks/useDraftManualSave";
+import { useBeforeUnload } from "@/hooks/useBeforeUnload";
+import { getDraft } from "@/lib/draft-api";
+import SaveIndicator from "@/components/letter/SaveIndicator";
+import DraftSaveButton from "@/components/letter/DraftSaveButton";
+import DraftList from "@/components/drafts/DraftList";
+import { Button } from "@/components/ui/button";
+import { Suspense } from "react";
+import { Menu, X, FileText } from "lucide-react";
 
 type LetterType = "story" | "friend";
 
-export default function WritePage() {
+function WritePageContent() {
   const [letterType, setLetterType] = useState<LetterType>("story");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -22,6 +31,16 @@ export default function WritePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // 사이드바 상태
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // 임시저장 관련 상태
+  const searchParams = useSearchParams();
+  const draftId = searchParams.get("draftId");
+  const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(draftId || undefined);
+  const [isLoadingDraft, setIsLoadingDraft] = useState(!!draftId);
 
   // URL 공유 모달 상태
   const [showShareModal, setShowShareModal] = useState(false);
@@ -35,10 +54,83 @@ export default function WritePage() {
 
   const editor = useLetterEditor({
     content,
-    onChange: setContent,
+    onChange: (newContent) => {
+      setContent(newContent);
+      setHasUnsavedChanges(true);
+    },
     placeholder: letterType === "story" ? "여기에 당신의 이야기를 작성해주세요..." : "여기에 당신의 마음을 담아주세요...",
     enableImages: letterType === "story", // 사연에만 이미지 기능 활성화
   });
+
+  // 임시저장 훅
+  const { saveState, manualSave } = useDraftManualSave({
+    content,
+    title,
+    type: letterType,
+    category: "기타", // 기본 카테고리
+    draftId: currentDraftId,
+    onSave: (savedDraftId) => {
+      setCurrentDraftId(savedDraftId);
+      setHasUnsavedChanges(false);
+    },
+    onError: (error) => {
+      console.error("저장 실패:", error);
+      alert(error);
+    },
+  });
+
+  // 페이지 이탈 경고
+  useBeforeUnload({
+    when: hasUnsavedChanges && (content.length > 10 || title.length > 0),
+    message: "작성 중인 편지가 저장되지 않았습니다. 정말 나가시겠습니까?",
+  });
+
+  // 임시저장 불러오기
+  useEffect(() => {
+    if (draftId && session?.backendToken) {
+      loadDraft(draftId);
+    }
+  }, [draftId, session?.backendToken]);
+
+  const loadDraft = async (id: string) => {
+    if (!session?.backendToken) return;
+
+    setIsLoadingDraft(true);
+    try {
+      const response = await getDraft(session.backendToken, id);
+      if (response.success) {
+        const draft = response.data;
+        setTitle(draft.title);
+        setContent(draft.content);
+        setLetterType(draft.type);
+        setCurrentDraftId(draft._id);
+        setHasUnsavedChanges(false);
+
+        // 에디터 내용 업데이트
+        if (editor) {
+          editor.commands.setContent(draft.content);
+        }
+      }
+    } catch (error) {
+      console.error("임시저장 불러오기 실패:", error);
+      alert("임시저장을 불러올 수 없습니다.");
+    } finally {
+      setIsLoadingDraft(false);
+    }
+  };
+
+  // 키보드 단축키 (Ctrl+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        manualSave();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [manualSave]);
 
   // AI 제목 생성 함수 (버튼 클릭 시 호출)
   const generateAITitle = async () => {
@@ -51,6 +143,7 @@ export default function WritePage() {
           const generatedTitle = await generateTitle(plainContent);
           setAiGeneratedTitle(generatedTitle);
           setTitle(generatedTitle);
+          setHasUnsavedChanges(true);
         } catch (error) {
           console.error("제목 생성 실패:", error);
           alert("제목 생성에 실패했습니다. 다시 시도해주세요.");
@@ -65,6 +158,17 @@ export default function WritePage() {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleAuthorChange = (newAuthor: string) => {
+    setAuthor(newAuthor);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleLetterTypeChange = (newType: LetterType) => {
+    setLetterType(newType);
+    setHasUnsavedChanges(true);
   };
 
   const regenerateTitle = async () => {
@@ -172,6 +276,9 @@ export default function WritePage() {
         });
         setShowShareModal(true);
       }
+
+      // 성공적으로 발행되면 임시저장 상태 초기화
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error("등록 실패:", error);
       alert(error instanceof Error ? error.message : "등록에 실패했습니다. 다시 시도해주세요.");
@@ -181,10 +288,16 @@ export default function WritePage() {
   };
 
   const handleReset = () => {
+    if (hasUnsavedChanges && !confirm("작성 중인 내용이 모두 삭제됩니다. 계속하시겠습니까?")) {
+      return;
+    }
+
     setTitle("");
     setContent("");
     setAuthor("");
     setAiGeneratedTitle("");
+    setHasUnsavedChanges(false);
+    setCurrentDraftId(undefined);
     editor?.commands.clearContent();
   };
 
@@ -195,25 +308,92 @@ export default function WritePage() {
     router.push("/");
   };
 
+  // 임시저장 편집 핸들러
+  const handleEditDraft = (editDraftId: string) => {
+    if (hasUnsavedChanges) {
+      const shouldContinue = confirm("현재 작성 중인 내용이 있습니다. 다른 임시저장을 불러오시겠습니까?");
+      if (!shouldContinue) return;
+    }
+
+    // URL 업데이트하여 새로운 임시저장 로드
+    router.push(`/write?draftId=${editDraftId}`);
+    setIsSidebarOpen(false);
+  };
+
+  // 사이드바 토글
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
+  if (isLoadingDraft) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>임시저장을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
-      <main className="w-full flex flex-col items-center py-16 px-4 sm:px-8">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20 flex">
+      {/* 임시저장 사이드바 */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:relative lg:translate-x-0 lg:shadow-none lg:border-r`}
+      >
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            <h2 className="font-semibold">임시저장</h2>
+          </div>
+          <Button variant="ghost" size="sm" onClick={toggleSidebar} className="lg:hidden">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+        <div className="p-4 h-full overflow-y-auto">
+          <DraftList onEditDraft={handleEditDraft} />
+        </div>
+      </div>
+
+      {/* 사이드바 오버레이 (모바일) */}
+      {isSidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={toggleSidebar} />}
+
+      {/* 메인 컨텐츠 */}
+      <main className="flex-1 flex flex-col items-center py-16 px-4 sm:px-8">
         {/* 페이지 타이틀 */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">{letterType === "story" ? "당신의 사연을 들려주세요" : "편지 만들기"}</h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            {/* 사이드바 토글 버튼 (모바일) */}
+            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="lg:hidden">
+              <Menu className="w-4 h-4" />
+            </Button>
+
+            <h1 className="text-3xl md:text-4xl font-bold text-primary">{letterType === "story" ? "당신의 사연을 들려주세요" : "편지 만들기"}</h1>
+
+            {/* 임시저장 상태 표시 */}
+            <div className="flex items-center gap-2">
+              <SaveIndicator saveState={saveState} />
+              <DraftSaveButton onSave={manualSave} saveState={saveState} />
+            </div>
+          </div>
           <p className="text-lg text-muted-foreground max-w-2xl">{letterType === "story" ? "특별한 이야기를 사연으로 남겨보세요" : "마음을 담은 편지를 만들어 공유해보세요"}</p>
+          {/* 임시저장 안내 */}
+          <div className="mt-4 text-sm text-gray-500">💡 Ctrl+S를 눌러 언제든 임시저장할 수 있습니다</div>
         </div>
 
         {/* 타입 선택 */}
         <div className="w-full max-w-4xl mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">편지 유형</label>
-          <Select value={letterType} onValueChange={(value) => setLetterType(value as LetterType)}>
+          <Select value={letterType} onValueChange={handleLetterTypeChange}>
             <SelectTrigger className="w-full h-12 text-base">
               <SelectValue placeholder="편지 유형을 선택하세요" />
             </SelectTrigger>
@@ -342,7 +522,7 @@ export default function WritePage() {
                   <input
                     type="text"
                     value={author}
-                    onChange={(e) => setAuthor(e.target.value)}
+                    onChange={(e) => handleAuthorChange(e.target.value)}
                     placeholder="작성자"
                     className="text-right bg-transparent border-none outline-none text-base text-gray-700 placeholder-gray-400 w-32"
                     style={{
@@ -370,6 +550,9 @@ export default function WritePage() {
           >
             초기화
           </button>
+          <button onClick={toggleSidebar} className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium lg:hidden">
+            임시저장 목록
+          </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
@@ -395,5 +578,22 @@ export default function WritePage() {
       {/* URL 공유 모달 */}
       {shareData && <ShareModal isOpen={showShareModal} onClose={handleShareModalClose} letterUrl={shareData.url} letterTitle={shareData.title} />}
     </div>
+  );
+}
+
+export default function WritePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <WritePageContent />
+    </Suspense>
   );
 }
