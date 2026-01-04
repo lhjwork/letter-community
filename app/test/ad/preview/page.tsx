@@ -2,11 +2,7 @@
 
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  trackAdImpression,
-  trackAdClick,
-  trackAdDwell,
-} from "@/lib/analytics/ad-tracker";
+import { adService } from "@/lib/services/adService";
 
 // 테스트용 광고 데이터
 const testAdsData: Record<
@@ -97,7 +93,8 @@ function AdPreviewContent() {
       setTimeout(() => {
         addLog(`📊 impression 이벤트 전송 - adSlug: ${ad.slug}`);
       }, 0);
-      trackAdImpression({
+      adService.trackEvent({
+        eventType: "impression",
         adId: ad._id,
         adSlug: ad.slug,
         letterId,
@@ -112,12 +109,22 @@ function AdPreviewContent() {
 
     const handleBeforeUnload = () => {
       const dwellTime = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      trackAdDwell({
+
+      const payload = JSON.stringify({
+        eventType: "dwell",
         adId: ad._id,
         adSlug: ad.slug,
         dwellTime,
         letterId,
+        timestamp: new Date().toISOString(),
       });
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ads/track`,
+          payload
+        );
+      }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -129,7 +136,8 @@ function AdPreviewContent() {
     const dwellTime = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
     addLog(`🖱️ click 이벤트 전송 - clickTarget: cta`);
-    await trackAdClick({
+    await adService.trackEvent({
+      eventType: "click",
       adId: ad._id,
       adSlug: ad.slug,
       clickTarget: "cta",
@@ -142,12 +150,21 @@ function AdPreviewContent() {
     });
 
     addLog(`⏱️ dwell 이벤트 전송 - dwellTime: ${dwellTime}초`);
-    trackAdDwell({
+    const payload = JSON.stringify({
+      eventType: "dwell",
       adId: ad._id,
       adSlug: ad.slug,
       dwellTime,
       letterId,
+      timestamp: new Date().toISOString(),
     });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ads/track`,
+        payload
+      );
+    }
 
     // 테스트 모드에서는 실제 리다이렉트 대신 알림
     setTimeout(() => {

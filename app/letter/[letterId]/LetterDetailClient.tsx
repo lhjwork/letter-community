@@ -15,111 +15,14 @@ import RecipientAddressModal from "@/components/recipient/RecipientAddressModal"
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
 import SimplePhysicalStatus from "@/components/letter/SimplePhysicalStatus";
 import { Button } from "@/components/ui/button";
+import AdBanner from "@/components/ads/AdBanner";
+import AdCarousel from "@/components/ads/AdCarousel";
 import {
   saveLetterRequest,
   getLetterRequests,
   cleanupOldRequests,
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
-
-// 실제 광고처럼 보이는 프로모션 배너 컴포넌트
-function PromotionBanner({ letterId }: { letterId: string }) {
-  const [currentAd, setCurrentAd] = useState(0);
-
-  const promotions = [
-    {
-      slug: "test-cafe-promo",
-      advertiser: "카페 블루밍",
-      headline: "☕ 아메리카노 1+1 이벤트",
-      description: "Letter 사용자 전용! 매장 방문 시 쿠폰 제시",
-      ctaText: "쿠폰 받기",
-      bgGradient: "from-amber-100 to-orange-50",
-      accentColor: "bg-amber-600 hover:bg-amber-700",
-      textColor: "text-amber-900",
-    },
-    {
-      slug: "test-bookstore-promo",
-      advertiser: "책방 오늘",
-      headline: "📚 베스트셀러 20% 할인",
-      description: "편지와 함께하는 독서, 이번 주말까지!",
-      ctaText: "할인 보기",
-      bgGradient: "from-emerald-100 to-teal-50",
-      accentColor: "bg-emerald-600 hover:bg-emerald-700",
-      textColor: "text-emerald-900",
-    },
-    {
-      slug: "test-flower-promo",
-      advertiser: "플라워샵 봄",
-      headline: "🌷 꽃다발 무료 배송",
-      description: "5만원 이상 구매 시 전국 무료 배송",
-      ctaText: "주문하기",
-      bgGradient: "from-pink-100 to-rose-50",
-      accentColor: "bg-pink-600 hover:bg-pink-700",
-      textColor: "text-pink-900",
-    },
-  ];
-
-  const ad = promotions[currentAd];
-
-  return (
-    <div className="mt-8">
-      {/* 광고 배너 */}
-      <div
-        className={`relative overflow-hidden rounded-2xl bg-gradient-to-r ${ad.bgGradient} border border-gray-200 shadow-lg`}
-      >
-        {/* AD 표시 */}
-        <div className="absolute top-2 left-2 px-2 py-0.5 bg-gray-800/70 text-white text-xs rounded">
-          AD
-        </div>
-
-        <div className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            {/* 광고 내용 */}
-            <div className="flex-1">
-              <p className="text-xs text-gray-500 mb-1">{ad.advertiser}</p>
-              <h3
-                className={`text-xl md:text-2xl font-bold ${ad.textColor} mb-2`}
-              >
-                {ad.headline}
-              </h3>
-              <p className="text-gray-600 text-sm md:text-base">
-                {ad.description}
-              </p>
-            </div>
-
-            {/* CTA 버튼 */}
-            <Link
-              href={`/ad/${ad.slug}?letter=${letterId}&utm_source=qr&utm_medium=offline&utm_campaign=letter_banner`}
-              className={`inline-flex items-center justify-center px-6 py-3 ${ad.accentColor} text-white font-medium rounded-xl transition-all transform hover:scale-105 shadow-md whitespace-nowrap`}
-            >
-              {ad.ctaText} →
-            </Link>
-          </div>
-        </div>
-
-        {/* 광고 전환 인디케이터 */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {promotions.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentAd(idx)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                idx === currentAd ? "bg-gray-700 w-4" : "bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* 개발 모드 표시 */}
-      {process.env.NODE_ENV === "development" && (
-        <p className="text-xs text-gray-400 text-center mt-2">
-          🧪 테스트 광고 - 클릭하면 광고 랜딩 페이지로 이동
-        </p>
-      )}
-    </div>
-  );
-}
 
 interface Letter {
   _id: string;
@@ -551,8 +454,27 @@ export default function LetterDetailClient({
           }}
         />
 
-        {/* 프로모션 광고 배너 */}
-        <PromotionBanner letterId={letter._id} />
+        {/* 캐러셀 광고 배너 */}
+        <AdCarousel
+          placement="banner"
+          limit={1}
+          aspectRatio="16:9"
+          autoPlay={false}
+          showControls={false}
+          showIndicators={false}
+          className="mt-8"
+          showDebugInfo={process.env.NODE_ENV === "development"}
+        />
+
+        {/* 사이드바 광고 (데스크톱에서만) */}
+        <div className="hidden lg:block mt-8">
+          <AdBanner
+            placement="sidebar"
+            limit={2}
+            className="space-y-4"
+            showDebugInfo={process.env.NODE_ENV === "development"}
+          />
+        </div>
       </div>
     </div>
   );

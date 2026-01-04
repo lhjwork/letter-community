@@ -1,37 +1,14 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdLandingClient from "./AdLandingClient";
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-interface AdData {
-  _id: string;
-  slug: string;
-  status: string;
-  advertiser: {
-    name: string;
-    logo?: string;
-  };
-  content: {
-    headline: string;
-    description: string;
-    ctaText: string;
-    targetUrl: string;
-    backgroundImage?: string;
-    backgroundColor?: string;
-    theme?: string;
-  };
-  campaign: {
-    name: string;
-    startDate: string;
-    endDate: string;
-  };
-}
+import { API_CONFIG } from "@/lib/config/api";
+import { Ad } from "@/types/ad";
 
 // 테스트용 목업 광고 데이터
-const testAdsData: Record<string, AdData> = {
+const testAdsData: Record<string, Ad> = {
   "test-cafe-promo": {
     _id: "test-ad-001",
+    name: "카페 블루밍 프로모션",
     slug: "test-cafe-promo",
     status: "active",
     advertiser: { name: "카페 블루밍" },
@@ -48,9 +25,25 @@ const testAdsData: Record<string, AdData> = {
       startDate: "2024-01-01",
       endDate: "2030-12-31",
     },
+    displayControl: {
+      isVisible: true,
+      placements: ["banner", "landing"],
+      priority: 50,
+    },
+    stats: {
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+      uniqueVisitors: 0,
+      avgDwellTime: 0,
+    },
+    linkedLetters: [],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   "test-bookstore-promo": {
     _id: "test-ad-002",
+    name: "책방 오늘 프로모션",
     slug: "test-bookstore-promo",
     status: "active",
     advertiser: { name: "책방 오늘" },
@@ -67,9 +60,25 @@ const testAdsData: Record<string, AdData> = {
       startDate: "2024-01-01",
       endDate: "2030-12-31",
     },
+    displayControl: {
+      isVisible: true,
+      placements: ["banner", "landing"],
+      priority: 50,
+    },
+    stats: {
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+      uniqueVisitors: 0,
+      avgDwellTime: 0,
+    },
+    linkedLetters: [],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   "test-flower-promo": {
     _id: "test-ad-003",
+    name: "플라워샵 봄 프로모션",
     slug: "test-flower-promo",
     status: "active",
     advertiser: { name: "플라워샵 봄" },
@@ -86,19 +95,37 @@ const testAdsData: Record<string, AdData> = {
       startDate: "2024-01-01",
       endDate: "2030-12-31",
     },
+    displayControl: {
+      isVisible: true,
+      placements: ["banner", "landing"],
+      priority: 50,
+    },
+    stats: {
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+      uniqueVisitors: 0,
+      avgDwellTime: 0,
+    },
+    linkedLetters: [],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
 };
 
-async function getAdData(adSlug: string): Promise<AdData | null> {
+async function getAdData(adSlug: string): Promise<Ad | null> {
   // 테스트용 광고 slug인 경우 목업 데이터 반환
   if (adSlug.startsWith("test-") && testAdsData[adSlug]) {
     return testAdsData[adSlug];
   }
 
   try {
-    const res = await fetch(`${BACKEND_URL}/api/ads/${adSlug}`, {
-      next: { revalidate: 60 },
-    });
+    const res = await fetch(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADS_DETAIL}/${adSlug}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
 
     if (!res.ok) return null;
 
@@ -152,7 +179,12 @@ export default async function AdLandingPage({
   const startDate = new Date(ad.campaign.startDate);
   const endDate = new Date(ad.campaign.endDate);
 
-  if (ad.status !== "active" || now < startDate || now > endDate) {
+  if (
+    ad.status !== "active" ||
+    !ad.displayControl.isVisible ||
+    now < startDate ||
+    now > endDate
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center p-8">
@@ -169,9 +201,11 @@ export default async function AdLandingPage({
     <AdLandingClient
       ad={ad}
       letterId={search.letter}
-      utmSource={search.utm_source}
-      utmMedium={search.utm_medium}
-      utmCampaign={search.utm_campaign}
+      utm={{
+        source: search.utm_source,
+        medium: search.utm_medium,
+        campaign: search.utm_campaign,
+      }}
     />
   );
 }

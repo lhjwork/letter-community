@@ -5,12 +5,27 @@ import Link from "next/link";
 import { useInfiniteStories } from "@/hooks/useStories";
 import { useStoriesFilter } from "@/hooks/useStoriesFilter";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { CategoryFilter, SearchBar, SortSelect, StoryCard, EmptyState } from "@/components/stories";
+import {
+  CategoryFilter,
+  SearchBar,
+  SortSelect,
+  StoryCard,
+  EmptyState,
+} from "@/components/stories";
+import AdCarousel from "@/components/ads/AdCarousel";
 import type { SortOption } from "@/lib/api";
 
 function StoriesContent() {
-  const { search, sort, category, updateFilter, resetFilter } = useStoriesFilter();
-  const { stories, pagination, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useInfiniteStories({ search, sort, category, limit: 20 });
+  const { search, sort, category, updateFilter, resetFilter } =
+    useStoriesFilter();
+  const {
+    stories,
+    pagination,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteStories({ search, sort, category, limit: 20 });
 
   // 다음 페이지 로드 함수
   const loadMore = useCallback(() => {
@@ -32,9 +47,22 @@ function StoriesContent() {
       {/* 캐러셀 영역 (더미) */}
       <section className="bg-white py-8 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="bg-gray-100 rounded-lg h-48 md:h-64 flex items-center justify-center">
+          <div className="bg-gray-100 rounded-lg h-48 md:h-64 flex items-center justify-center mb-6">
             <p className="text-gray-400 text-lg">캐러셀 영역 (추후 구현)</p>
           </div>
+
+          {/* 상단 캐러셀 광고 */}
+          <AdCarousel
+            placement="banner"
+            limit={3}
+            aspectRatio="21:9"
+            autoPlay={true}
+            autoPlayInterval={6000}
+            showControls={true}
+            showIndicators={true}
+            className="mb-4"
+            showDebugInfo={process.env.NODE_ENV === "development"}
+          />
         </div>
       </section>
 
@@ -44,24 +72,38 @@ function StoriesContent() {
           {/* 검색바 */}
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-4">
             <div className="flex-1 max-w-md w-full">
-              <SearchBar value={search} onChange={(value) => updateFilter({ search: value })} />
+              <SearchBar
+                value={search}
+                onChange={(value) => updateFilter({ search: value })}
+              />
             </div>
 
             {/* 사연 작성 버튼 */}
-            <Link href="/write" className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+            <Link
+              href="/write"
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+              style={{ fontFamily: "NanumJangMiCe, cursive" }}
+            >
               사연 작성
             </Link>
           </div>
 
           {/* 카테고리 필터 버튼 */}
-          <CategoryFilter selected={category} onChange={(value) => updateFilter({ category: value })} />
+          <CategoryFilter
+            selected={category}
+            onChange={(value) => updateFilter({ category: value })}
+          />
 
           {/* 결과 수 & 정렬 */}
           <div className="flex justify-between items-center mt-4">
             <span className="text-gray-600">
-              총 <span className="font-semibold text-primary">{total}</span>개의 사연
+              총 <span className="font-semibold text-primary">{total}</span>개의
+              사연
             </span>
-            <SortSelect value={sort as SortOption} onChange={(value) => updateFilter({ sort: value })} />
+            <SortSelect
+              value={sort as SortOption}
+              onChange={(value) => updateFilter({ sort: value })}
+            />
           </div>
         </div>
       </section>
@@ -81,9 +123,25 @@ function StoriesContent() {
           ) : (
             <>
               <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                {stories.map((story) => (
+                {stories.map((story, index) => (
                   <div key={story._id} className="break-inside-avoid mb-4">
                     <StoryCard story={story} />
+
+                    {/* 중간 캐러셀 광고 삽입 (20번째마다) */}
+                    {(index + 1) % 20 === 0 && (
+                      <div className="mb-4 col-span-full">
+                        <AdCarousel
+                          placement="banner"
+                          limit={2}
+                          aspectRatio="16:9"
+                          autoPlay={true}
+                          autoPlayInterval={7000}
+                          showControls={false}
+                          showIndicators={true}
+                          showDebugInfo={process.env.NODE_ENV === "development"}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -98,7 +156,9 @@ function StoriesContent() {
                 ) : hasNextPage ? (
                   <span className="text-gray-400">스크롤하여 더 보기</span>
                 ) : (
-                  <span className="text-gray-400">모든 사연을 불러왔습니다 ✓</span>
+                  <span className="text-gray-400">
+                    모든 사연을 불러왔습니다 ✓
+                  </span>
                 )}
               </div>
             </>

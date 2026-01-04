@@ -4,4 +4,5 @@ export type { DeviceInfo } from "./device";
 export { getOrCreateSession, updateSessionActivity } from "./session";
 export type { SessionInfo } from "./session";
 
-export { trackAdImpression, trackAdClick, trackAdDwell } from "./ad-tracker";
+// ad-tracker는 adService로 대체됨
+// export { trackAdImpression, trackAdClick, trackAdDwell } from "./ad-tracker";
