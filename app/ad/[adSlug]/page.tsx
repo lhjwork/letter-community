@@ -28,7 +28,73 @@ interface AdData {
   };
 }
 
+// 테스트용 목업 광고 데이터
+const testAdsData: Record<string, AdData> = {
+  "test-wedding-promo": {
+    _id: "test-ad-001",
+    slug: "test-wedding-promo",
+    status: "active",
+    advertiser: { name: "플라워카페" },
+    content: {
+      headline: "신혼부부 특별 할인 10%!",
+      description:
+        "결혼을 축하합니다! 플라워카페에서 특별한 혜택을 준비했어요. 아름다운 꽃다발과 함께 행복한 시작을 응원합니다.",
+      ctaText: "혜택 받으러 가기",
+      targetUrl: "https://example.com/wedding-promo",
+      theme: "wedding",
+    },
+    campaign: {
+      name: "웨딩 테스트 캠페인",
+      startDate: "2024-01-01",
+      endDate: "2030-12-31",
+    },
+  },
+  "test-birthday-promo": {
+    _id: "test-ad-002",
+    slug: "test-birthday-promo",
+    status: "active",
+    advertiser: { name: "스위트베이커리" },
+    content: {
+      headline: "🎂 생일 축하 특별 이벤트!",
+      description:
+        "소중한 분의 생일을 더욱 특별하게! 케이크 주문 시 미니 케이크를 무료로 드립니다.",
+      ctaText: "이벤트 참여하기",
+      targetUrl: "https://example.com/birthday-promo",
+      theme: "birthday",
+    },
+    campaign: {
+      name: "생일 테스트 캠페인",
+      startDate: "2024-01-01",
+      endDate: "2030-12-31",
+    },
+  },
+  "test-general-promo": {
+    _id: "test-ad-003",
+    slug: "test-general-promo",
+    status: "active",
+    advertiser: { name: "Letter Partners" },
+    content: {
+      headline: "Letter와 함께하는 특별한 혜택",
+      description:
+        "Letter Community 사용자만을 위한 특별 할인! 지금 바로 확인해보세요.",
+      ctaText: "자세히 보기",
+      targetUrl: "https://example.com/general-promo",
+      theme: "general",
+    },
+    campaign: {
+      name: "일반 테스트 캠페인",
+      startDate: "2024-01-01",
+      endDate: "2030-12-31",
+    },
+  },
+};
+
 async function getAdData(adSlug: string): Promise<AdData | null> {
+  // 테스트용 광고 slug인 경우 목업 데이터 반환
+  if (adSlug.startsWith("test-") && testAdsData[adSlug]) {
+    return testAdsData[adSlug];
+  }
+
   try {
     const res = await fetch(`${BACKEND_URL}/api/ads/${adSlug}`, {
       next: { revalidate: 60 },
