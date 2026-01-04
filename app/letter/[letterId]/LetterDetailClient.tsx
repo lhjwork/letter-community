@@ -165,36 +165,14 @@ export default function LetterDetailClient({
   const isAuthor = currentUserId === letter.authorId;
   const letterId = letter._id;
 
-  // 사용자 신청 목록 조회 함수
+  // 사용자 신청 목록 조회 함수 (localStorage 기반)
   const loadUserRequests = useCallback(async () => {
     try {
       const BACKEND_URL =
         process.env.NEXT_PUBLIC_BACKEND_URL ||
         "https://letter-my-backend.onrender.com";
 
-      // 현재 편지에 대한 사용자 신청 목록을 직접 조회
-      const response = await fetch(
-        `${BACKEND_URL}/api/letters/${letterId}/physical-request/user`,
-        {
-          credentials: "include",
-          cache: "no-cache",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setUserRequests(result.data.requests || []);
-          return;
-        }
-      }
-
-      // API가 없는 경우 localStorage에서 편지별 신청 정보 조회
+      // localStorage에서 편지별 신청 정보 조회
       const letterRequests = getLetterRequests(letterId);
       const requests = [];
 
@@ -247,36 +225,14 @@ export default function LetterDetailClient({
           process.env.NEXT_PUBLIC_BACKEND_URL ||
           "https://letter-my-backend.onrender.com";
 
-        // 현재 편지에 대한 사용자 신청 목록을 직접 조회
-        const response = await fetch(
-          `${BACKEND_URL}/api/letters/${letterId}/physical-request/user`,
-          {
-            credentials: "include",
-            cache: "no-cache",
-            headers: {
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              Pragma: "no-cache",
-              Expires: "0",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setUserRequests(result.data.requests || []);
-            return;
-          }
-        }
-
-        // API가 없는 경우 localStorage에서 편지별 신청 정보 조회
+        // localStorage에서 편지별 신청 정보 조회
         const letterRequests = getLetterRequests(letterId);
         const requests = [];
 
         for (const letterRequest of letterRequests) {
           try {
             const statusResponse = await fetch(
-              `${BACKEND_URL}/api/letters/physical-request/${letterRequest.requestId}/status`,
+              `${BACKEND_URL}/api/letters/physical-requests/${letterRequest.requestId}/status`,
               {
                 credentials: "include",
                 cache: "no-cache",
