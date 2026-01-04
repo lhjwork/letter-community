@@ -22,53 +22,104 @@ import {
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
 
-// 테스트용 광고 배너 컴포넌트
-function TestAdBanner({ letterId }: { letterId: string }) {
-  const testAds = [
+// 실제 광고처럼 보이는 프로모션 배너 컴포넌트
+function PromotionBanner({ letterId }: { letterId: string }) {
+  const [currentAd, setCurrentAd] = useState(0);
+
+  const promotions = [
     {
       slug: "test-wedding-promo",
-      name: "웨딩 프로모션",
       theme: "wedding",
-      emoji: "💒",
+      advertiser: "플라워카페",
+      headline: "💐 신혼부부 특별 할인 10%",
+      description: "아름다운 꽃다발과 함께 행복한 시작을",
+      ctaText: "혜택 받기",
+      bgGradient: "from-pink-100 to-rose-50",
+      accentColor: "bg-rose-500 hover:bg-rose-600",
+      textColor: "text-rose-800",
     },
     {
       slug: "test-birthday-promo",
-      name: "생일 프로모션",
       theme: "birthday",
-      emoji: "🎂",
+      advertiser: "스위트베이커리",
+      headline: "🎂 생일 축하 특별 이벤트",
+      description: "케이크 주문 시 미니 케이크 무료!",
+      ctaText: "참여하기",
+      bgGradient: "from-orange-100 to-yellow-50",
+      accentColor: "bg-orange-500 hover:bg-orange-600",
+      textColor: "text-orange-800",
     },
     {
       slug: "test-general-promo",
-      name: "일반 프로모션",
       theme: "general",
-      emoji: "🎁",
+      advertiser: "Letter Partners",
+      headline: "🎁 Letter 사용자 특별 혜택",
+      description: "지금 바로 확인해보세요!",
+      ctaText: "자세히 보기",
+      bgGradient: "from-blue-100 to-indigo-50",
+      accentColor: "bg-blue-500 hover:bg-blue-600",
+      textColor: "text-blue-800",
     },
   ];
 
-  // 개발 환경에서만 표시
-  if (process.env.NODE_ENV !== "development") return null;
+  const ad = promotions[currentAd];
 
   return (
-    <div className="mt-8 p-4 bg-yellow-50 border-2 border-dashed border-yellow-400 rounded-lg">
-      <div className="text-center mb-3">
-        <span className="text-yellow-600 font-medium text-sm">
-          🧪 [개발용] 광고 테스트 배너
-        </span>
+    <div className="mt-8">
+      {/* 광고 배너 */}
+      <div
+        className={`relative overflow-hidden rounded-2xl bg-gradient-to-r ${ad.bgGradient} border border-gray-200 shadow-lg`}
+      >
+        {/* AD 표시 */}
+        <div className="absolute top-2 left-2 px-2 py-0.5 bg-gray-800/70 text-white text-xs rounded">
+          AD
+        </div>
+
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            {/* 광고 내용 */}
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 mb-1">{ad.advertiser}</p>
+              <h3
+                className={`text-xl md:text-2xl font-bold ${ad.textColor} mb-2`}
+              >
+                {ad.headline}
+              </h3>
+              <p className="text-gray-600 text-sm md:text-base">
+                {ad.description}
+              </p>
+            </div>
+
+            {/* CTA 버튼 */}
+            <Link
+              href={`/ad/${ad.slug}?letter=${letterId}&utm_source=qr&utm_medium=offline&utm_campaign=letter_banner`}
+              className={`inline-flex items-center justify-center px-6 py-3 ${ad.accentColor} text-white font-medium rounded-xl transition-all transform hover:scale-105 shadow-md whitespace-nowrap`}
+            >
+              {ad.ctaText} →
+            </Link>
+          </div>
+        </div>
+
+        {/* 광고 전환 인디케이터 */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+          {promotions.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentAd(idx)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                idx === currentAd ? "bg-gray-700 w-4" : "bg-gray-400"
+              }`}
+            />
+          ))}
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2 justify-center">
-        {testAds.map((ad) => (
-          <Link
-            key={ad.slug}
-            href={`/ad/${ad.slug}?letter=${letterId}&utm_source=qr&utm_medium=offline&utm_campaign=test`}
-            className="px-4 py-2 bg-white border border-yellow-300 rounded-lg hover:bg-yellow-100 transition-colors text-sm"
-          >
-            {ad.emoji} {ad.name}
-          </Link>
-        ))}
-      </div>
-      <p className="text-xs text-yellow-600 text-center mt-2">
-        클릭하면 광고 랜딩 페이지로 이동합니다 (실제 QR 스캔 시뮬레이션)
-      </p>
+
+      {/* 개발 모드 표시 */}
+      {process.env.NODE_ENV === "development" && (
+        <p className="text-xs text-gray-400 text-center mt-2">
+          🧪 테스트 광고 - 클릭하면 광고 랜딩 페이지로 이동
+        </p>
+      )}
     </div>
   );
 }
@@ -547,8 +598,8 @@ export default function LetterDetailClient({
           }}
         />
 
-        {/* 테스트용 광고 배너 (개발 환경에서만 표시) */}
-        <TestAdBanner letterId={letter._id} />
+        {/* 프로모션 광고 배너 */}
+        <PromotionBanner letterId={letter._id} />
       </div>
     </div>
   );
