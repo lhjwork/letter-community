@@ -20,7 +20,10 @@ interface AdDwellData extends AdTrackingData {
   dwellTime: number;
 }
 
-async function sendAdEvent(eventType: string, data: Record<string, unknown>) {
+async function sendAdEvent(
+  eventType: string,
+  data: AdTrackingData | AdClickData | AdDwellData
+) {
   try {
     const device = getDeviceInfo();
     const session = getOrCreateSession();
