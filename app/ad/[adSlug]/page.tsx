@@ -30,59 +30,59 @@ interface AdData {
 
 // 테스트용 목업 광고 데이터
 const testAdsData: Record<string, AdData> = {
-  "test-wedding-promo": {
+  "test-cafe-promo": {
     _id: "test-ad-001",
-    slug: "test-wedding-promo",
+    slug: "test-cafe-promo",
     status: "active",
-    advertiser: { name: "플라워카페" },
+    advertiser: { name: "카페 블루밍" },
     content: {
-      headline: "신혼부부 특별 할인 10%!",
+      headline: "☕ 아메리카노 1+1 이벤트",
       description:
-        "결혼을 축하합니다! 플라워카페에서 특별한 혜택을 준비했어요. 아름다운 꽃다발과 함께 행복한 시작을 응원합니다.",
-      ctaText: "혜택 받으러 가기",
-      targetUrl: "https://example.com/wedding-promo",
-      theme: "wedding",
-    },
-    campaign: {
-      name: "웨딩 테스트 캠페인",
-      startDate: "2024-01-01",
-      endDate: "2030-12-31",
-    },
-  },
-  "test-birthday-promo": {
-    _id: "test-ad-002",
-    slug: "test-birthday-promo",
-    status: "active",
-    advertiser: { name: "스위트베이커리" },
-    content: {
-      headline: "🎂 생일 축하 특별 이벤트!",
-      description:
-        "소중한 분의 생일을 더욱 특별하게! 케이크 주문 시 미니 케이크를 무료로 드립니다.",
-      ctaText: "이벤트 참여하기",
-      targetUrl: "https://example.com/birthday-promo",
-      theme: "birthday",
-    },
-    campaign: {
-      name: "생일 테스트 캠페인",
-      startDate: "2024-01-01",
-      endDate: "2030-12-31",
-    },
-  },
-  "test-general-promo": {
-    _id: "test-ad-003",
-    slug: "test-general-promo",
-    status: "active",
-    advertiser: { name: "Letter Partners" },
-    content: {
-      headline: "Letter와 함께하는 특별한 혜택",
-      description:
-        "Letter Community 사용자만을 위한 특별 할인! 지금 바로 확인해보세요.",
-      ctaText: "자세히 보기",
-      targetUrl: "https://example.com/general-promo",
+        "Letter 사용자만을 위한 특별 혜택! 매장 방문 시 이 쿠폰을 보여주시면 아메리카노 1+1 혜택을 드립니다. 따뜻한 커피 한 잔과 함께 소중한 편지를 나눠보세요.",
+      ctaText: "쿠폰 받기",
+      targetUrl: "https://example.com/cafe-promo",
       theme: "general",
     },
     campaign: {
-      name: "일반 테스트 캠페인",
+      name: "카페 테스트 캠페인",
+      startDate: "2024-01-01",
+      endDate: "2030-12-31",
+    },
+  },
+  "test-bookstore-promo": {
+    _id: "test-ad-002",
+    slug: "test-bookstore-promo",
+    status: "active",
+    advertiser: { name: "책방 오늘" },
+    content: {
+      headline: "📚 베스트셀러 20% 할인",
+      description:
+        "편지와 함께하는 독서의 즐거움! 이번 주말까지 베스트셀러 도서 20% 할인 이벤트를 진행합니다. 소중한 사람에게 책 한 권 선물해보세요.",
+      ctaText: "할인 보기",
+      targetUrl: "https://example.com/bookstore-promo",
+      theme: "general",
+    },
+    campaign: {
+      name: "서점 테스트 캠페인",
+      startDate: "2024-01-01",
+      endDate: "2030-12-31",
+    },
+  },
+  "test-flower-promo": {
+    _id: "test-ad-003",
+    slug: "test-flower-promo",
+    status: "active",
+    advertiser: { name: "플라워샵 봄" },
+    content: {
+      headline: "🌷 꽃다발 무료 배송",
+      description:
+        "5만원 이상 구매 시 전국 어디든 무료 배송! 편지와 함께 아름다운 꽃다발을 선물해보세요. 마음을 전하는 가장 아름다운 방법입니다.",
+      ctaText: "주문하기",
+      targetUrl: "https://example.com/flower-promo",
+      theme: "general",
+    },
+    campaign: {
+      name: "꽃집 테스트 캠페인",
       startDate: "2024-01-01",
       endDate: "2030-12-31",
     },
