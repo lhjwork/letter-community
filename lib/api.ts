@@ -10,7 +10,10 @@ interface ApiRequestOptions extends RequestInit {
 /**
  * 백엔드 API 호출 유틸리티
  */
-export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  endpoint: string,
+  options: ApiRequestOptions = {}
+): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
   const defaultHeaders: Record<string, string> = {
@@ -59,7 +62,10 @@ export async function getCurrentUser(token: string) {
 /**
  * 사용자 정보 업데이트
  */
-export async function updateUser(token: string, data: { name?: string; email?: string; image?: string }) {
+export async function updateUser(
+  token: string,
+  data: { name?: string; email?: string; image?: string }
+) {
   return apiRequest("/api/users/me", {
     method: "PUT",
     token,
@@ -248,12 +254,18 @@ export interface GetMyLettersResponse {
 /**
  * 내가 쓴 편지 목록 조회 (페이지네이션 지원)
  */
-export async function getMyLetters(token: string, params?: { page?: number; limit?: number }): Promise<GetMyLettersResponse> {
+export async function getMyLetters(
+  token: string,
+  params?: { page?: number; limit?: number }
+): Promise<GetMyLettersResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
 
-  const endpoint = params && (params.page || params.limit) ? `/api/letters/my?${queryParams.toString()}` : "/api/letters/my";
+  const endpoint =
+    params && (params.page || params.limit)
+      ? `/api/letters/my?${queryParams.toString()}`
+      : "/api/letters/my";
 
   return apiRequest<GetMyLettersResponse>(endpoint, {
     method: "GET",
@@ -264,7 +276,10 @@ export async function getMyLetters(token: string, params?: { page?: number; limi
 /**
  * 편지 삭제
  */
-export async function deleteLetter(letterId: string, token: string): Promise<void> {
+export async function deleteLetter(
+  letterId: string,
+  token: string
+): Promise<void> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
     token,
@@ -323,7 +338,9 @@ export interface GetStoriesParams {
 /**
  * 사연 목록 조회 (공개 사연만)
  */
-export async function getStories(params?: GetStoriesParams): Promise<StoriesResponse> {
+export async function getStories(
+  params?: GetStoriesParams
+): Promise<StoriesResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
@@ -339,8 +356,23 @@ export async function getStories(params?: GetStoriesParams): Promise<StoriesResp
 /**
  * 카테고리 통계 조회
  */
-export async function getCategoryStats(): Promise<{ success: boolean; data: CategoryStats }> {
+export async function getCategoryStats(): Promise<{
+  success: boolean;
+  data: CategoryStats;
+}> {
   return apiRequest("/api/letters/categories/stats", {
+    method: "GET",
+  });
+}
+
+/**
+ * 메인 랜딩 페이지용 추천 사연 조회 (최신 4개)
+ */
+export async function getFeaturedStories(): Promise<{
+  success: boolean;
+  data: Story[];
+}> {
+  return apiRequest("/api/letters/stories/featured", {
     method: "GET",
   });
 }
@@ -366,7 +398,10 @@ export interface MyLikesResponse {
 /**
  * 좋아요 추가
  */
-export async function addLike(letterId: string, token: string): Promise<LikeResponse> {
+export async function addLike(
+  letterId: string,
+  token: string
+): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "POST",
     token,
@@ -376,7 +411,10 @@ export async function addLike(letterId: string, token: string): Promise<LikeResp
 /**
  * 좋아요 취소
  */
-export async function removeLike(letterId: string, token: string): Promise<LikeResponse> {
+export async function removeLike(
+  letterId: string,
+  token: string
+): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "DELETE",
     token,
@@ -386,7 +424,10 @@ export async function removeLike(letterId: string, token: string): Promise<LikeR
 /**
  * 좋아요 상태 확인
  */
-export async function checkLikeStatus(letterId: string, token: string): Promise<LikeResponse> {
+export async function checkLikeStatus(
+  letterId: string,
+  token: string
+): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "GET",
     token,
@@ -396,7 +437,10 @@ export async function checkLikeStatus(letterId: string, token: string): Promise<
 /**
  * 내가 좋아요한 목록 조회
  */
-export async function getMyLikes(token: string, params?: { page?: number; limit?: number }): Promise<MyLikesResponse> {
+export async function getMyLikes(
+  token: string,
+  params?: { page?: number; limit?: number }
+): Promise<MyLikesResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
