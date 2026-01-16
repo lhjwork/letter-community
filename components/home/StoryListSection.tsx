@@ -115,7 +115,7 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
         </div>
 
         {/* 스토리 카드 그리드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8 justify-items-center">
           {displayStories.map((story) => (
             <StoryCard key={story._id} story={story} />
           ))}
