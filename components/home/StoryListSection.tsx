@@ -24,7 +24,7 @@ function StoryCard({ story }: StoryCardProps) {
 
   return (
     <Link href={`/letter/${story._id}`}>
-      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-8 w-full h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
+      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-8 w-[285px] h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
         {/* 가로 줄들 */}
         <div className="space-y-12">
           {[...Array(6)].map((_, i) => (
@@ -115,7 +115,7 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
         </div>
 
         {/* 스토리 카드 그리드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8 justify-items-center">
+        <div className="flex flex-wrap justify-center gap-6 mb-8">
           {displayStories.map((story) => (
             <StoryCard key={story._id} story={story} />
           ))}
