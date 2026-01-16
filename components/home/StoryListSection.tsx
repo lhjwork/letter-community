@@ -24,7 +24,7 @@ function StoryCard({ story }: StoryCardProps) {
 
   return (
     <Link href={`/letter/${story._id}`}>
-      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-8 w-[285px] h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
+      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-8 w-full h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
         {/* 가로 줄들 */}
         <div className="space-y-12">
           {[...Array(6)].map((_, i) => (
@@ -34,32 +34,24 @@ function StoryCard({ story }: StoryCardProps) {
 
         {/* 날짜 */}
         <div className="absolute top-8 right-8">
-          <span className="text-lg text-[#424242]">
-            {formatDate(story.createdAt)}
-          </span>
+          <span className="text-lg text-[#424242]">{formatDate(story.createdAt)}</span>
         </div>
 
         {/* 카테고리 배지 */}
         {story.category && (
           <div className="absolute top-8 left-8">
-            <span className="px-3 py-1 bg-[#FF7F65] text-white text-sm rounded-full">
-              {getCategoryLabel(story.category)}
-            </span>
+            <span className="px-3 py-1 bg-[#FF7F65] text-white text-sm rounded-full">{getCategoryLabel(story.category)}</span>
           </div>
         )}
 
         {/* 제목 또는 내용 미리보기 */}
         <div className="absolute top-20 left-8 right-8">
-          <p className="text-base text-[#424242] line-clamp-3">
-            {story.title || getPlainText(story.content || "")}
-          </p>
+          <p className="text-base text-[#424242] line-clamp-3">{story.title || getPlainText(story.content || "")}</p>
         </div>
 
         {/* 작성자 */}
         <div className="absolute bottom-8 right-8 flex items-center gap-2">
-          <span className="text-xl font-medium text-[#424242]">
-            {story.authorName || "익명"}
-          </span>
+          <span className="text-xl font-medium text-[#424242]">{story.authorName || "익명"}</span>
         </div>
 
         {/* 통계 정보 */}
@@ -118,40 +110,20 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
       <div className="container mx-auto px-20">
         {/* 타이틀 */}
         <div className="text-center mb-16">
-          <h2 className="text-[52px] leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-4">
-            사연을 남겨주세요
-          </h2>
-          <p className="text-2xl text-[#757575]">
-            당신의 이야기가 한장의 편지로 이어집니다
-          </p>
+          <h2 className="text-[52px] leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-4">사연을 남겨주세요</h2>
+          <p className="text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
         </div>
 
         {/* 스토리 카드 그리드 */}
-        <div className="grid grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           {displayStories.map((story) => (
             <StoryCard key={story._id} story={story} />
           ))}
-
-          {/* 빈 카드 (데이터가 4개 미만일 때) */}
-          {emptyCards > 0 &&
-            [...Array(emptyCards)].map((_, index) => (
-              <div
-                key={`empty-${index}`}
-                className="bg-[#F9F9F9] border border-dashed border-[#C4C4C4] rounded-xl w-[285px] h-[312px] flex items-center justify-center"
-              >
-                <span className="text-[#C4C4C4] text-lg">
-                  사연을 기다리는 중
-                </span>
-              </div>
-            ))}
         </div>
 
         {/* 더보기 버튼 */}
         <div className="flex justify-center">
-          <Link
-            href="/stories"
-            className="px-8 py-4 border-2 border-[#FF7F65] text-[#FF7F65] text-2xl font-semibold rounded hover:bg-[#FFF5F3] transition-colors"
-          >
+          <Link href="/stories" className="px-8 py-4 border-2 border-[#FF7F65] text-[#FF7F65] text-2xl font-semibold rounded hover:bg-[#FFF5F3] transition-colors">
             더 많은 사연 보기
           </Link>
         </div>
