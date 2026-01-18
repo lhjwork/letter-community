@@ -20,6 +20,17 @@
   "editor.suggestSelection": "first",
   "editor.inlineSuggest.enabled": true,
 
+  // Snippet 설정
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.snippetSuggestions": "top",
+  "editor.tabCompletion": "onlySnippets",
+
+  // TypeScript/JavaScript 자동 import 설정
+  "typescript.suggest.autoImports": "on",
+  "javascript.suggest.autoImports": "on",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "javascript.preferences.includePackageJsonAutoImports": "on",
+
   // GitHub Copilot 설정
   "github.copilot.enable": {
     "*": true,
@@ -59,13 +70,15 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.suggest.snippetsPreventQuickSuggestions": false
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.suggest.snippetsPreventQuickSuggestions": false
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

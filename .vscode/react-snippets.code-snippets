@@ -1,0 +1,22 @@
+{
+  "LoginModalIllustration Component": {
+    "prefix": "LoginModalIllustration",
+    "body": ["<LoginModalIllustration className=\"$1\" $2/>"],
+    "description": "Insert LoginModalIllustration component",
+  },
+  "LetterLogo Component": {
+    "prefix": "LetterLogo",
+    "body": ["<LetterLogo className=\"$1\" $2/>"],
+    "description": "Insert LetterLogo component",
+  },
+  "KakaoLogo Component": {
+    "prefix": "KakaoLogo",
+    "body": ["<KakaoLogo className=\"$1\" $2/>"],
+    "description": "Insert KakaoLogo component",
+  },
+  "NaverLogo Component": {
+    "prefix": "NaverLogo",
+    "body": ["<NaverLogo className=\"$1\" $2/>"],
+    "description": "Insert NaverLogo component",
+  },
+}
