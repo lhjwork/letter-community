@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { LikeButton } from "@/components/like";
 import PostcodeSearch, {
   PostcodeResult,
@@ -13,10 +12,9 @@ import AuthorRequestsManager from "@/components/letter/AuthorRequestsManager";
 import UserRequestsStatus from "@/components/letter/UserRequestsStatus";
 import RecipientAddressModal from "@/components/recipient/RecipientAddressModal";
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
-import SimplePhysicalStatus from "@/components/letter/SimplePhysicalStatus";
+
 import { Button } from "@/components/ui/button";
-import AdBanner from "@/components/ads/AdBanner";
-import AdCarousel from "@/components/ads/AdCarousel";
+import { HeroBanner } from "@/components/home";
 import {
   saveLetterRequest,
   getLetterRequests,
@@ -65,6 +63,15 @@ export default function LetterDetailClient({
   const router = useRouter();
   const { data: session } = useSession();
 
+  // 정적 배너 데이터
+  const bannerSlides = [
+    {
+      id: 1,
+      image: "/images/mainbanner/banner-1.png",
+      alt: "배너 1",
+    },
+  ];
+
   const isAuthor = currentUserId === letter.authorId;
   const letterId = letter._id;
 
@@ -91,7 +98,7 @@ export default function LetterDetailClient({
                 Pragma: "no-cache",
                 Expires: "0",
               },
-            }
+            },
           );
 
           if (statusResponse.ok) {
@@ -144,7 +151,7 @@ export default function LetterDetailClient({
                   Pragma: "no-cache",
                   Expires: "0",
                 },
-              }
+              },
             );
 
             if (statusResponse.ok) {
@@ -180,21 +187,40 @@ export default function LetterDetailClient({
       loadUserRequests();
       setShowAddressForm(false);
     },
-    [loadUserRequests, letterId]
+    [loadUserRequests, letterId],
   );
 
   // 현재 활성 신청 개수 계산
   const activeRequestCount = useMemo(() => {
     return userRequests.filter(
-      (r) => r.status !== "cancelled" && r.status !== "rejected"
+      (r) => r.status !== "cancelled" && r.status !== "rejected",
     ).length;
   }, [userRequests]);
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-background to-muted/20 py-16 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      {/* 베너 */}
+      {bannerSlides.length > 0 && (
+        <div className="container mx-auto px-20 py-12">
+          <HeroBanner bannerSlides={bannerSlides} />
+        </div>
+      )}
+
+      {/* 메인 컨텐츠 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 뒤로가기 버튼 */}
+        <div className="mb-8">
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+          >
+            <span>← 뒤로가기</span>
+          </Button>
+        </div>
+
         {/* 편지 내용 */}
-        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
+        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col mb-12">
           {/* 편지지 장식 */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
           <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
@@ -270,8 +296,8 @@ export default function LetterDetailClient({
           </div>
         </div>
 
-        {/* 좋아요 버튼 */}
-        <div className="mt-8 flex items-center justify-center">
+        {/* 좋아요 섹션 */}
+        <section className="mb-12 flex justify-center">
           <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
             <LikeButton
               letterId={letter._id}
@@ -279,12 +305,42 @@ export default function LetterDetailClient({
               size="lg"
               showCount
             />
-            <span className="text-gray-500 text-sm ml-2">좋아요</span>
           </div>
-        </div>
+        </section>
 
-        {/* 간단한 실물 편지 상태 표시 */}
-        <SimplePhysicalStatus letterId={letter._id} />
+        {/* 구분선 */}
+        <div className="w-full h-px bg-[#C4C4C4] mb-12"></div>
+
+        {/* CTA 버튼 섹션 */}
+        <div className="flex justify-end gap-6 mb-12">
+          {/* 편지 답장하기 버튼 */}
+          <Button
+            onClick={() => router.push("/write")}
+            className="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-lg h-[60px] min-w-[200px]"
+          >
+            편지 답장하기
+          </Button>
+
+          {/* 실물 편지 신청하기 버튼 */}
+          {letter.authorSettings.allowPhysicalRequests && (
+            <Button
+              onClick={() => {
+                if (!session) {
+                  router.push(`/letter/${letter._id}/request`);
+                } else {
+                  setShowRecipientSelect(true);
+                }
+              }}
+              disabled={
+                !!session &&
+                activeRequestCount >= letter.authorSettings.maxRequestsPerPerson
+              }
+              className="px-8 py-4 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg h-[60px] min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              실물 편지 신청하기 ✉️
+            </Button>
+          )}
+        </div>
 
         {/* 편지 작성자용 신청 관리 */}
         {isAuthor && (
@@ -323,104 +379,6 @@ export default function LetterDetailClient({
           />
         )}
 
-        {/* 실물 편지 신청 CTA */}
-        {letter.authorSettings.allowPhysicalRequests && (
-          <div className="mt-8 bg-linear-to-r from-pink-50 to-purple-50 rounded-lg p-8 border border-pink-200">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                이 편지를 실물로 받고 싶으신가요?
-              </h2>
-
-              {/* 승인 메시지 */}
-              {letter.authorSettings.requireApprovalMessage && (
-                <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-blue-800 text-sm">
-                    📝 작성자 메시지:{" "}
-                    {letter.authorSettings.requireApprovalMessage}
-                  </p>
-                </div>
-              )}
-
-              <p className="text-gray-600 mb-6">
-                손으로 쓴 진짜 편지를 우편으로 받아보세요.
-                <br />
-                {letter.authorSettings.autoApprove
-                  ? "신청 즉시 배송 준비가 시작됩니다."
-                  : "편지 작성자의 승인 후 배송이 시작됩니다."}
-              </p>
-
-              {/* 신청 통계 표시 */}
-              {letter.physicalLetterStats.totalRequests > 0 && (
-                <div className="mb-6 p-4 bg-white/70 rounded-lg border border-pink-100">
-                  <div className="flex items-center justify-center gap-4 text-pink-700">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold">
-                        {letter.physicalLetterStats.totalRequests}
-                      </div>
-                      <div className="text-sm">총 신청</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">
-                        {letter.physicalLetterStats.approvedRequests}
-                      </div>
-                      <div className="text-sm">승인됨</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {letter.physicalLetterStats.pendingRequests}
-                      </div>
-                      <div className="text-sm">대기 중</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* 신청 제한 안내 */}
-              {letter.authorSettings.maxRequestsPerPerson > 1 && (
-                <div className="mb-4 text-sm text-gray-600">
-                  1인당 최대 {letter.authorSettings.maxRequestsPerPerson}개까지
-                  신청 가능 (현재 {activeRequestCount}개 신청됨)
-                </div>
-              )}
-
-              <button
-                onClick={() => {
-                  // 로그인하지 않은 사용자는 익명 신청 페이지로 이동
-                  if (!session) {
-                    router.push(`/letter/${letter._id}/request`);
-                  } else {
-                    // 로그인한 사용자는 기존 방식 사용
-                    setShowRecipientSelect(true);
-                  }
-                }}
-                disabled={
-                  !!session &&
-                  activeRequestCount >=
-                    letter.authorSettings.maxRequestsPerPerson
-                }
-                className="px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                실물 편지 신청하기 ✉️
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 신청 불가 안내 */}
-        {!letter.authorSettings.allowPhysicalRequests && (
-          <div className="mt-8 bg-gray-50 rounded-lg p-8 border border-gray-200">
-            <div className="text-center">
-              <div className="text-4xl mb-4">📪</div>
-              <h2 className="text-xl font-bold text-gray-600 mb-2">
-                실물 편지 신청이 중단되었습니다
-              </h2>
-              <p className="text-gray-500">
-                편지 작성자가 실물 편지 신청을 허용하지 않습니다.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* 주소 입력 폼 */}
         {showAddressForm && (
           <AddressForm
@@ -453,29 +411,7 @@ export default function LetterDetailClient({
             setShowAddressForm(true);
           }}
         />
-
-        {/* 캐러셀 광고 배너 */}
-        <AdCarousel
-          placement="banner"
-          limit={1}
-          aspectRatio="16:9"
-          autoPlay={false}
-          showControls={false}
-          showIndicators={false}
-          className="mt-8"
-          showDebugInfo={process.env.NODE_ENV === "development"}
-        />
-
-        {/* 사이드바 광고 (데스크톱에서만) */}
-        <div className="hidden lg:block mt-8">
-          <AdBanner
-            placement="sidebar"
-            limit={2}
-            className="space-y-4"
-            showDebugInfo={process.env.NODE_ENV === "development"}
-          />
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -551,7 +487,7 @@ function AddressForm({
           },
           credentials: "include",
           body: JSON.stringify({ address: formData }),
-        }
+        },
       );
 
       const result = await response.json();
@@ -570,7 +506,7 @@ function AddressForm({
         // 추적 정보 표시
         if (result.data.trackingInfo) {
           alert(
-            `${result.message}\n\n추적 ID: ${result.data.trackingInfo.requestId}\n${result.data.trackingInfo.message}`
+            `${result.message}\n\n추적 ID: ${result.data.trackingInfo.requestId}\n${result.data.trackingInfo.message}`,
           );
         } else {
           alert(result.message);
@@ -585,7 +521,7 @@ function AddressForm({
       alert(
         error instanceof Error
           ? error.message
-          : "신청에 실패했습니다. 다시 시도해주세요."
+          : "신청에 실패했습니다. 다시 시도해주세요.",
       );
     } finally {
       setIsSubmitting(false);

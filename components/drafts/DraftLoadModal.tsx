@@ -29,7 +29,11 @@ export default function DraftLoadModal({
 
     setIsLoading(true);
     try {
-      const response = await getDrafts(session.backendToken);
+      const response = await getDrafts(session.backendToken, {
+        type: "friend", // friend 타입의 임시저장만 가져오기
+        sort: "latest",
+        limit: 50,
+      });
       if (response.success) {
         setDrafts(response.data.drafts || response.data);
       }
