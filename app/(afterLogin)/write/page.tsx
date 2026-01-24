@@ -22,11 +22,8 @@ import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import { getDraft } from "@/lib/draft-api";
 import SaveIndicator from "@/components/letter/SaveIndicator";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
-import DraftList from "@/components/drafts/DraftList";
 import DraftLoadButton from "@/components/drafts/DraftLoadButton";
-import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
-import { Menu, X, FileText } from "lucide-react";
 import { DraftLetter } from "@/types/draft";
 
 type LetterType = "story" | "friend";
@@ -40,9 +37,6 @@ function WritePageContent() {
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  // 사이드바 상태
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // 임시저장 관련 상태
   const searchParams = useSearchParams();
@@ -100,37 +94,37 @@ function WritePageContent() {
 
   // 임시저장 불러오기
   useEffect(() => {
+    const loadDraft = async (id: string) => {
+      if (!session?.backendToken) return;
+
+      setIsLoadingDraft(true);
+      try {
+        const response = await getDraft(session.backendToken, id);
+        if (response.success) {
+          const draft = response.data;
+          setTitle(draft.title);
+          setContent(draft.content);
+          setLetterType(draft.type);
+          setCurrentDraftId(draft._id);
+          setHasUnsavedChanges(false);
+
+          // 에디터 내용 업데이트
+          if (editor) {
+            editor.commands.setContent(draft.content);
+          }
+        }
+      } catch (error) {
+        console.error("임시저장 불러오기 실패:", error);
+        alert("임시저장을 불러올 수 없습니다.");
+      } finally {
+        setIsLoadingDraft(false);
+      }
+    };
+
     if (draftId && session?.backendToken) {
       loadDraft(draftId);
     }
-  }, [draftId, session?.backendToken]);
-
-  const loadDraft = async (id: string) => {
-    if (!session?.backendToken) return;
-
-    setIsLoadingDraft(true);
-    try {
-      const response = await getDraft(session.backendToken, id);
-      if (response.success) {
-        const draft = response.data;
-        setTitle(draft.title);
-        setContent(draft.content);
-        setLetterType(draft.type);
-        setCurrentDraftId(draft._id);
-        setHasUnsavedChanges(false);
-
-        // 에디터 내용 업데이트
-        if (editor) {
-          editor.commands.setContent(draft.content);
-        }
-      }
-    } catch (error) {
-      console.error("임시저장 불러오기 실패:", error);
-      alert("임시저장을 불러올 수 없습니다.");
-    } finally {
-      setIsLoadingDraft(false);
-    }
-  };
+  }, [draftId, session?.backendToken, editor]);
 
   // 키보드 단축키 (Ctrl+S)
   useEffect(() => {
@@ -356,25 +350,6 @@ function WritePageContent() {
     }
   };
 
-  // 임시저장 편집 핸들러
-  const handleEditDraft = (editDraftId: string) => {
-    if (hasUnsavedChanges) {
-      const shouldContinue = confirm(
-        "현재 작성 중인 내용이 있습니다. 다른 임시저장을 불러오시겠습니까?",
-      );
-      if (!shouldContinue) return;
-    }
-
-    // URL 업데이트하여 새로운 임시저장 로드
-    router.push(`/write?draftId=${editDraftId}`);
-    setIsSidebarOpen(false);
-  };
-
-  // 사이드바 토글
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
@@ -393,55 +368,12 @@ function WritePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-background to-muted/20 flex">
-      {/* 임시저장 사이드바 */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:relative lg:translate-x-0 lg:shadow-none lg:border-r`}
-      >
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            <h2 className="font-semibold">임시저장</h2>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleSidebar}
-            className="lg:hidden"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-        <div className="p-4 h-full overflow-y-auto">
-          <DraftList onEditDraft={handleEditDraft} />
-        </div>
-      </div>
-
-      {/* 사이드바 오버레이 (모바일) */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
-
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       {/* 메인 컨텐츠 */}
       <main className="flex-1 flex flex-col items-center py-16 px-4 sm:px-8">
         {/* 페이지 타이틀 */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-4">
-            {/* 사이드바 토글 버튼 (모바일) */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleSidebar}
-              className="lg:hidden"
-            >
-              <Menu className="w-4 h-4" />
-            </Button>
-
             <h1 className="text-3xl md:text-4xl font-bold text-primary">
               {letterType === "story"
                 ? "당신의 사연을 들려주세요"
@@ -662,12 +594,6 @@ function WritePageContent() {
             className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             초기화
-          </button>
-          <button
-            onClick={toggleSidebar}
-            className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium lg:hidden"
-          >
-            임시저장 목록
           </button>
           <button
             onClick={handleSubmit}
