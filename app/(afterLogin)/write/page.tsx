@@ -4,18 +4,10 @@ import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
-import { createStory, createLetter } from "@/lib/api";
+import { createLetter } from "@/lib/api";
 import { generateTitle, canGenerateTitle } from "@/lib/ai-title-generator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { classifyCategory } from "@/lib/categoryClassifier";
 import ShareModal from "@/components/ShareModal";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
@@ -24,18 +16,14 @@ import SaveIndicator from "@/components/letter/SaveIndicator";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
 import DraftLoadButton from "@/components/drafts/DraftLoadButton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckSquare } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Suspense } from "react";
 import { DraftLetter } from "@/types/draft";
 import { HeroBanner } from "@/components/home";
 
-type LetterType = "story" | "friend";
-
 function WritePageContent() {
-  const [letterType, setLetterType] = useState<LetterType>("story");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
@@ -74,18 +62,15 @@ function WritePageContent() {
       setContent(newContent);
       setHasUnsavedChanges(true);
     },
-    placeholder:
-      letterType === "story"
-        ? "여기에 당신의 이야기를 작성해주세요..."
-        : "여기에 당신의 마음을 담아주세요...",
-    enableImages: letterType === "story", // 사연에만 이미지 기능 활성화
+    placeholder: "여기에 당신의 마음을 담아주세요...",
+    enableImages: false, // 일반 편지는 이미지 비활성화
   });
 
   // 임시저장 훅
   const { saveState, manualSave } = useDraftManualSave({
     content,
     title,
-    type: letterType,
+    type: "friend", // 일반 편지로 고정
     category: "기타", // 기본 카테고리
     draftId: currentDraftId,
     onSave: (savedDraftId) => {
@@ -116,7 +101,6 @@ function WritePageContent() {
           const draft = response.data;
           setTitle(draft.title);
           setContent(draft.content);
-          setLetterType(draft.type);
           setCurrentDraftId(draft._id);
           setHasUnsavedChanges(false);
 
@@ -153,7 +137,7 @@ function WritePageContent() {
 
   // AI 제목 생성 함수 (버튼 클릭 시 호출)
   const generateAITitle = async () => {
-    if (letterType === "friend" && content) {
+    if (content) {
       const plainContent = content.replace(/<[^>]*>/g, "").trim();
 
       if (canGenerateTitle(plainContent)) {
@@ -177,11 +161,6 @@ function WritePageContent() {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    setHasUnsavedChanges(true);
-  };
-
-  const handleLetterTypeChange = (newType: LetterType) => {
-    setLetterType(newType);
     setHasUnsavedChanges(true);
   };
 
@@ -226,69 +205,25 @@ function WritePageContent() {
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
-      let result;
+      // 일반 편지 생성
+      const result = await createLetter(
+        {
+          title: title.trim(),
+          content: htmlContent,
+          type: "friend",
+          ogTitle: title.trim(),
+          ogPreviewText,
+        },
+        token,
+      );
 
-      if (letterType === "story") {
-        // 사연 등록
-        const classificationResult = classifyCategory(
-          title.trim(),
-          plainContent,
-        );
-        const aiCategory = classificationResult.category;
-        const aiMetadata = {
-          confidence: classificationResult.confidence,
-          reason: classificationResult.reason,
-          tags: classificationResult.tags,
-          classifiedAt: new Date().toISOString(),
-          model: "keyword-based-frontend",
-        };
-
-        result = await createStory(
-          {
-            title: title.trim(),
-            content: htmlContent,
-            authorName: session?.user?.name || "익명",
-            ogTitle: title.trim(),
-            ogPreviewText,
-            category: aiCategory,
-            isPublic,
-            aiMetadata,
-          },
-          token,
-        );
-
-        alert(`사연이 "${aiCategory}" 카테고리로 등록되었습니다! 💌`);
-
-        // 성공적으로 발행되면 임시저장 상태 초기화
-        setHasUnsavedChanges(false);
-
-        // 사연 상세 페이지로 이동
-        if (result?.data?._id) {
-          router.push(`/letter/${result.data._id}`);
-        } else {
-          router.push("/stories");
-        }
-      } else {
-        // 일반 편지 - URL 공유
-        result = await createLetter(
-          {
-            title: title.trim(),
-            content: htmlContent,
-            type: "friend",
-            ogTitle: title.trim(),
-            ogPreviewText,
-          },
-          token,
-        );
-
-        // 공유 모달 표시
-        setShareData({
-          url: result.data.url,
-          title: result.data.title,
-        });
-        setShowShareModal(true);
-        setHasUnsavedChanges(false);
-      }
+      // 공유 모달 표시
+      setShareData({
+        url: result.data.url,
+        title: result.data.title,
+      });
+      setShowShareModal(true);
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error("등록 실패:", error);
       alert(
@@ -319,7 +254,6 @@ function WritePageContent() {
 
     setTitle(draft.title);
     setContent(draft.content);
-    setLetterType(draft.type);
     setCurrentDraftId(draft._id);
     setHasUnsavedChanges(false);
 
@@ -363,28 +297,6 @@ function WritePageContent() {
           </Button>
         </div>
 
-        {/* 편지 유형 선택 */}
-        <section className="mb-12">
-          <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
-            style={{ fontFamily: "NanumJangMiCe, cursive" }}
-          >
-            편지 유형을 선택해주세요
-          </h2>
-
-          <div className="w-full max-w-4xl mb-6">
-            <Select value={letterType} onValueChange={handleLetterTypeChange}>
-              <SelectTrigger className="w-full h-12 text-base">
-                <SelectValue placeholder="편지 유형을 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="story">사연 (공개)</SelectItem>
-                <SelectItem value="friend">일반 편지 (URL 공유)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
-
         {/* 제목 입력 */}
         <section className="mb-12">
           <h2
@@ -405,9 +317,8 @@ function WritePageContent() {
           </div>
 
           <p className="text-gray-600 text-xl mt-4">
-            {letterType === "story"
-              ? "제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을 제안해드려요."
-              : "편지 내용을 작성한 후 AI 제목 생성 버튼을 클릭하여 제목을 자동으로 생성할 수 있습니다."}
+            편지 내용을 작성한 후 AI 제목 생성 버튼을 클릭하여 제목을 자동으로
+            생성할 수 있습니다.
           </p>
         </section>
 
@@ -417,9 +328,7 @@ function WritePageContent() {
             className="text-5xl font-bold text-gray-700 mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
-            {letterType === "story"
-              ? "어떤 이야기를 건네고 싶으신가요?"
-              : "어떤 마음을 전하고 싶으신가요?"}
+            어떤 마음을 전하고 싶으신가요?
           </h2>
 
           {/* 편지지 스타일 컨테이너 */}
@@ -428,10 +337,7 @@ function WritePageContent() {
             <div className="relative z-20 bg-white border-b">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <EditorToolbar
-                    editor={editor}
-                    enableImages={letterType === "story"}
-                  />
+                  <EditorToolbar editor={editor} enableImages={false} />
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2">
                   <SaveIndicator saveState={saveState} />
@@ -476,61 +382,59 @@ function WritePageContent() {
                   })}
                 </div>
                 <div className="text-left text-base text-gray-700 mb-4">
-                  {letterType === "story" ? "To Letter" : "To Someone Special"}
+                  To Someone Special
                 </div>
 
-                {/* AI 제목 생성 관련 버튼들 (일반 편지일 때만) */}
-                {letterType === "friend" && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      {isGeneratingTitle && (
-                        <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                      )}
+                {/* AI 제목 생성 관련 버튼들 */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    {isGeneratingTitle && (
+                      <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                    )}
 
+                    <button
+                      onClick={generateAITitle}
+                      disabled={
+                        isGeneratingTitle ||
+                        !content.replace(/<[^>]*>/g, "").trim()
+                      }
+                      className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={"AI로 제목 생성"}
+                    >
+                      {isGeneratingTitle ? "생성 중..." : "🤖 AI 제목 생성"}
+                    </button>
+
+                    {aiGeneratedTitle && !isGeneratingTitle && (
                       <button
-                        onClick={generateAITitle}
-                        disabled={
-                          isGeneratingTitle ||
-                          !content.replace(/<[^>]*>/g, "").trim()
-                        }
-                        className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={"AI로 제목 생성"}
+                        onClick={regenerateTitle}
+                        className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors"
+                        title={"제목 다시 생성"}
                       >
-                        {isGeneratingTitle ? "생성 중..." : "🤖 AI 제목 생성"}
+                        🔄 재생성
                       </button>
-
-                      {aiGeneratedTitle && !isGeneratingTitle && (
-                        <button
-                          onClick={regenerateTitle}
-                          className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors"
-                          title={"제목 다시 생성"}
-                        >
-                          🔄 재생성
-                        </button>
-                      )}
-                    </div>
-
-                    {/* AI 제목 생성 상태 표시 */}
-                    <div className="text-xs text-gray-500">
-                      {isGeneratingTitle ? (
-                        <span className="flex items-center gap-1">
-                          <span className="animate-pulse">🤖</span>
-                          AI가 제목을 생성하고 있습니다...
-                        </span>
-                      ) : aiGeneratedTitle ? (
-                        <span className="text-green-600">
-                          ✨ AI가 생성한 제목입니다. 마음에 들지 않으면 직접
-                          수정하세요.
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">
-                          편지 내용을 작성한 후 &quot;AI 제목 생성&quot; 버튼을
-                          클릭하세요.
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
-                )}
+
+                  {/* AI 제목 생성 상태 표시 */}
+                  <div className="text-xs text-gray-500">
+                    {isGeneratingTitle ? (
+                      <span className="flex items-center gap-1">
+                        <span className="animate-pulse">🤖</span>
+                        AI가 제목을 생성하고 있습니다...
+                      </span>
+                    ) : aiGeneratedTitle ? (
+                      <span className="text-green-600">
+                        ✨ AI가 생성한 제목입니다. 마음에 들지 않으면 직접
+                        수정하세요.
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">
+                        편지 내용을 작성한 후 &quot;AI 제목 생성&quot; 버튼을
+                        클릭하세요.
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Tiptap 에디터 */}
@@ -540,83 +444,14 @@ function WritePageContent() {
 
               {/* 편지 마무리 */}
               <div className="mt-12 flex justify-end items-center pb-8">
-                {letterType === "story" ? (
-                  <>
-                    <input
-                      type="text"
-                      value={session?.user?.name || ""}
-                      placeholder="작성자"
-                      className="text-right bg-transparent border-none outline-none text-base text-gray-700 placeholder-gray-400 w-32"
-                      style={{
-                        fontFamily: "'Noto Sans KR', sans-serif",
-                      }}
-                      readOnly
-                    />
-                    <span className="ml-2">💌</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-gray-600">
-                      From. {session?.user?.name || "익명"}
-                    </span>
-                    <span className="ml-2 text-2xl">💌</span>
-                  </>
-                )}
+                <span className="text-gray-600">
+                  From. {session?.user?.name || "익명"}
+                </span>
+                <span className="ml-2 text-2xl">💌</span>
               </div>
             </div>
           </div>
         </section>
-
-        {/* 구분선 */}
-        <div className="border-t border-gray-300 mb-12"></div>
-
-        {/* 공개 여부 선택 (사연일 때만) */}
-        {letterType === "story" && (
-          <section className="mb-12">
-            <h2
-              className="text-5xl font-bold text-gray-700 mb-8"
-              style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            >
-              사연의 공개 여부를 선택해주세요
-            </h2>
-
-            <div className="flex space-x-8 mb-6">
-              {/* 공개하기 버튼 */}
-              <button
-                onClick={() => setIsPublic(true)}
-                className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
-              >
-                <span className="text-gray-800 text-xl font-medium">
-                  모두에게 공개하기
-                </span>
-                {isPublic ? (
-                  <CheckSquare className="w-6 h-6 text-[#FF9883]" />
-                ) : (
-                  <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
-                )}
-              </button>
-
-              {/* 비공개 버튼 */}
-              <button
-                onClick={() => setIsPublic(false)}
-                className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
-              >
-                <span className="text-gray-800 text-xl font-medium">
-                  공개하지 않기
-                </span>
-                {!isPublic ? (
-                  <CheckSquare className="w-6 h-6 text-[#FF9883]" />
-                ) : (
-                  <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
-                )}
-              </button>
-            </div>
-
-            <p className="text-gray-600 text-xl">
-              공개하지 않은 사연은 레터만 확인할 수 있어요
-            </p>
-          </section>
-        )}
 
         <div className="w-full h-px bg-[#C4C4C4] mb-14"></div>
 
@@ -636,7 +471,7 @@ function WritePageContent() {
             disabled={isSubmitting}
             className="px-6 py-4 text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[168px] h-[60px]"
           >
-            {isSubmitting ? "작성 중..." : "작성 완료"}
+            {isSubmitting ? "편지 생성 중..." : "편지 만들기"}
           </Button>
         </section>
       </main>
