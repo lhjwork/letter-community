@@ -12,7 +12,7 @@ interface ApiRequestOptions extends RequestInit {
  */
 export async function apiRequest<T>(
   endpoint: string,
-  options: ApiRequestOptions = {}
+  options: ApiRequestOptions = {},
 ): Promise<T> {
   const { token, headers, ...restOptions } = options;
 
@@ -64,7 +64,7 @@ export async function getCurrentUser(token: string) {
  */
 export async function updateUser(
   token: string,
-  data: { name?: string; email?: string; image?: string }
+  data: { name?: string; email?: string; image?: string },
 ) {
   return apiRequest("/api/users/me", {
     method: "PUT",
@@ -84,7 +84,7 @@ export async function linkOAuthAccount(
     accessToken?: string;
     refreshToken?: string;
     profile?: Record<string, unknown>;
-  }
+  },
 ) {
   return apiRequest("/api/users/me/oauth/link", {
     method: "POST",
@@ -117,6 +117,7 @@ export async function createStory(
     ogTitle?: string;
     ogPreviewText?: string;
     category?: string; // AI 분류 카테고리
+    isPublic?: boolean; // 공개 여부
     aiMetadata?: {
       confidence: number;
       reason: string;
@@ -125,7 +126,7 @@ export async function createStory(
       model: string;
     };
   },
-  token?: string
+  token?: string,
 ): Promise<{ data: { _id: string } }> {
   return apiRequest("/api/letters", {
     method: "POST",
@@ -159,7 +160,7 @@ export async function createLetter(
       model: string;
     };
   },
-  token?: string
+  token?: string,
 ): Promise<{
   message: string;
   data: {
@@ -256,7 +257,7 @@ export interface GetMyLettersResponse {
  */
 export async function getMyLetters(
   token: string,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ): Promise<GetMyLettersResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
@@ -278,7 +279,7 @@ export async function getMyLetters(
  */
 export async function deleteLetter(
   letterId: string,
-  token: string
+  token: string,
 ): Promise<void> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "DELETE",
@@ -339,7 +340,7 @@ export interface GetStoriesParams {
  * 사연 목록 조회 (공개 사연만)
  */
 export async function getStories(
-  params?: GetStoriesParams
+  params?: GetStoriesParams,
 ): Promise<StoriesResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
@@ -400,7 +401,7 @@ export interface MyLikesResponse {
  */
 export async function addLike(
   letterId: string,
-  token: string
+  token: string,
 ): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "POST",
@@ -413,7 +414,7 @@ export async function addLike(
  */
 export async function removeLike(
   letterId: string,
-  token: string
+  token: string,
 ): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "DELETE",
@@ -426,7 +427,7 @@ export async function removeLike(
  */
 export async function checkLikeStatus(
   letterId: string,
-  token: string
+  token: string,
 ): Promise<LikeResponse> {
   return apiRequest(`/api/letters/${letterId}/like`, {
     method: "GET",
@@ -439,7 +440,7 @@ export async function checkLikeStatus(
  */
 export async function getMyLikes(
   token: string,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ): Promise<MyLikesResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
