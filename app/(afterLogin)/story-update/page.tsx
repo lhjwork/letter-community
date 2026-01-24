@@ -214,6 +214,7 @@ function StoryUpdateContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* 베너 */}
       {bannerSlides.length > 0 && (
         <div className="container mx-auto px-20 py-12">
           <HeroBanner bannerSlides={bannerSlides} />
@@ -227,7 +228,7 @@ function StoryUpdateContent() {
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="flex items-center space-x-2 text-orange-500 border-orange-500 hover:bg-orange-50"
+            className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>뒤로가기</span>
@@ -237,7 +238,7 @@ function StoryUpdateContent() {
         {/* 카테고리 선택 */}
         <section className="mb-12">
           <h2
-            className="text-3xl font-bold text-gray-700 mb-6"
+            className="text-5xl font-bold text-gray-700 mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 색깔을 골라주세요
@@ -248,19 +249,19 @@ function StoryUpdateContent() {
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`px-6 py-4 rounded-lg border-2 transition-colors ${
+                className={`px-6 py-4 rounded-lg border-2 transition-colors min-w-[100px] ${
                   selectedCategory === category.id
-                    ? "bg-orange-400 text-white border-orange-400"
+                    ? "bg-[#FF7F65] text-white border-[#FF7F65]"
                     : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
                 }`}
               >
-                <span className="font-semibold text-lg">{category.label}</span>
+                <span className="font-semibold text-xl">{category.label}</span>
               </button>
             ))}
           </div>
 
           {selectedCategoryInfo && (
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-xl">
               {selectedCategoryInfo.description}
             </p>
           )}
@@ -269,7 +270,7 @@ function StoryUpdateContent() {
         {/* 제목 입력 */}
         <section className="mb-12">
           <h2
-            className="text-3xl font-bold text-gray-700 mb-6"
+            className="text-5xl font-bold text-gray-700 mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             편지의 제목을 정해주세요
@@ -281,11 +282,11 @@ function StoryUpdateContent() {
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="내용을 입력해주세요"
-              className="w-full text-lg text-gray-700 placeholder-gray-400 border-none outline-none"
+              className="w-full text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
             />
           </div>
 
-          <p className="text-gray-600 text-lg mt-4">
+          <p className="text-gray-600 text-xl mt-4">
             제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
             제안해드려요.
           </p>
@@ -294,13 +295,13 @@ function StoryUpdateContent() {
         {/* 내용 작성 */}
         <section className="mb-12">
           <h2
-            className="text-3xl font-bold text-gray-700 mb-6"
+            className="text-5xl font-bold text-gray-700 mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             어떤 이야기를 건네고 싶으신가요?
           </h2>
 
-          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <div className="bg-white border border-gray-300 rounded-lg overflow-hidden relative">
             {/* 에디터 툴바 */}
             <div className="border-b border-gray-300 p-4">
               <div className="flex items-center justify-between">
@@ -316,7 +317,7 @@ function StoryUpdateContent() {
 
             {/* 에디터 영역 */}
             <div className="p-7">
-              <div className="text-gray-800 text-lg mb-4">*에디터 영역</div>
+              <div className="text-gray-800 text-xl mb-4">*에디터 영역</div>
               <div className="border-b-2 border-gray-300 mb-6"></div>
 
               <div className="min-h-[400px] relative">
@@ -327,8 +328,8 @@ function StoryUpdateContent() {
                     backgroundImage: `repeating-linear-gradient(
                       transparent,
                       transparent 47px,
-                      #e5e7eb 47px,
-                      #e5e7eb 48px
+                      #c4c4c4 47px,
+                      #c4c4c4 48px
                     )`,
                     backgroundSize: "100% 48px",
                   }}
@@ -337,7 +338,7 @@ function StoryUpdateContent() {
                 {/* 에디터 */}
                 <div className="relative z-10">
                   {!content && (
-                    <div className="text-gray-400 text-lg mb-4">
+                    <div className="text-gray-400 text-xl mb-4">
                       내용을 입력해주세요
                     </div>
                   )}
@@ -359,7 +360,7 @@ function StoryUpdateContent() {
         {/* 공개 여부 선택 */}
         <section className="mb-12">
           <h2
-            className="text-3xl font-bold text-gray-700 mb-6"
+            className="text-5xl font-bold text-gray-700 mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 공개 여부를 선택해주세요
@@ -369,17 +370,13 @@ function StoryUpdateContent() {
             {/* 공개하기 버튼 */}
             <button
               onClick={() => setIsPublic(true)}
-              className={`flex items-center space-x-4 px-7 py-4 rounded-lg border transition-colors ${
-                isPublic
-                  ? "bg-white border-gray-300"
-                  : "bg-white border-gray-300"
-              }`}
+              className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
             >
-              <span className="text-gray-800 text-lg font-medium">
+              <span className="text-gray-800 text-xl font-medium">
                 모두에게 공개하기
               </span>
               {isPublic ? (
-                <CheckSquare className="w-6 h-6 text-orange-500" />
+                <CheckSquare className="w-6 h-6 text-[#FF9883]" />
               ) : (
                 <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
               )}
@@ -388,35 +385,33 @@ function StoryUpdateContent() {
             {/* 비공개 버튼 */}
             <button
               onClick={() => setIsPublic(false)}
-              className={`flex items-center space-x-4 px-7 py-4 rounded-lg border transition-colors ${
-                !isPublic
-                  ? "bg-white border-gray-300"
-                  : "bg-white border-gray-300"
-              }`}
+              className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
             >
-              <span className="text-gray-800 text-lg font-medium">
+              <span className="text-gray-800 text-xl font-medium">
                 공개하지 않기
               </span>
               {!isPublic ? (
-                <CheckSquare className="w-6 h-6 text-orange-500" />
+                <CheckSquare className="w-6 h-6 text-[#FF9883]" />
               ) : (
                 <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
               )}
             </button>
           </div>
 
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-xl">
             공개하지 않은 사연은 레터만 확인할 수 있어요
           </p>
         </section>
 
+        <div className="w-full h-[1px] bg-[#C4C4C4] mb-14"></div>
+
         {/* 액션 버튼 */}
-        <section className="flex justify-center space-x-8 mb-16">
+        <section className="flex justify-end space-x-8 mb-16">
           <Button
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="px-6 py-4 text-lg border-gray-400 text-gray-600 hover:bg-gray-50"
+            className="px-6 py-4 text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[168px] h-[60px]"
           >
             취소
           </Button>
@@ -424,7 +419,7 @@ function StoryUpdateContent() {
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-6 py-4 text-lg bg-orange-500 text-white border-orange-500 hover:bg-orange-600"
+            className="px-6 py-4 text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[168px] h-[60px]"
           >
             {isSubmitting ? "작성 중..." : "작성 완료"}
           </Button>
