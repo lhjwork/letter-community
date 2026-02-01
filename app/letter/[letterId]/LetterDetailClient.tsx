@@ -7,14 +7,12 @@ import { LikeButton } from "@/components/like";
 import PostcodeSearch, {
   PostcodeResult,
 } from "@/components/address/PostcodeSearch";
-import PhysicalRequestsList from "@/components/letter/PhysicalRequestsList";
-import AuthorRequestsManager from "@/components/letter/AuthorRequestsManager";
 import UserRequestsStatus from "@/components/letter/UserRequestsStatus";
 import RecipientAddressModal from "@/components/recipient/RecipientAddressModal";
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
-
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/home";
+import { useIsAuthor } from "@/hooks/useIsAuthor";
 import {
   saveLetterRequest,
   getLetterRequests,
@@ -29,6 +27,7 @@ interface Letter {
   ogTitle?: string;
   status: string;
   authorId: string;
+  senderId?: string; // 백엔드에서 실제로 사용하는 필드
   physicalLetterStats: {
     totalRequests: number;
     pendingRequests: number;
@@ -49,12 +48,10 @@ interface Letter {
 
 interface LetterDetailClientProps {
   letter: Letter;
-  currentUserId?: string;
 }
 
 export default function LetterDetailClient({
   letter,
-  currentUserId,
 }: LetterDetailClientProps) {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [showRecipientModal, setShowRecipientModal] = useState(false);
@@ -62,6 +59,9 @@ export default function LetterDetailClient({
   const [userRequests, setUserRequests] = useState<any[]>([]);
   const router = useRouter();
   const { data: session } = useSession();
+
+  // 작성자 여부 확인 훅 사용
+  const { isAuthor } = useIsAuthor(letter);
 
   // 정적 배너 데이터
   const bannerSlides = [
@@ -72,7 +72,6 @@ export default function LetterDetailClient({
     },
   ];
 
-  const isAuthor = currentUserId === letter.authorId;
   const letterId = letter._id;
 
   // 사용자 신청 목록 조회 함수 (localStorage 기반)
@@ -308,71 +307,113 @@ export default function LetterDetailClient({
           </div>
         </section>
 
-        {/* 구분선 */}
-        <div className="w-full h-px bg-[#C4C4C4] mb-12"></div>
-
         {/* CTA 버튼 섹션 */}
-        <div className="flex justify-end gap-6 mb-12">
-          {/* 편지 답장하기 버튼 */}
-          <Button
-            onClick={() => router.push("/write")}
-            className="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-lg h-[60px] min-w-[200px]"
-          >
-            편지 답장하기
-          </Button>
-
-          {/* 실물 편지 신청하기 버튼 */}
-          {letter.authorSettings.allowPhysicalRequests && (
+        {!isAuthor && (
+          <div className="flex justify-end gap-6 mb-12">
+            {/* 편지 답장하기 버튼 */}
             <Button
-              onClick={() => {
-                if (!session) {
-                  router.push(`/letter/${letter._id}/request`);
-                } else {
-                  setShowRecipientSelect(true);
-                }
-              }}
-              disabled={
-                !!session &&
-                activeRequestCount >= letter.authorSettings.maxRequestsPerPerson
-              }
-              className="px-8 py-4 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg h-[60px] min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => router.push("/write")}
+              className="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-lg h-[60px] min-w-[200px]"
             >
-              실물 편지 신청하기 ✉️
+              편지 답장하기
             </Button>
-          )}
-        </div>
 
-        {/* 편지 작성자용 신청 관리 */}
-        {isAuthor && (
-          <div className="mt-8 space-y-4">
-            <AuthorRequestsManager
-              letterId={letter._id}
-              letterStats={letter.physicalLetterStats}
-              authorSettings={letter.authorSettings}
-            />
-
-            {/* 수신자 주소 관리 버튼 */}
-            <div className="flex justify-center">
+            {/* 실물 편지 신청하기 버튼 */}
+            {letter.authorSettings.allowPhysicalRequests && (
               <Button
-                onClick={() => setShowRecipientModal(true)}
-                variant="outline"
-                className="px-6 py-3"
+                onClick={() => {
+                  if (!session) {
+                    router.push(`/letter/${letter._id}/request`);
+                  } else {
+                    setShowRecipientSelect(true);
+                  }
+                }}
+                disabled={
+                  !!session &&
+                  activeRequestCount >=
+                    letter.authorSettings.maxRequestsPerPerson
+                }
+                className="px-8 py-4 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg h-[60px] min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                📮 수신자 주소 관리
+                실물 편지 신청하기 ✉️
               </Button>
+            )}
+          </div>
+        )}
+
+        {/* 편지 작성자용 섹션 */}
+        {isAuthor && (
+          <div className="mt-12">
+            <div className="w-full h-px bg-[#C4C4C4]"></div>
+
+            {/* 링크 공유 섹션 */}
+            <div className=" rounded-lg p-12">
+              <h2
+                className="mb-8"
+                style={{
+                  color: "#757575",
+                  fontSize: "48px",
+                  fontStyle: "normal",
+                  fontWeight: 400,
+                  lineHeight: "normal",
+                }}
+              >
+                링크를 통해 편지를 공유해주세요
+              </h2>
+
+              {/* 링크 복사 영역 */}
+              <div className="flex items-center gap-3 mb-12 ">
+                <div className="flex-1 bg-white rounded-lg border border-gray-300 h-16">
+                  <input
+                    type="text"
+                    value={`https://letter-community.vercel.app/letter/69d3600b6433643e74d5174`}
+                    readOnly
+                    className="w-full h-full px-4 border-none outline-none text-gray-600 bg-transparent text-base rounded-lg"
+                  />
+                </div>
+                <Button
+                  onClick={() => {
+                    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/letter/${letter._id}`;
+                    navigator.clipboard.writeText(url);
+                    alert("링크가 복사되었습니다!");
+                  }}
+                  className="px-8 h-16 bg-white rounded-lg hover:bg-[#FF9883] cursor-pointer transition-colors font-medium text-base border border-[#FF9883]"
+                  style={{ color: "#FF9883" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#FF9883";
+                  }}
+                >
+                  링크 복사하기
+                </Button>
+              </div>
+
+              {/* 네비게이션 버튼들 */}
+              <div className="flex justify-center gap-6">
+                <Button
+                  onClick={() => router.push("/my-page")}
+                  variant="outline"
+                  className="w-56 h-16 border-2 border-gray-300 hover:bg-gray-50 rounded-lg bg-white text-[#757575] text-center text-2xl font-semibold leading-5"
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  마이페이지 이동
+                </Button>
+                <Button
+                  onClick={() => router.push("/")}
+                  className="flex w-56 h-16 px-6 py-2 justify-center items-center gap-2.5 rounded-lg bg-[#FF9883] text-white hover:bg-orange-600 transition-colors text-2xl font-semibold leading-5"
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  메인페이지 이동
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* 공개 신청 현황 */}
-        <PhysicalRequestsList
-          letterId={letter._id}
-          stats={letter.physicalLetterStats}
-          allowNewRequests={letter.authorSettings.allowPhysicalRequests}
-        />
-
-        {/* 사용자 신청 현황 - 기존 방식 (호환성 유지) */}
-        {userRequests.length > 0 && (
+        {/* 수신자용 신청 현황 - 작성자가 아닌 경우만 표시 */}
+        {!isAuthor && userRequests.length > 0 && (
           <UserRequestsStatus
             requests={userRequests}
             onRefresh={loadUserRequests}

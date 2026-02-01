@@ -54,7 +54,9 @@ async function getLetter(letterId: string): Promise<Letter | null> {
     // 새로운 필드들에 대한 기본값 설정 (백엔드 호환성)
     return {
       ...data,
-      authorId: data.authorId || data.senderUserId || "unknown",
+      // senderId를 우선적으로 사용하고, 없으면 다른 필드들 확인
+      authorId:
+        data.senderId || data.authorId || data.senderUserId || "unknown",
       physicalLetterStats: data.physicalLetterStats || {
         totalRequests: 0,
         pendingRequests: 0,
@@ -75,7 +77,11 @@ async function getLetter(letterId: string): Promise<Letter | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ letterId: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ letterId: string }>;
+}): Promise<Metadata> {
   const { letterId } = await params;
   const letter = await getLetter(letterId);
 
@@ -114,7 +120,11 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
   };
 }
 
-export default async function LetterDetailPage({ params }: { params: Promise<{ letterId: string }> }) {
+export default async function LetterDetailPage({
+  params,
+}: {
+  params: Promise<{ letterId: string }>;
+}) {
   const { letterId } = await params;
   const letter = await getLetter(letterId);
 
