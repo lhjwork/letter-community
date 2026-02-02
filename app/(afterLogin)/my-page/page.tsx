@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMyLetters } from "@/hooks/useMyLetters";
@@ -13,7 +13,7 @@ import { CategoryFilter, StoryCard } from "@/components/stories";
 import { HeroBanner } from "@/components/home";
 import AdCarousel from "@/components/ads/AdCarousel";
 
-export default function MyPage() {
+function MyPageContent() {
   const { status } = useSession();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -185,7 +185,7 @@ export default function MyPage() {
           // 편지 목록
           <>
             {/* 빠른 액션 버튼들 */}
-            {/* <div className="flex justify-center gap-4 mb-8">
+            <div className="flex justify-center gap-4 mb-8">
               <Link
                 href="/my-page/addresses"
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
@@ -230,7 +230,7 @@ export default function MyPage() {
                 </svg>
                 <span className="text-sm font-medium">좋아요한 사연</span>
               </Link>
-            </div> */}
+            </div>
 
             {isLettersLoading ? (
               <div className="flex justify-center items-center h-64">
@@ -469,5 +469,22 @@ export default function MyPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <MyPageContent />
+    </Suspense>
   );
 }
