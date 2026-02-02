@@ -185,7 +185,7 @@ function MyPageContent() {
           // 편지 목록
           <>
             {/* 빠른 액션 버튼들 */}
-            <div className="flex justify-center gap-4 mb-8">
+            {/* <div className="flex justify-center gap-4 mb-8">
               <Link
                 href="/my-page/addresses"
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
@@ -230,7 +230,7 @@ function MyPageContent() {
                 </svg>
                 <span className="text-sm font-medium">좋아요한 사연</span>
               </Link>
-            </div>
+            </div> */}
 
             {isLettersLoading ? (
               <div className="flex justify-center items-center h-64">
