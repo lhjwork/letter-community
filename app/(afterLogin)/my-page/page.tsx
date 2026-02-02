@@ -5,57 +5,85 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMyLetters } from "@/hooks/useMyLetters";
+import { useInfiniteStories } from "@/hooks/useStories";
+import { useStoriesFilter } from "@/hooks/useStoriesFilter";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { LetterCard } from "@/components/letters";
-import DraftList from "@/components/drafts/DraftList";
+import { CategoryFilter, StoryCard } from "@/components/stories";
+import { HeroBanner } from "@/components/home";
 import AdCarousel from "@/components/ads/AdCarousel";
-import { Button } from "@/components/ui/button";
 
 export default function MyPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"letters" | "stories">("letters");
+
+  // 정적 배너 데이터
+  const bannerSlides = [
+    {
+      id: 1,
+      image: "/images/mainbanner/banner-1.png",
+      alt: "배너 1",
+    },
+  ];
+
+  // 내 편지 관련 훅
   const {
     letters,
-    pagination,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    refetch,
+    pagination: letterPagination,
+    isLoading: isLettersLoading,
+    isFetchingNextPage: isLettersFetching,
+    hasNextPage: hasLettersNextPage,
+    fetchNextPage: fetchLettersNextPage,
+    refetch: refetchLetters,
   } = useMyLetters(20);
 
-  // 탭 상태 관리
-  const [activeTab, setActiveTab] = useState<"letters" | "drafts">("letters");
+  // 사연 관련 훅
+  const { search, sort, category, updateFilter } = useStoriesFilter();
+  const {
+    stories,
+    pagination: storiesPagination,
+    isLoading: isStoriesLoading,
+    isFetchingNextPage: isStoriesFetching,
+    hasNextPage: hasStoriesNextPage,
+    fetchNextPage: fetchStoriesNextPage,
+  } = useInfiniteStories({ search, sort, category, limit: 20 });
 
-  const loadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+  // 내 편지 무한 스크롤
+  const loadMoreLetters = useCallback(() => {
+    if (hasLettersNextPage && !isLettersFetching) {
+      fetchLettersNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasLettersNextPage, isLettersFetching, fetchLettersNextPage]);
 
-  const { ref: loadMoreRef } = useIntersectionObserver({
-    onIntersect: loadMore,
+  const { ref: lettersLoadMoreRef } = useIntersectionObserver({
+    onIntersect: loadMoreLetters,
     rootMargin: "200px",
   });
 
-  const handleLetterDelete = useCallback(
-    (letterId: string) => {
-      refetch(); // 삭제 후 목록 새로고침
-    },
-    [refetch]
-  );
+  // 사연 무한 스크롤
+  const loadMoreStories = useCallback(() => {
+    if (hasStoriesNextPage && !isStoriesFetching) {
+      fetchStoriesNextPage();
+    }
+  }, [hasStoriesNextPage, isStoriesFetching, fetchStoriesNextPage]);
 
-  // 임시저장 편집 핸들러
-  const handleEditDraft = (draftId: string) => {
-    router.push(`/write?draftId=${draftId}`);
-  };
+  const { ref: storiesLoadMoreRef } = useIntersectionObserver({
+    onIntersect: loadMoreStories,
+    rootMargin: "200px",
+  });
+
+  const handleLetterDelete = useCallback(() => {
+    refetchLetters();
+  }, [refetchLetters]);
 
   if (status === "unauthenticated") {
     router.push("/");
     return null;
   }
 
-  if (status === "loading" || isLoading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -66,55 +94,104 @@ export default function MyPage() {
     );
   }
 
-  const total = pagination?.total || 0;
+  // 검색 필터링된 편지들
+  const filteredLetters = letters.filter(
+    (letter) =>
+      letter.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      letter.content.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // 사연 검색 필터링
+  const filteredStories = stories.filter(
+    (story) =>
+      story.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (story.content &&
+        story.content.toLowerCase().includes(searchQuery.toLowerCase())),
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 섹션 */}
-      <section className="bg-white py-8 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1
-                className="text-4xl font-bold text-gray-800 mb-2"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                마이페이지
-              </h1>
-              <p className="text-gray-600">
-                안녕하세요,{" "}
-                <span className="font-semibold">{session?.user?.name}</span>님
-              </p>
-            </div>
-            <Link
-              href="/write"
-              className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-            >
-              새 편지 쓰기
-            </Link>
-          </div>
+      {/* 베너 */}
+      {bannerSlides.length > 0 && (
+        <div className="container mx-auto px-20 py-12">
+          <HeroBanner bannerSlides={bannerSlides} />
+        </div>
+      )}
 
-          {/* 통계 */}
-          <div className="flex items-center gap-6 text-sm text-gray-600">
-            <span>
-              총 <span className="font-semibold text-pink-600">{total}</span>
-              개의 편지
-            </span>
+      {/* 메인 컨텐츠 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 탭 네비게이션 */}
+        <div className="mb-8">
+          <div className="flex gap-8">
+            <button
+              onClick={() => setActiveTab("letters")}
+              className={`text-3xl font-bold pb-2 border-b-2 transition-colors ${
+                activeTab === "letters"
+                  ? "text-gray-800 border-gray-800"
+                  : "text-gray-400 border-transparent hover:text-gray-600"
+              }`}
+            >
+              내 편지
+            </button>
+            <button
+              onClick={() => setActiveTab("stories")}
+              className={`text-3xl font-bold pb-2 border-b-2 transition-colors ${
+                activeTab === "stories"
+                  ? "text-gray-800 border-gray-800"
+                  : "text-gray-400 border-transparent hover:text-gray-600"
+              }`}
+            >
+              사연 모아보기
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* 메뉴 섹션 */}
-      <section className="bg-white py-6 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex gap-4 mb-6">
-            <Link
-              href="/my-page/addresses"
-              className="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-colors"
-            >
-              <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+        {/* 검색바와 작성 버튼 */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="검색"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
+              />
+            </div>
+          </div>
+          <Link
+            href="/write"
+            className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
+          >
+            {activeTab === "letters" ? "편지 작성" : "사연 작성"}
+          </Link>
+        </div>
+
+        {/* 탭 컨텐츠 */}
+        {activeTab === "letters" ? (
+          // 편지 목록
+          <>
+            {/* 빠른 액션 버튼들 */}
+            {/* <div className="flex justify-center gap-4 mb-8">
+              <Link
+                href="/my-page/addresses"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
+              >
                 <svg
-                  className="w-4 h-4 text-pink-600"
+                  className="w-4 h-4 text-[#FF9883]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -132,16 +209,14 @@ export default function MyPage() {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-              </div>
-              <span className="text-sm font-medium">배송지 관리</span>
-            </Link>
-            <Link
-              href="/my-page/likes"
-              className="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-colors"
-            >
-              <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium">배송지 관리</span>
+              </Link>
+              <Link
+                href="/my-page/likes"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
+              >
                 <svg
-                  className="w-4 h-4 text-pink-600"
+                  className="w-4 h-4 text-[#FF9883]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -153,75 +228,43 @@ export default function MyPage() {
                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                   />
                 </svg>
+                <span className="text-sm font-medium">좋아요한 사연</span>
+              </Link>
+            </div> */}
+
+            {isLettersLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 border-4 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-gray-400">로딩 중...</p>
+                </div>
               </div>
-              <span className="text-sm font-medium">좋아요한 사연</span>
-            </Link>
-          </div>
-
-          {/* 탭 메뉴 */}
-          <div className="flex border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab("letters")}
-              className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === "letters"
-                  ? "border-pink-500 text-pink-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              발행된 편지 ({total})
-            </button>
-            <button
-              onClick={() => setActiveTab("drafts")}
-              className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === "drafts"
-                  ? "border-pink-500 text-pink-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              임시저장
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 컨텐츠 섹션 */}
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          {/* 마이페이지 캐러셀 광고 */}
-          <AdCarousel
-            placement="banner"
-            limit={2}
-            aspectRatio="16:9"
-            autoPlay={true}
-            autoPlayInterval={8000}
-            showControls={true}
-            showIndicators={true}
-            className="mb-8"
-            showDebugInfo={process.env.NODE_ENV === "development"}
-          />
-
-          {activeTab === "letters" ? (
-            // 발행된 편지 목록
-            letters.length === 0 ? (
+            ) : filteredLetters.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">📝</div>
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  아직 작성한 편지가 없습니다
+                  {searchQuery
+                    ? "검색 결과가 없습니다"
+                    : "아직 작성한 편지가 없습니다"}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  첫 번째 편지를 작성해보세요
+                  {searchQuery
+                    ? "다른 검색어로 시도해보세요"
+                    : "첫 번째 편지를 작성해보세요"}
                 </p>
-                <Link
-                  href="/write"
-                  className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-                >
-                  편지 쓰기
-                </Link>
+                {!searchQuery && (
+                  <Link
+                    href="/write"
+                    className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    편지 쓰기
+                  </Link>
+                )}
               </div>
             ) : (
               <>
                 <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                  {letters.map((letter) => (
+                  {filteredLetters.map((letter) => (
                     <div key={letter._id} className="break-inside-avoid mb-4">
                       <LetterCard
                         letter={letter}
@@ -231,81 +274,200 @@ export default function MyPage() {
                   ))}
                 </div>
 
-                {/* 인피니티 스크롤 트리거 */}
-                <div ref={loadMoreRef} className="py-8 flex justify-center">
-                  {isFetchingNextPage ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-gray-400">로딩 중...</span>
-                    </div>
-                  ) : hasNextPage ? (
-                    <span className="text-gray-400">스크롤하여 더 보기</span>
-                  ) : (
-                    <span className="text-gray-400">
-                      모든 편지를 불러왔습니다 ✓
-                    </span>
-                  )}
-                </div>
+                {/* 무한 스크롤 로더 - 검색 중이 아닐 때만 표시 */}
+                {!searchQuery && (
+                  <div
+                    ref={lettersLoadMoreRef}
+                    className="py-8 flex justify-center"
+                  >
+                    {isLettersFetching ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
+                        <span className="text-gray-400">로딩 중...</span>
+                      </div>
+                    ) : hasLettersNextPage ? (
+                      <span className="text-gray-400">스크롤하여 더 보기</span>
+                    ) : (
+                      <span className="text-gray-400">
+                        모든 편지를 불러왔습니다 ✓
+                      </span>
+                    )}
+                  </div>
+                )}
               </>
-            )
-          ) : (
-            // 임시저장 목록
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-6 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    임시저장된 편지
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    작성 중인 편지를 관리하고 계속 작성할 수 있습니다
-                  </p>
-                </div>
-                <Button
-                  onClick={() => router.push("/write")}
-                  className="bg-pink-500 hover:bg-pink-600"
-                >
-                  새 편지 작성
-                </Button>
-              </div>
-              <DraftList onEditDraft={handleEditDraft} />
-            </div>
-          )}
-        </div>
-      </section>
+            )}
+          </>
+        ) : (
+          // 사연 목록
+          <>
+            {/* 검색 및 필터 섹션 */}
+            <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border border-gray-200">
+              <CategoryFilter
+                selected={category}
+                onChange={(value) => updateFilter({ category: value })}
+              />
 
-      {/* 계정 정보 섹션 */}
-      <section className="py-8 bg-white border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="bg-gray-50 rounded-2xl p-6">
-            <h2
-              className="text-2xl font-bold text-gray-800 mb-4"
-              style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            >
-              계정 정보
-            </h2>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-gray-600 w-24">이름:</span>
-                <span className="font-semibold">
-                  {session?.user?.name || "-"}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-600 w-24">이메일:</span>
-                <span className="font-semibold">
-                  {session?.user?.email || "-"}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-600 w-24">로그인:</span>
-                <span className="font-semibold capitalize">
-                  {(session as any)?.provider || "-"}
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                <span className="text-gray-600">
+                  총{" "}
+                  <span className="font-semibold text-[#FF9883]">
+                    {storiesPagination?.total || 0}
+                  </span>
+                  개의 사연
                 </span>
               </div>
             </div>
+
+            {isStoriesLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 border-4 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-gray-400">로딩 중...</p>
+                </div>
+              </div>
+            ) : filteredStories.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-6xl mb-4">📖</div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  {searchQuery ? "검색 결과가 없습니다" : "사연이 없습니다"}
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  {searchQuery
+                    ? "다른 검색어로 시도해보세요"
+                    : "첫 번째 사연을 작성해보세요"}
+                </p>
+                {!searchQuery && (
+                  <Link
+                    href="/write"
+                    className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    사연 쓰기
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
+                  {filteredStories.map((story, index) => (
+                    <div key={story._id} className="break-inside-avoid mb-4">
+                      <StoryCard story={story} />
+                      {(index + 1) % 20 === 0 && (
+                        <div className="mb-4 col-span-full">
+                          <AdCarousel
+                            placement="banner"
+                            limit={2}
+                            aspectRatio="16:9"
+                            autoPlay={true}
+                            autoPlayInterval={7000}
+                            showControls={false}
+                            showIndicators={true}
+                            showDebugInfo={
+                              process.env.NODE_ENV === "development"
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 무한 스크롤 로더 - 검색 중이 아닐 때만 표시 */}
+                {!searchQuery && (
+                  <div
+                    ref={storiesLoadMoreRef}
+                    className="py-8 flex justify-center"
+                  >
+                    {isStoriesFetching ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
+                        <span className="text-gray-400">로딩 중...</span>
+                      </div>
+                    ) : hasStoriesNextPage ? (
+                      <span className="text-gray-400">스크롤하여 더 보기</span>
+                    ) : (
+                      <span className="text-gray-400">
+                        모든 사연을 불러왔습니다 ✓
+                      </span>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
+
+        {/* 페이지네이션 */}
+        {((activeTab === "letters" &&
+          letterPagination &&
+          letterPagination.totalPages > 1) ||
+          (activeTab === "stories" &&
+            storiesPagination &&
+            storiesPagination.totalPages > 1)) && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            <button
+              onClick={() => {
+                /* 이전 페이지 로직 */
+              }}
+              disabled={
+                activeTab === "letters"
+                  ? letterPagination?.page === 1
+                  : storiesPagination?.page === 1
+              }
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            >
+              ‹
+            </button>
+
+            {Array.from(
+              {
+                length: Math.min(
+                  5,
+                  activeTab === "letters"
+                    ? letterPagination?.totalPages || 0
+                    : storiesPagination?.totalPages || 0,
+                ),
+              },
+              (_, i) => {
+                const pageNum = i + 1;
+                const currentPage =
+                  activeTab === "letters"
+                    ? letterPagination?.page
+                    : storiesPagination?.page;
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => {
+                      /* 페이지 이동 로직 */
+                    }}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
+                      pageNum === currentPage
+                        ? "bg-[#FF9883] text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              },
+            )}
+
+            <button
+              onClick={() => {
+                /* 다음 페이지 로직 */
+              }}
+              disabled={
+                activeTab === "letters"
+                  ? letterPagination?.page === letterPagination?.totalPages
+                  : storiesPagination?.page === storiesPagination?.totalPages
+              }
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            >
+              ›
+            </button>
           </div>
-        </div>
-      </section>
+        )}
+      </main>
     </div>
   );
 }
