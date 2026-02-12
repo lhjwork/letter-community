@@ -9,7 +9,6 @@ import { useInfiniteStories } from "@/hooks/useStories";
 import { useStoriesFilter } from "@/hooks/useStoriesFilter";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { LetterCard } from "@/components/letters";
-import { CategoryFilter, StoryCard } from "@/components/stories";
 import { HeroBanner } from "@/components/home";
 import AdCarousel from "@/components/ads/AdCarousel";
 
@@ -141,49 +140,49 @@ function MyPageContent() {
                   : "text-gray-400 border-transparent hover:text-gray-600"
               }`}
             >
-              사연 모아보기
+              사연 목록
             </button>
           </div>
         </div>
 
-        {/* 검색바와 작성 버튼 */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="검색"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
-              />
-            </div>
-          </div>
-          <Link
-            href="/write"
-            className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
-          >
-            {activeTab === "letters" ? "편지 작성" : "사연 작성"}
-          </Link>
-        </div>
-
         {/* 탭 컨텐츠 */}
         {activeTab === "letters" ? (
-          // 편지 목록
           <>
+            {/* 검색바와 작성 버튼 - 편지 탭 */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <svg
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="검색"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <Link
+                href="/write"
+                className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
+              >
+                편지 작성
+              </Link>
+            </div>
+
+            {/* 편지 목록 */}
             {/* 빠른 액션 버튼들 */}
             {/* <div className="flex justify-center gap-4 mb-8">
               <Link
@@ -300,22 +299,73 @@ function MyPageContent() {
         ) : (
           // 사연 목록
           <>
-            {/* 검색 및 필터 섹션 */}
-            <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border border-gray-200">
-              <CategoryFilter
-                selected={category}
-                onChange={(value) => updateFilter({ category: value })}
-              />
-
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                <span className="text-gray-600">
-                  총{" "}
-                  <span className="font-semibold text-[#FF9883]">
-                    {storiesPagination?.total || 0}
-                  </span>
-                  개의 사연
-                </span>
+            {/* 검색바, 카테고리, 작성 버튼 */}
+            <div className="flex items-center gap-3 mb-8">
+              {/* 카테고리 드롭다운 */}
+              <div className="relative">
+                <select
+                  value={category}
+                  onChange={(e) => updateFilter({ category: e.target.value })}
+                  className="appearance-none px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="">카테고리</option>
+                  <option value="가족">👨‍👩‍👧‍👦 가족</option>
+                  <option value="사랑">💕 사랑</option>
+                  <option value="우정">💛 우정</option>
+                  <option value="성장">🌱 성장</option>
+                  <option value="위로">🫂 위로</option>
+                  <option value="추억">📷 추억</option>
+                  <option value="감사">⚠️ 감사</option>
+                  <option value="기타">📝 기타</option>
+                </select>
+                <svg
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </div>
+
+              {/* 검색바 */}
+              <div className="flex-1">
+                <div className="relative">
+                  <svg
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="검색"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* 사연 작성 버튼 */}
+              <Link
+                href="/write"
+                className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
+              >
+                사연 작성
+              </Link>
             </div>
 
             {isStoriesLoading ? (
@@ -348,27 +398,39 @@ function MyPageContent() {
             ) : (
               <>
                 <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                  {filteredStories.map((story, index) => (
-                    <div key={story._id} className="break-inside-avoid mb-4">
-                      <StoryCard story={story} />
-                      {(index + 1) % 20 === 0 && (
-                        <div className="mb-4 col-span-full">
-                          <AdCarousel
-                            placement="banner"
-                            limit={2}
-                            aspectRatio="16:9"
-                            autoPlay={true}
-                            autoPlayInterval={7000}
-                            showControls={false}
-                            showIndicators={true}
-                            showDebugInfo={
-                              process.env.NODE_ENV === "development"
-                            }
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  {filteredStories.map((story, index) => {
+                    // Story를 Letter 형식으로 변환
+                    const letterFromStory = {
+                      _id: story._id,
+                      title: story.title || "제목 없음",
+                      content: story.content || "",
+                      authorName: story.authorName || "익명",
+                      createdAt: story.createdAt,
+                      category: story.category,
+                    };
+
+                    return (
+                      <div key={story._id} className="break-inside-avoid mb-4">
+                        <LetterCard letter={letterFromStory} />
+                        {(index + 1) % 20 === 0 && (
+                          <div className="mb-4 col-span-full">
+                            <AdCarousel
+                              placement="banner"
+                              limit={2}
+                              aspectRatio="16:9"
+                              autoPlay={true}
+                              autoPlayInterval={7000}
+                              showControls={false}
+                              showIndicators={true}
+                              showDebugInfo={
+                                process.env.NODE_ENV === "development"
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* 무한 스크롤 로더 - 검색 중이 아닐 때만 표시 */}
