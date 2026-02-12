@@ -4,7 +4,13 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address, AddressInput } from "@/types/address";
-import { getAddresses, createAddress, updateAddress, deleteAddress as deleteAddressApi, setDefaultAddress } from "@/lib/address-api";
+import {
+  getAddresses,
+  createAddress,
+  updateAddress,
+  deleteAddress as deleteAddressApi,
+  setDefaultAddress,
+} from "@/lib/address-api";
 import { Button } from "@/components/ui/button";
 import AddressCard from "@/components/address/AddressCard";
 import AddressFormModal from "@/components/address/AddressFormModal";
@@ -40,7 +46,11 @@ export default function AddressesPage() {
       const response = await getAddresses(session.backendToken);
       setAddresses(response.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "배송지를 불러오는데 실패했습니다.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "배송지를 불러오는데 실패했습니다.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +85,9 @@ export default function AddressesPage() {
       await setDefaultAddress(session.backendToken, id);
       fetchAddresses();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "기본 배송지 설정에 실패했습니다.");
+      alert(
+        err instanceof Error ? err.message : "기본 배송지 설정에 실패했습니다.",
+      );
     }
   };
 
@@ -114,15 +126,24 @@ export default function AddressesPage() {
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="mb-8">
-          <Link href="/my-page" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4">
+          <Link
+            href="/letter-box"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
+          >
             <ArrowLeft className="w-4 h-4" />
             마이페이지로 돌아가기
           </Link>
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-800" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+            <h1
+              className="text-3xl font-bold text-gray-800"
+              style={{ fontFamily: "NanumJangMiCe, cursive" }}
+            >
               배송지 관리
             </h1>
-            <Button onClick={handleAddAddress} className="bg-pink-500 hover:bg-pink-600">
+            <Button
+              onClick={handleAddAddress}
+              className="bg-pink-500 hover:bg-pink-600"
+            >
               <Plus className="w-4 h-4 mr-1" />
               배송지 추가
             </Button>
@@ -131,19 +152,34 @@ export default function AddressesPage() {
 
         {/* 배송지 목록 */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
 
           {addresses.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg mb-4">저장된 배송지가 없습니다.</p>
-              <Button onClick={handleAddAddress} className="bg-pink-500 hover:bg-pink-600">
+              <p className="text-gray-500 text-lg mb-4">
+                저장된 배송지가 없습니다.
+              </p>
+              <Button
+                onClick={handleAddAddress}
+                className="bg-pink-500 hover:bg-pink-600"
+              >
                 첫 번째 배송지 추가하기
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               {addresses.map((address) => (
-                <AddressCard key={address._id} address={address} onEdit={handleEditAddress} onDelete={handleDeleteAddress} onSetDefault={handleSetDefault} />
+                <AddressCard
+                  key={address._id}
+                  address={address}
+                  onEdit={handleEditAddress}
+                  onDelete={handleDeleteAddress}
+                  onSetDefault={handleSetDefault}
+                />
               ))}
             </div>
           )}
@@ -151,7 +187,13 @@ export default function AddressesPage() {
       </div>
 
       {/* 배송지 추가/수정 모달 */}
-      <AddressFormModal open={showFormModal} onOpenChange={setShowFormModal} onSubmit={handleSubmit} editAddress={editingAddress} isLoading={isSubmitting} />
+      <AddressFormModal
+        open={showFormModal}
+        onOpenChange={setShowFormModal}
+        onSubmit={handleSubmit}
+        editAddress={editingAddress}
+        isLoading={isSubmitting}
+      />
     </div>
   );
 }

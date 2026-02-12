@@ -393,7 +393,7 @@ export default function LetterDetailClient({
               {/* 네비게이션 버튼들 */}
               <div className="flex justify-center gap-6">
                 <Button
-                  onClick={() => router.push("/my-page")}
+                  onClick={() => router.push("/letter-box")}
                   variant="outline"
                   className="w-56 h-16 border-2 border-gray-300 hover:bg-gray-50 rounded-lg bg-white text-[#757575] text-center text-2xl font-semibold leading-5"
                   style={{ fontFamily: "Pretendard" }}

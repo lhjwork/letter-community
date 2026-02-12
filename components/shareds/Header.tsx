@@ -72,14 +72,7 @@ export default function Header() {
                   className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
                   style={{ fontFamily: "NanumJangMiCe, cursive" }}
                 >
-                  내 편지함
-                </Link>
-                <Link
-                  href="/stories"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  사연 목록
+                  우편함
                 </Link>
               </>
             ) : (
@@ -189,14 +182,7 @@ export default function Header() {
                 className="text-base text-[#757575] hover:text-black transition-colors"
                 style={{ fontFamily: "NanumJangMiCe, cursive" }}
               >
-                내 편지함
-              </Link>
-              <Link
-                href="/stories"
-                className="text-base text-[#757575] hover:text-black transition-colors"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                사연 목록
+                우편함
               </Link>
             </>
           ) : (
