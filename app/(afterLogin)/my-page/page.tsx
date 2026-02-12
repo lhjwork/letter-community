@@ -18,12 +18,30 @@ interface Letter {
   createdAt: string;
 }
 
+interface Story {
+  _id?: string;
+  id?: string;
+  type: string;
+  userId: string;
+  title: string;
+  content: string;
+  plainContent?: string;
+  authorName: string;
+  category: string;
+  viewCount: number;
+  likeCount: number;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function MyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("letters");
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
+  const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 편지 목록 가져오기 함수
@@ -47,10 +65,35 @@ export default function MyPage() {
     }
   };
 
-  // 편지 목록 가져오기 Effect
+  // 사연 목록 가져오기 함수
+  const fetchStories = async () => {
+    if (!session) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/stories/my");
+
+      if (response.ok) {
+        const data = await response.json();
+        setStories(data.data || []);
+      } else {
+        console.error("사연 목록 가져오기 실패:", response.status);
+      }
+    } catch (error) {
+      console.error("사연 목록 가져오기 실패:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 편지/사연 목록 가져오기 Effect
   useEffect(() => {
-    if (activeTab === "letters" && session) {
-      fetchLetters();
+    if (session) {
+      if (activeTab === "letters") {
+        fetchLetters();
+      } else if (activeTab === "stories") {
+        fetchStories();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, session]);
@@ -305,9 +348,54 @@ export default function MyPage() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-center text-gray-500 py-12">
-                    나의 사연을 표시합니다
-                  </p>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="w-8 h-8 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
+                    </div>
+                  ) : stories.length > 0 ? (
+                    <div className="space-y-4">
+                      {stories.map((story) => {
+                        const storyId = story._id || story.id;
+                        return (
+                          <Link
+                            key={storyId}
+                            href={`/letter/${storyId}`}
+                            className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs px-2 py-1 bg-pink-100 text-pink-600 rounded">
+                                  {story.category}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  조회 {story.viewCount} · 좋아요{" "}
+                                  {story.likeCount}
+                                </span>
+                              </div>
+                              <h3 className="text-xl font-medium text-gray-800">
+                                {story.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 line-clamp-2">
+                                {story.plainContent ||
+                                  story.content.replace(/<[^>]*>/g, "")}
+                              </p>
+                            </div>
+                            <div className="mt-2 text-right">
+                              <span className="text-sm text-gray-500">
+                                {new Date(story.createdAt).toLocaleDateString(
+                                  "ko-KR",
+                                )}
+                              </span>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-500 py-12">
+                      작성한 사연이 없습니다
+                    </p>
+                  )}
                 </div>
               )}
             </div>
