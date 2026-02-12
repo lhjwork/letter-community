@@ -71,7 +71,7 @@ export default function MyPage() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/stories/my");
+      const response = await fetch("/api/letters/my/stories");
 
       if (response.ok) {
         const data = await response.json();

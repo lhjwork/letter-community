@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     // 쿼리 파라미터 가져오기
     const searchParams = request.nextUrl.searchParams;
     const queryString = searchParams.toString();
-    const url = `${BACKEND_URL}/api/stories/my${queryString ? `?${queryString}` : ""}`;
+    const url = `${BACKEND_URL}/api/letters/my/stories${queryString ? `?${queryString}` : ""}`;
 
     // 백엔드 API 호출
     const response = await fetch(url, {
