@@ -3,10 +3,16 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
+
+type TabType = "letters" | "stories";
+type FilterType = "all" | "sent" | "received";
 
 export default function MyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<TabType>("letters");
+  const [filter, setFilter] = useState<FilterType>("all");
 
   if (status === "loading") {
     return (
@@ -127,27 +133,97 @@ export default function MyPage() {
             </div>
           </div>
 
-          {/* 오른쪽: 나의 편지 */}
+          {/* 오른쪽: 나의 편지/사연 */}
           <div className="lg:col-span-2">
+            {/* 탭과 필터 */}
             <div className="flex items-center justify-between mb-8">
-              <h2
-                className="text-4xl font-bold text-gray-600"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                나의 편지
-              </h2>
-              <Link
-                href="/letter-box"
-                className="px-6 py-2 border-2 border-gray-400 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-              >
-                전체보기
-              </Link>
+              {/* 탭 */}
+              <div className="flex gap-8">
+                <button
+                  onClick={() => setActiveTab("letters")}
+                  className="relative"
+                >
+                  <h2
+                    className={`text-4xl font-bold transition-colors ${
+                      activeTab === "letters"
+                        ? "text-gray-600"
+                        : "text-gray-200"
+                    }`}
+                    style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                  >
+                    나의 편지
+                  </h2>
+                  {activeTab === "letters" && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab("stories")}
+                  className="relative"
+                >
+                  <h2
+                    className={`text-4xl font-bold transition-colors ${
+                      activeTab === "stories"
+                        ? "text-gray-600"
+                        : "text-gray-200"
+                    }`}
+                    style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                  >
+                    나의 사연
+                  </h2>
+                  {activeTab === "stories" && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
+                  )}
+                </button>
+              </div>
+
+              {/* Select 필터 - 나의 편지 탭일 때만 표시 */}
+              {activeTab === "letters" && (
+                <div className="relative">
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value as FilterType)}
+                    className="pl-4 pr-10 py-2 border-2 border-gray-400 rounded-lg text-gray-600 bg-white hover:bg-gray-50 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300 appearance-none"
+                  >
+                    <option value="all">전체</option>
+                    <option value="sent">보낸 편지</option>
+                    <option value="received">받은 편지</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg
+                      className="h-5 w-5 text-gray-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* 콘텐츠 영역 */}
             <div className="bg-white rounded-lg border-2 border-gray-200 p-6 min-h-[500px]">
-              <p className="text-center text-gray-500 py-12">
-                편지함으로 이동하여 편지를 확인하세요
-              </p>
+              {activeTab === "letters" ? (
+                <div>
+                  <p className="text-center text-gray-500 py-12">
+                    {filter === "all" && "모든 편지를 표시합니다"}
+                    {filter === "sent" && "보낸 편지를 표시합니다"}
+                    {filter === "received" && "받은 편지를 표시합니다"}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-center text-gray-500 py-12">
+                    나의 사연을 표시합니다
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
