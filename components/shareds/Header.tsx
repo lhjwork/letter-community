@@ -68,7 +68,7 @@ export default function Header() {
                   사연 작성
                 </Link>
                 <Link
-                  href="/my-page"
+                  href="/letter-box"
                   className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
                   style={{ fontFamily: "NanumJangMiCe, cursive" }}
                 >

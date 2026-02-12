@@ -3,16 +3,65 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type TabType = "letters" | "stories";
 type FilterType = "all" | "sent" | "received";
+
+interface Letter {
+  id: string;
+  title: string;
+  content: string;
+  recipientName?: string;
+  senderName?: string;
+  createdAt: string;
+}
 
 export default function MyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("letters");
   const [filter, setFilter] = useState<FilterType>("all");
+  const [letters, setLetters] = useState<Letter[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // 편지 목록 가져오기 함수
+  const fetchLetters = async () => {
+    if (!session) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/letters/my");
+
+      if (response.ok) {
+        const data = await response.json();
+        setLetters(data.data || []);
+      } else {
+        console.error("편지 목록 가져오기 실패:", response.status);
+      }
+    } catch (error) {
+      console.error("편지 목록 가져오기 실패:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 편지 목록 가져오기 Effect
+  useEffect(() => {
+    if (activeTab === "letters" && session) {
+      fetchLetters();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, session]);
+
+  // 필터링된 편지 목록
+  const filteredLetters = letters.filter((letter) => {
+    if (filter === "all") return true;
+    if (filter === "sent") return letter.senderName === session?.user?.name;
+    if (filter === "received")
+      return letter.recipientName === session?.user?.name;
+    return true;
+  });
 
   if (status === "loading") {
     return (
@@ -208,14 +257,47 @@ export default function MyPage() {
             </div>
 
             {/* 콘텐츠 영역 */}
-            <div className="bg-white rounded-lg border-2 border-gray-200 p-6 min-h-[500px]">
+            <div className="bg-white rounded-lg border-2 border-gray-200 p-6 min-h-[500px] max-h-[600px] overflow-y-auto">
               {activeTab === "letters" ? (
                 <div>
-                  <p className="text-center text-gray-500 py-12">
-                    {filter === "all" && "모든 편지를 표시합니다"}
-                    {filter === "sent" && "보낸 편지를 표시합니다"}
-                    {filter === "received" && "받은 편지를 표시합니다"}
-                  </p>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="w-8 h-8 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
+                    </div>
+                  ) : filteredLetters.length > 0 ? (
+                    <div className="space-y-4">
+                      {filteredLetters.map((letter) => (
+                        <Link
+                          key={letter.id}
+                          href={`/letter/${letter.id}`}
+                          className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex flex-col gap-1">
+                            <h3 className="text-xl font-medium text-gray-800">
+                              {letter.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 line-clamp-1">
+                              {letter.content.replace(/<[^>]*>/g, "")}
+                            </p>
+                          </div>
+                          <div className="mt-1 text-right">
+                            <span className="text-sm text-gray-600">
+                              <span className="text-pink-400">From.</span>
+                              {filter === "sent"
+                                ? letter.recipientName || "익명"
+                                : letter.senderName || "익명"}
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-500 py-12">
+                      {filter === "all" && "작성한 편지가 없습니다"}
+                      {filter === "sent" && "보낸 편지가 없습니다"}
+                      {filter === "received" && "받은 편지가 없습니다"}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div>
