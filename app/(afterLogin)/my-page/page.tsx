@@ -9,7 +9,8 @@ type TabType = "letters" | "stories";
 type FilterType = "all" | "sent" | "received";
 
 interface Letter {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   content: string;
   recipientName?: string;
@@ -266,30 +267,33 @@ export default function MyPage() {
                     </div>
                   ) : filteredLetters.length > 0 ? (
                     <div className="space-y-4">
-                      {filteredLetters.map((letter) => (
-                        <Link
-                          key={letter.id}
-                          href={`/letter/${letter.id}`}
-                          className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex flex-col gap-1">
-                            <h3 className="text-xl font-medium text-gray-800">
-                              {letter.title}
-                            </h3>
-                            <p className="text-sm text-gray-600 line-clamp-1">
-                              {letter.content.replace(/<[^>]*>/g, "")}
-                            </p>
-                          </div>
-                          <div className="mt-1 text-right">
-                            <span className="text-sm text-gray-600">
-                              <span className="text-pink-400">From.</span>
-                              {filter === "sent"
-                                ? letter.recipientName || "익명"
-                                : letter.senderName || "익명"}
-                            </span>
-                          </div>
-                        </Link>
-                      ))}
+                      {filteredLetters.map((letter) => {
+                        const letterId = letter._id || letter.id;
+                        return (
+                          <Link
+                            key={letterId}
+                            href={`/letter/${letterId}`}
+                            className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex flex-col gap-1">
+                              <h3 className="text-xl font-medium text-gray-800">
+                                {letter.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 line-clamp-1">
+                                {letter.content.replace(/<[^>]*>/g, "")}
+                              </p>
+                            </div>
+                            <div className="mt-1 text-right">
+                              <span className="text-sm text-gray-600">
+                                <span className="text-pink-400">From.</span>
+                                {filter === "sent"
+                                  ? letter.recipientName || "익명"
+                                  : letter.senderName || "익명"}
+                              </span>
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-center text-gray-500 py-12">
