@@ -19,6 +19,7 @@ import {
   cleanupOldRequests,
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
+import { isLetterSaved, toggleSaveLetter } from "@/lib/saved-letters";
 
 interface Letter {
   _id: string;
@@ -62,6 +63,25 @@ export default function LetterDetailClient({
 
   // 작성자 여부 확인 훅 사용
   const { isAuthor } = useIsAuthor(letter);
+
+  // 편지 보관 상태 (클라이언트에서만 확인)
+  const [isSaved, setIsSaved] = useState(() => {
+    if (typeof window !== "undefined") {
+      return isLetterSaved(letter._id);
+    }
+    return false;
+  });
+
+  // 편지 보관하기 핸들러
+  const handleSaveLetter = useCallback(() => {
+    const contentText = letter.content.replace(/<[^>]*>/g, "");
+    const saved = toggleSaveLetter({
+      letterId: letter._id,
+      title: letter.ogTitle || "제목 없는 편지",
+      contentPreview: contentText.slice(0, 100),
+    });
+    setIsSaved(saved);
+  }, [letter._id, letter.ogTitle, letter.content]);
 
   // 정적 배너 데이터
   const bannerSlides = [
@@ -197,7 +217,7 @@ export default function LetterDetailClient({
   }, [userRequests]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: "#FEFEFE" }}>
       {/* 베너 */}
       {bannerSlides.length > 0 && (
         <div className="container mx-auto px-20 py-12">
@@ -218,8 +238,55 @@ export default function LetterDetailClient({
           </Button>
         </div>
 
+        {/* To. 수신자 표시 */}
+        {!isAuthor && (
+          <div className="mb-6">
+            <h2
+              className="text-[#757575]"
+              style={{
+                fontFamily: "'Nanum JangMiCe', cursive",
+                fontSize: "48px",
+                fontWeight: 400,
+                lineHeight: "1.15",
+              }}
+            >
+              To. 당신에게 도착한 편지
+            </h2>
+          </div>
+        )}
+
+        {/* 사연 제목 필드 */}
+        {letter.ogTitle && (
+          <div
+            className="mb-4 rounded-lg border px-7 py-[18px]"
+            style={{
+              backgroundColor: "#FEFEFE",
+              borderColor: "#C4C4C4",
+            }}
+          >
+            <span
+              className="text-[#424242]"
+              style={{
+                fontFamily: "Pretendard, sans-serif",
+                fontSize: "20px",
+                fontWeight: 500,
+                lineHeight: "1.19",
+              }}
+            >
+              {letter.ogTitle}
+            </span>
+          </div>
+        )}
+
         {/* 편지 내용 */}
-        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col mb-12">
+        <div
+          className="rounded-lg border overflow-hidden relative flex flex-col mb-12"
+          style={{
+            backgroundColor: "#FEFEFE",
+            borderColor: "#C4C4C4",
+          }}
+        >
+          {" "}
           {/* 편지지 장식 */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
           <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
@@ -230,7 +297,6 @@ export default function LetterDetailClient({
           <div className="absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
           <div className="absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
           <div className="absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-
           {/* 편지지 내용 영역 */}
           <div
             className="pl-16 pr-8 py-12 min-h-[800px] relative"
@@ -277,19 +343,30 @@ export default function LetterDetailClient({
             {/* 편지 본문 */}
             <div className="relative z-10 mb-20">
               <div
-                className="letter-content text-gray-800"
+                className="letter-content"
                 style={{
-                  fontFamily: "'Noto Sans KR', sans-serif",
-                  fontSize: "16px",
+                  fontFamily: "Pretendard, sans-serif",
+                  fontSize: "20px",
                   lineHeight: "28px",
+                  color: "#424242",
                 }}
                 dangerouslySetInnerHTML={{ __html: letter.content }}
               />
             </div>
 
-            {/* 편지 마무리 */}
+            {/* 편지 마무리 - From 닉네임 + 💌 아이콘 */}
             <div className="mt-12 flex justify-end items-center pb-8">
-              <span className="text-gray-600">From. Letter</span>
+              <span
+                style={{
+                  fontFamily: "Pretendard, sans-serif",
+                  fontSize: "20px",
+                  lineHeight: "1.19",
+                  color: "#424242",
+                  textAlign: "right",
+                }}
+              >
+                From. Letter
+              </span>
               <span className="ml-2 text-2xl">💌</span>
             </div>
           </div>
@@ -309,11 +386,25 @@ export default function LetterDetailClient({
 
         {/* CTA 버튼 섹션 */}
         {!isAuthor && (
-          <div className="flex justify-end gap-6 mb-12">
+          <div className="flex justify-end gap-4 mb-12">
+            {/* 편지 보관하기 버튼 */}
+            <Button
+              onClick={handleSaveLetter}
+              className={`w-56 h-16 rounded-lg transition-colors font-semibold text-2xl leading-5 ${
+                isSaved
+                  ? "bg-[#FF9883] text-white border-2 border-[#FF9883] hover:bg-[#ff8a70]"
+                  : "bg-white text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50"
+              }`}
+              style={{ fontFamily: "Pretendard" }}
+            >
+              {isSaved ? "보관됨 ✓" : "편지 보관하기"}
+            </Button>
+
             {/* 편지 답장하기 버튼 */}
             <Button
               onClick={() => router.push("/write")}
-              className="px-8 py-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-lg h-[60px] min-w-[200px]"
+              className="w-56 h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-2xl leading-5"
+              style={{ fontFamily: "Pretendard" }}
             >
               편지 답장하기
             </Button>
@@ -333,9 +424,10 @@ export default function LetterDetailClient({
                   activeRequestCount >=
                     letter.authorSettings.maxRequestsPerPerson
                 }
-                className="px-8 py-4 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg h-[60px] min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-56 h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontFamily: "Pretendard" }}
               >
-                실물 편지 신청하기 ✉️
+                실물 편지 신청 ✉️
               </Button>
             )}
           </div>

@@ -4,8 +4,13 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import {
+  getSavedLetters,
+  removeSavedLetter,
+  SavedLetter,
+} from "@/lib/saved-letters";
 
-type TabType = "letters" | "stories";
+type TabType = "letters" | "stories" | "saved";
 type FilterType = "all" | "sent" | "received";
 
 interface Letter {
@@ -42,6 +47,7 @@ export default function MyPage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 편지 목록 가져오기 함수
@@ -93,7 +99,12 @@ export default function MyPage() {
         fetchLetters();
       } else if (activeTab === "stories") {
         fetchStories();
+      } else if (activeTab === "saved") {
+        setSavedLetters(getSavedLetters());
       }
+    } else if (activeTab === "saved") {
+      // 보관한 편지는 로그인 없이도 조회 가능
+      setSavedLetters(getSavedLetters());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, session]);
@@ -194,7 +205,7 @@ export default function MyPage() {
               {/* 배송정보 관리 */}
               <Link
                 href="/letter-box/addresses"
-                className="block mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <span className="text-gray-600">배송정보 관리</span>
                 <svg
@@ -265,6 +276,22 @@ export default function MyPage() {
                     나의 사연
                   </h2>
                   {activeTab === "stories" && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab("saved")}
+                  className="relative"
+                >
+                  <h2
+                    className={`text-4xl font-bold transition-colors ${
+                      activeTab === "saved" ? "text-gray-600" : "text-gray-200"
+                    }`}
+                    style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                  >
+                    보관한 편지
+                  </h2>
+                  {activeTab === "saved" && (
                     <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
                   )}
                 </button>
@@ -343,6 +370,56 @@ export default function MyPage() {
                       {filter === "all" && "작성한 편지가 없습니다"}
                       {filter === "sent" && "보낸 편지가 없습니다"}
                       {filter === "received" && "받은 편지가 없습니다"}
+                    </p>
+                  )}
+                </div>
+              ) : activeTab === "saved" ? (
+                <div>
+                  {savedLetters.length > 0 ? (
+                    <div className="space-y-4">
+                      {savedLetters.map((saved) => (
+                        <div
+                          key={saved.letterId}
+                          className="border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
+                        >
+                          <Link
+                            href={`/letter/${saved.letterId}`}
+                            className="block"
+                          >
+                            <div className="flex flex-col gap-1">
+                              <h3 className="text-xl font-medium text-gray-800">
+                                {saved.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 line-clamp-2">
+                                {saved.contentPreview}
+                              </p>
+                            </div>
+                            <div className="mt-2 text-right">
+                              <span className="text-sm text-gray-500">
+                                {new Date(saved.savedAt).toLocaleDateString(
+                                  "ko-KR",
+                                )}{" "}
+                                보관
+                              </span>
+                            </div>
+                          </Link>
+                          <div className="mt-2 flex justify-end">
+                            <button
+                              onClick={() => {
+                                removeSavedLetter(saved.letterId);
+                                setSavedLetters(getSavedLetters());
+                              }}
+                              className="text-sm text-red-400 hover:text-red-600 transition-colors"
+                            >
+                              보관 해제
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-500 py-12">
+                      보관한 편지가 없습니다
                     </p>
                   )}
                 </div>
