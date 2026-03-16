@@ -55,7 +55,7 @@ export default function MyLikesPage() {
             </Link>
             <div>
               <h1
-                className="text-4xl font-bold text-gray-800 mb-2"
+                className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2"
                 style={{ fontFamily: "NanumJangMiCe, cursive" }}
               >
                 좋아요한 사연

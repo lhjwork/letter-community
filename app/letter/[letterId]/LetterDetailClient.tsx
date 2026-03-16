@@ -264,10 +264,9 @@ export default function LetterDetailClient({
             }}
           >
             <span
-              className="text-[#424242]"
+              className="text-[#424242] text-base sm:text-xl"
               style={{
                 fontFamily: "Pretendard, sans-serif",
-                fontSize: "20px",
                 fontWeight: 500,
                 lineHeight: "1.19",
               }}
@@ -342,10 +341,9 @@ export default function LetterDetailClient({
             {/* 편지 본문 */}
             <div className="relative z-10 mb-20">
               <div
-                className="letter-content"
+                className="letter-content text-base sm:text-xl"
                 style={{
                   fontFamily: "Pretendard, sans-serif",
-                  fontSize: "20px",
                   lineHeight: "28px",
                   color: "#424242",
                 }}

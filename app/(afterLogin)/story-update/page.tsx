@@ -216,15 +216,15 @@ function StoryUpdateContent() {
     <div className="min-h-screen bg-gray-50">
       {/* 베너 */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-20 py-12">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}
 
       {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 뒤로가기 버튼 */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-8">
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -236,66 +236,66 @@ function StoryUpdateContent() {
         </div>
 
         {/* 카테고리 선택 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 색깔을 골라주세요
           </h2>
 
-          <div className="flex flex-wrap gap-8 mb-6">
+          <div className="flex flex-wrap gap-3 sm:gap-8 mb-4 sm:mb-6">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`px-6 py-4 rounded-lg border-2 transition-colors min-w-[100px] ${
+                className={`px-4 sm:px-6 py-3 sm:py-4 rounded-lg border-2 transition-colors ${
                   selectedCategory === category.id
                     ? "bg-[#FF7F65] text-white border-[#FF7F65]"
                     : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
                 }`}
               >
-                <span className="font-semibold text-xl">{category.label}</span>
+                <span className="font-semibold text-base sm:text-xl">{category.label}</span>
               </button>
             ))}
           </div>
 
           {selectedCategoryInfo && (
-            <p className="text-gray-600 text-xl">
+            <p className="text-gray-600 text-sm sm:text-xl">
               {selectedCategoryInfo.description}
             </p>
           )}
         </section>
 
         {/* 제목 입력 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             편지의 제목을 정해주세요
           </h2>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-7">
+          <div className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7">
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="내용을 입력해주세요"
-              className="w-full text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
+              className="w-full text-base sm:text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
             />
           </div>
 
-          <p className="text-gray-600 text-xl mt-4">
+          <p className="text-gray-600 text-sm sm:text-xl mt-2 sm:mt-4">
             제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
             제안해드려요.
           </p>
         </section>
 
         {/* 내용 작성 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             어떤 이야기를 건네고 싶으신가요?
@@ -305,31 +305,31 @@ function StoryUpdateContent() {
           <div className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
             {/* 에디터 툴바 (상단 고정) */}
             <div className="relative z-20 bg-white border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between">
+                <div className="flex-1 overflow-x-auto">
                   <EditorToolbar editor={editor} enableImages={true} />
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2">
+                <div className="flex items-center gap-2 px-4 py-2 border-t sm:border-t-0">
                   <SaveIndicator saveState={saveState} />
                   <DraftSaveButton onSave={manualSave} saveState={saveState} />
                 </div>
               </div>
             </div>
 
-            {/* 편지지 구멍 (바인더 효과) */}
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
-            <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            {/* 편지지 구멍 (바인더 효과) - 모바일에서 숨김 */}
+            <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+            <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
 
             {/* 편지지 내용 영역 */}
             <div
-              className="pl-16 pr-8 py-12 h-[800px] overflow-y-auto relative scrollbar-hide"
+              className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 h-[500px] sm:h-[800px] overflow-y-auto relative scrollbar-hide"
               style={{
                 backgroundImage: `repeating-linear-gradient(
                   transparent,
@@ -382,60 +382,60 @@ function StoryUpdateContent() {
         <div className="border-t border-gray-300 mb-12"></div>
 
         {/* 공개 여부 선택 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 공개 여부를 선택해주세요
           </h2>
 
-          <div className="flex space-x-8 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 mb-4 sm:mb-6">
             {/* 공개하기 버튼 */}
             <button
               onClick={() => setIsPublic(true)}
-              className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
+              className="flex items-center justify-between sm:justify-start space-x-4 px-5 sm:px-7 py-3 sm:py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[288px]"
             >
-              <span className="text-gray-800 text-xl font-medium">
+              <span className="text-gray-800 text-base sm:text-xl font-medium">
                 모두에게 공개하기
               </span>
               {isPublic ? (
-                <CheckSquare className="w-6 h-6 text-[#FF9883]" />
+                <CheckSquare className="w-6 h-6 text-[#FF9883] shrink-0" />
               ) : (
-                <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
+                <div className="w-6 h-6 border-2 border-gray-400 rounded shrink-0"></div>
               )}
             </button>
 
             {/* 비공개 버튼 */}
             <button
               onClick={() => setIsPublic(false)}
-              className="flex items-center space-x-4 px-7 py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors min-w-[288px]"
+              className="flex items-center justify-between sm:justify-start space-x-4 px-5 sm:px-7 py-3 sm:py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[288px]"
             >
-              <span className="text-gray-800 text-xl font-medium">
+              <span className="text-gray-800 text-base sm:text-xl font-medium">
                 공개하지 않기
               </span>
               {!isPublic ? (
-                <CheckSquare className="w-6 h-6 text-[#FF9883]" />
+                <CheckSquare className="w-6 h-6 text-[#FF9883] shrink-0" />
               ) : (
-                <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
+                <div className="w-6 h-6 border-2 border-gray-400 rounded shrink-0"></div>
               )}
             </button>
           </div>
 
-          <p className="text-gray-600 text-xl">
+          <p className="text-gray-600 text-sm sm:text-xl">
             공개하지 않은 사연은 레터만 확인할 수 있어요
           </p>
         </section>
 
-        <div className="w-full h-[1px] bg-[#C4C4C4] mb-14"></div>
+        <div className="w-full h-[1px] bg-[#C4C4C4] mb-8 sm:mb-14"></div>
 
         {/* 액션 버튼 */}
-        <section className="flex justify-end space-x-8 mb-16">
+        <section className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16">
           <Button
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="px-6 py-4 text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[168px] h-[60px]"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
           >
             취소
           </Button>
@@ -443,7 +443,7 @@ function StoryUpdateContent() {
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-6 py-4 text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[168px] h-[60px]"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
           >
             {isSubmitting ? "작성 중..." : "작성 완료"}
           </Button>

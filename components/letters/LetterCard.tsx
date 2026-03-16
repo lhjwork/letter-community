@@ -40,11 +40,16 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
     }
   };
 
+  const handleTap = () => {
+    setIsHovered((prev) => !prev);
+  };
+
   return (
     <div
       className="relative bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-lg"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleTap}
       style={{
         backgroundImage: `repeating-linear-gradient(
           transparent,
