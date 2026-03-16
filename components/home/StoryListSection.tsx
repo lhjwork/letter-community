@@ -24,7 +24,7 @@ function StoryCard({ story }: StoryCardProps) {
 
   return (
     <Link href={`/letter/${story._id}`}>
-      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-8 w-[285px] h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
+      <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-6 sm:p-8 w-full sm:w-[285px] h-[280px] sm:h-[312px] relative hover:shadow-lg transition-shadow cursor-pointer">
         {/* 가로 줄들 */}
         <div className="space-y-12">
           {[...Array(6)].map((_, i) => (
@@ -107,15 +107,15 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
 
   return (
     <section className="w-full py-16">
-      <div className="container mx-auto px-20">
+      <div className="container mx-auto px-4 sm:px-8 lg:px-20">
         {/* 타이틀 */}
-        <div className="text-center mb-16">
-          <h2 className="text-[52px] leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-4">사연을 남겨주세요</h2>
-          <p className="text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
+        <div className="text-center mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-2 sm:mb-4">사연을 남겨주세요</h2>
+          <p className="text-base sm:text-xl lg:text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
         </div>
 
         {/* 스토리 카드 그리드 */}
-        <div className="flex flex-wrap justify-center gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {displayStories.map((story) => (
             <StoryCard key={story._id} story={story} />
           ))}
@@ -123,7 +123,7 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
 
         {/* 더보기 버튼 */}
         <div className="flex justify-center">
-          <Link href="/stories" className="px-8 py-4 border-2 border-[#FF7F65] text-[#FF7F65] text-2xl font-semibold rounded hover:bg-[#FFF5F3] transition-colors">
+          <Link href="/stories" className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-[#FF7F65] text-[#FF7F65] text-lg sm:text-2xl font-semibold rounded hover:bg-[#FFF5F3] transition-colors">
             더 많은 사연 보기
           </Link>
         </div>

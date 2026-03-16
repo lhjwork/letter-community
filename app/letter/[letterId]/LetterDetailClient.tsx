@@ -220,13 +220,13 @@ export default function LetterDetailClient({
     <div className="min-h-screen" style={{ backgroundColor: "#FEFEFE" }}>
       {/* 베너 */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-20 py-12">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}
 
       {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 뒤로가기 버튼 */}
         <div className="mb-8">
           <Button
@@ -242,10 +242,9 @@ export default function LetterDetailClient({
         {!isAuthor && (
           <div className="mb-6">
             <h2
-              className="text-[#757575]"
+              className="text-[#757575] text-2xl sm:text-4xl lg:text-[48px]"
               style={{
                 fontFamily: "'Nanum JangMiCe', cursive",
-                fontSize: "48px",
                 fontWeight: 400,
                 lineHeight: "1.15",
               }}
@@ -287,19 +286,19 @@ export default function LetterDetailClient({
           }}
         >
           {" "}
-          {/* 편지지 장식 */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
-          <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          {/* 편지지 장식 - 모바일에서 숨김 */}
+          <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+          <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+          <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
           {/* 편지지 내용 영역 */}
           <div
-            className="pl-16 pr-8 py-12 min-h-[800px] relative"
+            className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 min-h-[400px] sm:min-h-[800px] relative"
             style={{
               backgroundImage: `repeating-linear-gradient(
                 transparent,
@@ -386,11 +385,11 @@ export default function LetterDetailClient({
 
         {/* CTA 버튼 섹션 */}
         {!isAuthor && (
-          <div className="flex justify-end gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-8 sm:mb-12">
             {/* 편지 보관하기 버튼 */}
             <Button
               onClick={handleSaveLetter}
-              className={`w-56 h-16 rounded-lg transition-colors font-semibold text-2xl leading-5 ${
+              className={`w-full sm:w-44 lg:w-56 h-12 sm:h-16 rounded-lg transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 ${
                 isSaved
                   ? "bg-[#FF9883] text-white border-2 border-[#FF9883] hover:bg-[#ff8a70]"
                   : "bg-white text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50"
@@ -403,7 +402,7 @@ export default function LetterDetailClient({
             {/* 편지 답장하기 버튼 */}
             <Button
               onClick={() => router.push("/write")}
-              className="w-56 h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-2xl leading-5"
+              className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
               style={{ fontFamily: "Pretendard" }}
             >
               편지 답장하기
@@ -424,7 +423,7 @@ export default function LetterDetailClient({
                   activeRequestCount >=
                     letter.authorSettings.maxRequestsPerPerson
                 }
-                className="w-56 h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ fontFamily: "Pretendard" }}
               >
                 실물 편지 신청 ✉️
@@ -439,12 +438,11 @@ export default function LetterDetailClient({
             <div className="w-full h-px bg-[#C4C4C4]"></div>
 
             {/* 링크 공유 섹션 */}
-            <div className=" rounded-lg p-12">
+            <div className="rounded-lg p-4 sm:p-12">
               <h2
-                className="mb-8"
+                className="mb-4 sm:mb-8 text-2xl sm:text-4xl lg:text-[48px]"
                 style={{
                   color: "#757575",
-                  fontSize: "48px",
                   fontStyle: "normal",
                   fontWeight: 400,
                   lineHeight: "normal",
@@ -454,8 +452,8 @@ export default function LetterDetailClient({
               </h2>
 
               {/* 링크 복사 영역 */}
-              <div className="flex items-center gap-3 mb-12 ">
-                <div className="flex-1 bg-white rounded-lg border border-gray-300 h-16">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-12">
+                <div className="flex-1 bg-white rounded-lg border border-gray-300 h-12 sm:h-16">
                   <input
                     type="text"
                     value={`https://letter-community.vercel.app/letter/69d3600b6433643e74d5174`}
@@ -469,7 +467,7 @@ export default function LetterDetailClient({
                     navigator.clipboard.writeText(url);
                     alert("링크가 복사되었습니다!");
                   }}
-                  className="px-8 h-16 bg-white rounded-lg hover:bg-[#FF9883] cursor-pointer transition-colors font-medium text-base border border-[#FF9883]"
+                  className="px-6 sm:px-8 h-12 sm:h-16 bg-white rounded-lg hover:bg-[#FF9883] cursor-pointer transition-colors font-medium text-sm sm:text-base border border-[#FF9883]"
                   style={{ color: "#FF9883" }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = "white";
@@ -483,18 +481,18 @@ export default function LetterDetailClient({
               </div>
 
               {/* 네비게이션 버튼들 */}
-              <div className="flex justify-center gap-6">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6">
                 <Button
                   onClick={() => router.push("/letter-box")}
                   variant="outline"
-                  className="w-56 h-16 border-2 border-gray-300 hover:bg-gray-50 rounded-lg bg-white text-[#757575] text-center text-2xl font-semibold leading-5"
+                  className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 border-2 border-gray-300 hover:bg-gray-50 rounded-lg bg-white text-[#757575] text-center text-base sm:text-lg lg:text-2xl font-semibold leading-5"
                   style={{ fontFamily: "Pretendard" }}
                 >
                   마이페이지 이동
                 </Button>
                 <Button
                   onClick={() => router.push("/")}
-                  className="flex w-56 h-16 px-6 py-2 justify-center items-center gap-2.5 rounded-lg bg-[#FF9883] text-white hover:bg-orange-600 transition-colors text-2xl font-semibold leading-5"
+                  className="flex w-full sm:w-44 lg:w-56 h-12 sm:h-16 px-6 py-2 justify-center items-center gap-2.5 rounded-lg bg-[#FF9883] text-white hover:bg-orange-600 transition-colors text-base sm:text-lg lg:text-2xl font-semibold leading-5"
                   style={{ fontFamily: "Pretendard" }}
                 >
                   메인페이지 이동

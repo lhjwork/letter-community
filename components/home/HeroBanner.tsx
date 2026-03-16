@@ -54,7 +54,7 @@ export default function HeroBanner({ bannerSlides }: HeroBannerProps) {
   const showControls = bannerSlides.length > 1;
 
   return (
-    <section className="relative w-full rounded-[40px] overflow-hidden">
+    <section className="relative w-full rounded-2xl sm:rounded-[40px] overflow-hidden">
       {/* 슬라이드 컨테이너 */}
       <div className="relative w-full aspect-[1200/440]">
         {bannerSlides.map((slide, index) => (
@@ -79,7 +79,7 @@ export default function HeroBanner({ bannerSlides }: HeroBannerProps) {
       {showControls && (
         <button
           onClick={goToPrevious}
-          className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-sm z-10"
+          className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-sm z-10"
           aria-label="이전 슬라이드"
         >
           <svg
@@ -100,7 +100,7 @@ export default function HeroBanner({ bannerSlides }: HeroBannerProps) {
       {showControls && (
         <button
           onClick={goToNext}
-          className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-sm z-10"
+          className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-sm z-10"
           aria-label="다음 슬라이드"
         >
           <svg
@@ -120,7 +120,7 @@ export default function HeroBanner({ bannerSlides }: HeroBannerProps) {
 
       {/* 인디케이터 - 배너가 2개 이상일 때만 표시 */}
       {showControls && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {bannerSlides.map((_, index) => (
             <button
               key={index}

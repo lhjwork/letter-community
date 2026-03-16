@@ -22,7 +22,7 @@ export default async function LandingPage() {
     <main className="min-h-screen bg-[#FEFEFE]">
       {/* Hero Banner */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-20 py-12">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}

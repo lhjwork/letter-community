@@ -278,15 +278,15 @@ function WritePageContent() {
     <div className="min-h-screen bg-gray-50">
       {/* 베너 */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-20 py-12">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}
 
       {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 뒤로가기 버튼 */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-8">
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -298,34 +298,34 @@ function WritePageContent() {
         </div>
 
         {/* 제목 입력 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             편지의 제목을 정해주세요
           </h2>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-7">
+          <div className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7">
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="내용을 입력해주세요"
-              className="w-full text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
+              className="w-full text-base sm:text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
             />
           </div>
 
-          <p className="text-gray-600 text-xl mt-4">
+          <p className="text-gray-600 text-sm sm:text-xl mt-2 sm:mt-4">
             편지 내용을 작성한 후 AI 제목 생성 버튼을 클릭하여 제목을 자동으로
             생성할 수 있습니다.
           </p>
         </section>
 
         {/* 내용 작성 */}
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <h2
-            className="text-5xl font-bold text-gray-700 mb-8"
+            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             어떤 마음을 전하고 싶으신가요?
@@ -335,11 +335,11 @@ function WritePageContent() {
           <div className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
             {/* 에디터 툴바 (상단 고정) */}
             <div className="relative z-20 bg-white border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between">
+                <div className="flex-1 overflow-x-auto">
                   <EditorToolbar editor={editor} enableImages={false} />
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2">
+                <div className="flex items-center gap-2 px-4 py-2 border-t sm:border-t-0">
                   <SaveIndicator saveState={saveState} />
                   <DraftSaveButton onSave={manualSave} saveState={saveState} />
                   <DraftLoadButton onLoadDraft={handleLoadDraft} />
@@ -347,20 +347,20 @@ function WritePageContent() {
               </div>
             </div>
 
-            {/* 편지지 구멍 (바인더 효과) */}
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
-            <div className="absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-            <div className="absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            {/* 편지지 구멍 (바인더 효과) - 모바일에서 숨김 */}
+            <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+            <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
 
             {/* 편지지 내용 영역 */}
             <div
-              className="pl-16 pr-8 py-12 h-[800px] overflow-y-auto relative scrollbar-hide"
+              className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 h-[500px] sm:h-[800px] overflow-y-auto relative scrollbar-hide"
               style={{
                 backgroundImage: `repeating-linear-gradient(
                   transparent,
@@ -456,12 +456,12 @@ function WritePageContent() {
         <div className="w-full h-px bg-[#C4C4C4] mb-14"></div>
 
         {/* 액션 버튼 */}
-        <section className="flex justify-end space-x-8 mb-16">
+        <section className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16">
           <Button
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="px-6 py-4 text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[168px] h-[60px]"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
           >
             취소
           </Button>
@@ -469,7 +469,7 @@ function WritePageContent() {
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-6 py-4 text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[168px] h-[60px]"
+            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
           >
             {isSubmitting ? "편지 생성 중..." : "편지 만들기"}
           </Button>

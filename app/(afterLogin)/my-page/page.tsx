@@ -137,23 +137,23 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* 왼쪽: 내 프로필 */}
           <div className="lg:col-span-1">
             <h2
-              className="text-4xl font-bold text-gray-600 mb-8"
+              className="text-2xl sm:text-4xl font-bold text-gray-600 mb-4 sm:mb-8"
               style={{ fontFamily: "NanumJangMiCe, cursive" }}
             >
               내 프로필
             </h2>
 
-            <div className="bg-white rounded-lg border-2 border-gray-200 p-8">
+            <div className="bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-8">
               {/* 프로필 이미지 */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
-                  <div className="w-48 h-48 rounded-full bg-gray-400 flex items-center justify-center">
-                    <span className="text-6xl">👤</span>
+                  <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-gray-400 flex items-center justify-center">
+                    <span className="text-4xl sm:text-6xl">👤</span>
                   </div>
                   <button className="absolute bottom-0 right-0 w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
                     <svg
@@ -240,15 +240,15 @@ export default function MyPage() {
           {/* 오른쪽: 나의 편지/사연 */}
           <div className="lg:col-span-2">
             {/* 탭과 필터 */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-8 gap-4">
               {/* 탭 */}
-              <div className="flex gap-8">
+              <div className="flex gap-4 sm:gap-8 overflow-x-auto w-full sm:w-auto">
                 <button
                   onClick={() => setActiveTab("letters")}
-                  className="relative"
+                  className="relative shrink-0"
                 >
                   <h2
-                    className={`text-4xl font-bold transition-colors ${
+                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
                       activeTab === "letters"
                         ? "text-gray-600"
                         : "text-gray-200"
@@ -263,10 +263,10 @@ export default function MyPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab("stories")}
-                  className="relative"
+                  className="relative shrink-0"
                 >
                   <h2
-                    className={`text-4xl font-bold transition-colors ${
+                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
                       activeTab === "stories"
                         ? "text-gray-600"
                         : "text-gray-200"
@@ -281,10 +281,10 @@ export default function MyPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab("saved")}
-                  className="relative"
+                  className="relative shrink-0"
                 >
                   <h2
-                    className={`text-4xl font-bold transition-colors ${
+                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
                       activeTab === "saved" ? "text-gray-600" : "text-gray-200"
                     }`}
                     style={{ fontFamily: "NanumJangMiCe, cursive" }}

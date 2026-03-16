@@ -112,7 +112,7 @@ function MyPageContent() {
     <div className="min-h-screen bg-gray-50">
       {/* 베너 */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-20 py-12">
+        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}
@@ -124,7 +124,7 @@ function MyPageContent() {
           <div className="flex gap-8">
             <button
               onClick={() => setActiveTab("letters")}
-              className={`text-3xl font-bold pb-2 border-b-2 transition-colors ${
+              className={`text-xl sm:text-3xl font-bold pb-2 border-b-2 transition-colors ${
                 activeTab === "letters"
                   ? "text-gray-800 border-gray-800"
                   : "text-gray-400 border-transparent hover:text-gray-600"
@@ -134,7 +134,7 @@ function MyPageContent() {
             </button>
             <button
               onClick={() => setActiveTab("stories")}
-              className={`text-3xl font-bold pb-2 border-b-2 transition-colors ${
+              className={`text-xl sm:text-3xl font-bold pb-2 border-b-2 transition-colors ${
                 activeTab === "stories"
                   ? "text-gray-800 border-gray-800"
                   : "text-gray-400 border-transparent hover:text-gray-600"
