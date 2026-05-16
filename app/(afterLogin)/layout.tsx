@@ -1,6 +1,5 @@
 import Footer from "@/components/shareds/Footer";
 import Header from "@/components/shareds/Header";
-import { EmotionChat } from "@/components/ai/EmotionChat";
 import { ReactNode } from "react";
 
 type Props = { children: ReactNode };
@@ -13,7 +12,6 @@ export default function AfterLoginLayout({ children }: Props) {
         {children}
         <Footer />
       </div>
-      <EmotionChat />
     </div>
   );
 }

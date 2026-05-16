@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SessionProvider from "@/components/SessionProvider";
+import { EmotionChat } from "@/components/ai/EmotionChat";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="antialiased overflow-x-hidden">
         <SessionProvider>
           <div className="mx-auto max-w-[1920px] overflow-x-hidden">{children}</div>
+          <EmotionChat />
         </SessionProvider>
       </body>
     </html>
