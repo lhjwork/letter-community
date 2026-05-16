@@ -12,6 +12,7 @@ import {
   StoryCard,
   EmptyState,
 } from "@/components/stories";
+import { DailyPrompt } from "@/components/ai/DailyPrompt";
 import AdCarousel from "@/components/ads/AdCarousel";
 import type { SortOption } from "@/lib/api";
 
@@ -63,6 +64,13 @@ function StoriesContent() {
             className="mb-4"
             showDebugInfo={process.env.NODE_ENV === "development"}
           />
+        </div>
+      </section>
+
+      {/* 오���의 감정 질문 */}
+      <section className="bg-white py-6 border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <DailyPrompt />
         </div>
       </section>
 
