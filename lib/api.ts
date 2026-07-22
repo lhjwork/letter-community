@@ -187,43 +187,44 @@ export async function getLetter(letterId: string) {
   });
 }
 
-/**
- * OG 이미지 업로드 (커스텀)
- */
-export async function uploadOgImage(formData: FormData) {
-  const response = await fetch(`${BACKEND_URL}/api/og/upload`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: "Unknown error occurred",
-    }));
-    throw new Error(error.message || `API Error: ${response.status}`);
-  }
-
-  return response.json();
-}
-
-/**
- * OG 이미지 자동 생성 기록
- */
-export async function recordAutoOgImage(letterId: string, ogImageUrl: string) {
-  return apiRequest("/api/og/auto-generate", {
-    method: "PATCH",
-    body: JSON.stringify({ letterId, ogImageUrl }),
-  });
-}
-
-/**
- * OG 이미지 URL 조회
- */
-export async function getOgImageUrl(letterId: string) {
-  return apiRequest(`/api/og/${letterId}`, {
-    method: "GET",
-  });
-}
+// === S3 무료 서비스 종료로 이미지 관련 기능 비활성화 ===
+// /**
+//  * OG 이미지 업로드 (커스텀)
+//  */
+// export async function uploadOgImage(formData: FormData) {
+//   const response = await fetch(`${BACKEND_URL}/api/og/upload`, {
+//     method: "POST",
+//     body: formData,
+//   });
+//
+//   if (!response.ok) {
+//     const error = await response.json().catch(() => ({
+//       message: "Unknown error occurred",
+//     }));
+//     throw new Error(error.message || `API Error: ${response.status}`);
+//   }
+//
+//   return response.json();
+// }
+//
+// /**
+//  * OG 이미지 자동 생성 기록
+//  */
+// export async function recordAutoOgImage(letterId: string, ogImageUrl: string) {
+//   return apiRequest("/api/og/auto-generate", {
+//     method: "PATCH",
+//     body: JSON.stringify({ letterId, ogImageUrl }),
+//   });
+// }
+//
+// /**
+//  * OG 이미지 URL 조회
+//  */
+// export async function getOgImageUrl(letterId: string) {
+//   return apiRequest(`/api/og/${letterId}`, {
+//     method: "GET",
+//   });
+// }
 
 export interface Letter {
   _id: string;

@@ -91,7 +91,7 @@ export async function generateMetadata({
     };
   }
 
-  const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og?letterId=${letterId}`;
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og`;
   const title = letter.ogTitle || "당신에게 도착한 편지";
   const description = letter.ogPreviewText || "특별한 편지가 도착했습니다.";
 

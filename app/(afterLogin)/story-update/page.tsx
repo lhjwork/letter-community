@@ -81,7 +81,7 @@ function StoryUpdateContent() {
       setHasUnsavedChanges(true);
     },
     placeholder: "어떤 이야기를 건네고 싶으신가요?",
-    enableImages: true,
+    enableImages: false, // S3 무료 서비스 종료로 이미지 비활성화
   });
 
   // 임시저장 훅
@@ -307,7 +307,7 @@ function StoryUpdateContent() {
             <div className="relative z-20 bg-white border-b">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between">
                 <div className="flex-1 overflow-x-auto">
-                  <EditorToolbar editor={editor} enableImages={true} />
+                  <EditorToolbar editor={editor} enableImages={false} />
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 border-t sm:border-t-0">
                   <SaveIndicator saveState={saveState} />

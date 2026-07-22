@@ -71,7 +71,7 @@ export default function ShareModal({ isOpen, onClose, letterUrl, letterTitle }: 
         content: {
           title: letterTitle,
           description: "편지로 마음을 전하는 특별한 공간",
-          imageUrl: `${window.location.origin}/api/og/letter/${letterUrl.split("/").pop()}`,
+          imageUrl: `${window.location.origin}/api/og`,
           link: {
             mobileWebUrl: letterUrl,
             webUrl: letterUrl,
