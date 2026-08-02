@@ -37,7 +37,7 @@ function StoryCard({ story, index }: StoryCardProps) {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <Link href={`/letter/${story._id}`}>
-        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-5 sm:p-8 w-full sm:w-[285px] h-[240px] sm:h-[312px] relative cursor-pointer overflow-hidden">
+        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-5 sm:p-8 w-full h-[240px] sm:h-[312px] relative cursor-pointer overflow-hidden">
           {/* Shimmer overlay on hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
@@ -141,7 +141,7 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
 
         {/* Story cards - stagger grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8 lg:gap-10 mb-6"
           variants={staggerContainerWide}
           initial="hidden"
           whileInView="visible"
