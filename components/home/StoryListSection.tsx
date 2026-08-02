@@ -130,12 +130,12 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
         {/* Title - scroll reveal */}
         <motion.div
           ref={ref}
-          className="text-center mb-6 sm:mb-12"
+          className="text-center mb-6 sm:mb-14"
           variants={fadeInUp}
           initial="hidden"
           animate={controls}
         >
-          <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-1 sm:mb-3">사연을 남겨주세요</h2>
+          <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-2 sm:mb-5">사연을 남겨주세요</h2>
           <p className="text-base sm:text-xl lg:text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
         </motion.div>
 
