@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useScrollReveal } from "@/lib/animations/hooks";
-import { fadeInUp, staggerContainerWide, staggerItem, buttonPop } from "@/lib/animations/config";
+import { useRef, useEffect, useState } from "react";
 import type { Story } from "@/lib/api";
 
 interface StoryCardProps {
@@ -26,25 +24,12 @@ function StoryCard({ story, index }: StoryCardProps) {
   };
 
   return (
-    <motion.div
-      variants={staggerItem}
-      whileHover={{
-        y: -8,
-        scale: 1.02,
-        boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-      }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    <div
+      className="content-reveal transition-transform duration-300 hover:-translate-y-2 hover:scale-[1.02]"
+      style={{ animationDelay: `${0.15 * index}s` }}
     >
       <Link href={`/letter/${story._id}`}>
-        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-5 sm:p-8 w-full h-[240px] sm:h-[312px] relative cursor-pointer overflow-hidden">
-          {/* Shimmer overlay on hover */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
-            whileHover={{ translateX: "200%" }}
-            transition={{ duration: 0.6 }}
-          />
-
+        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-5 sm:p-8 w-full h-[240px] sm:h-[312px] relative cursor-pointer card-shimmer-hover transition-shadow duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
           {/* Horizontal lines */}
           <div className="space-y-8 sm:space-y-12">
             {[...Array(6)].map((_, i) => (
@@ -59,14 +44,9 @@ function StoryCard({ story, index }: StoryCardProps) {
 
           {/* Category badge */}
           {story.category && (
-            <motion.div
-              className="absolute top-5 left-5 sm:top-8 sm:left-8"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.3 + index * 0.1 }}
-            >
+            <div className="absolute top-5 left-5 sm:top-8 sm:left-8">
               <span className="px-3 py-1 bg-[#FF7F65] text-white text-sm rounded-full">{getCategoryLabel(story.category)}</span>
-            </motion.div>
+            </div>
           )}
 
           {/* Title / content preview */}
@@ -88,7 +68,7 @@ function StoryCard({ story, index }: StoryCardProps) {
           )}
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
@@ -122,48 +102,53 @@ interface StoryListSectionProps {
 
 export default function StoryListSection({ stories }: StoryListSectionProps) {
   const displayStories = stories.slice(0, 4);
-  const { ref, controls } = useScrollReveal();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section className="w-full py-10 sm:py-16">
       <div className="container mx-auto px-4 sm:px-8 lg:px-20">
         {/* Title - scroll reveal */}
-        <motion.div
-          ref={ref}
-          className="text-center mb-6 sm:mb-14"
-          variants={fadeInUp}
-          initial="hidden"
-          animate={controls}
-        >
+        <div className={`text-center mb-6 sm:mb-14 scroll-reveal ${inView ? "in-view" : ""}`}>
           <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-2 sm:mb-5">사연을 남겨주세요</h2>
           <p className="text-base sm:text-xl lg:text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
-        </motion.div>
+        </div>
 
         {/* Story cards - stagger grid */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8 lg:gap-10 mb-6"
-          variants={staggerContainerWide}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+        <div
+          ref={sectionRef}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-8 lg:gap-10 mb-6 ${inView ? "in-view" : ""}`}
         >
           {displayStories.map((story, index) => (
             <StoryCard key={story._id} story={story} index={index} />
           ))}
-        </motion.div>
+        </div>
 
         {/* More button */}
-        <motion.div
-          className="flex justify-center"
-          variants={buttonPop}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+        <div
+          className={`flex justify-center scroll-reveal ${inView ? "in-view" : ""}`}
+          style={{ animationDelay: "0.4s" }}
         >
           <Link href="/stories" className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-[#FF7F65] text-[#FF7F65] text-lg sm:text-2xl font-semibold rounded hover:bg-[#FFF5F3] transition-colors">
             더 많은 사연 보기
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

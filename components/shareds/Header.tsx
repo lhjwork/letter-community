@@ -9,13 +9,19 @@ import LoginDialog from "./LoginDialog";
 export default function Header() {
   const { data: session, status } = useSession();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [loginCallbackUrl, setLoginCallbackUrl] = useState("/");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  const openLoginDialog = (callbackUrl = "/") => {
+    setLoginCallbackUrl(callbackUrl);
+    setIsLoginDialogOpen(true);
+  };
 
   const handleLoginClick = () => {
     if (status === "authenticated") {
       setIsUserMenuOpen(!isUserMenuOpen);
     } else {
-      setIsLoginDialogOpen(true);
+      openLoginDialog("/");
     }
   };
 
@@ -77,13 +83,13 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link
-                  href="/write"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                <button
+                  onClick={() => openLoginDialog("/write")}
+                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
                   style={{ fontFamily: "NanumJangMiCe, cursive" }}
                 >
                   사연 작성
-                </Link>
+                </button>
                 <Link
                   href="/stories"
                   className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
@@ -187,13 +193,13 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link
-                href="/write"
-                className="text-base text-[#757575] hover:text-black transition-colors"
+              <button
+                onClick={() => openLoginDialog("/write")}
+                className="text-base text-[#757575] hover:text-black transition-colors cursor-pointer"
                 style={{ fontFamily: "NanumJangMiCe, cursive" }}
               >
                 사연 작성
-              </Link>
+              </button>
               <Link
                 href="/stories"
                 className="text-base text-[#757575] hover:text-black transition-colors"
@@ -217,6 +223,7 @@ export default function Header() {
       <LoginDialog
         isOpen={isLoginDialogOpen}
         onClose={() => setIsLoginDialogOpen(false)}
+        callbackUrl={loginCallbackUrl}
       />
     </>
   );

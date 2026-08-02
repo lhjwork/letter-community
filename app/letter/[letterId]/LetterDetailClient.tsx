@@ -12,6 +12,7 @@ import UserRequestsStatus from "@/components/letter/UserRequestsStatus";
 import RecipientAddressModal from "@/components/recipient/RecipientAddressModal";
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
 import { Button } from "@/components/ui/button";
+import LoginDialog from "@/components/shareds/LoginDialog";
 import { HeroBanner } from "@/components/home";
 import { useIsAuthor } from "@/hooks/useIsAuthor";
 import EnvelopeAnimation from "@/components/effects/EnvelopeAnimation";
@@ -22,7 +23,6 @@ import {
   cleanupOldRequests,
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
-import { isLetterSaved, toggleSaveLetter } from "@/lib/saved-letters";
 import { fadeInUp, staggerContainer, staggerItem, springs } from "@/lib/animations/config";
 
 interface Letter {
@@ -64,28 +64,18 @@ export default function LetterDetailClient({
   const [userRequests, setUserRequests] = useState<any[]>([]);
   const router = useRouter();
   const { data: session } = useSession();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  const handleWriteClick = () => {
+    if (session) {
+      router.push("/write");
+    } else {
+      setShowLoginDialog(true);
+    }
+  };
 
   // 작성자 여부 확인 훅 사용
   const { isAuthor } = useIsAuthor(letter);
-
-  // 편지 보관 상태 (클라이언트에서만 확인)
-  const [isSaved, setIsSaved] = useState(() => {
-    if (typeof window !== "undefined") {
-      return isLetterSaved(letter._id);
-    }
-    return false;
-  });
-
-  // 편지 보관하기 핸들러
-  const handleSaveLetter = useCallback(() => {
-    const contentText = letter.content.replace(/<[^>]*>/g, "");
-    const saved = toggleSaveLetter({
-      letterId: letter._id,
-      title: letter.ogTitle || "제목 없는 편지",
-      contentPreview: contentText.slice(0, 100),
-    });
-    setIsSaved(saved);
-  }, [letter._id, letter.ogTitle, letter.content]);
 
   // 정적 배너 데이터
   const bannerSlides = [
@@ -220,7 +210,8 @@ export default function LetterDetailClient({
     ).length;
   }, [userRequests]);
 
-  const [envelopeOpened, setEnvelopeOpened] = useState(false);
+  const isStory = letter.type === "story";
+  const [envelopeOpened, setEnvelopeOpened] = useState(isStory); // 사연은 바로 열림
 
   // 스크롤 연동 그림자 + 플로팅 버튼
   const letterPaperRef = useRef<HTMLDivElement>(null);
@@ -292,7 +283,9 @@ export default function LetterDetailClient({
                 lineHeight: "1.15",
               }}
             >
-              {envelopeOpened ? (
+              {isStory ? (
+                "당신에게 전해진 사연"
+              ) : envelopeOpened ? (
                 "To. 당신에게 도착한 편지"
               ) : (
                 <TypewriterText
@@ -305,7 +298,10 @@ export default function LetterDetailClient({
           </motion.div>
         )}
 
-        {/* 봉투 애니메이션 → 편지 내용 */}
+        {/* 사연: 바로 표시 / 편지: 봉투 애니메이션 */}
+        {isStory ? (
+          <StoryContent letter={letter} isAuthor={isAuthor} handleWriteClick={handleWriteClick} letterPaperRef={letterPaperRef} paperShadow={paperShadow} session={session} activeRequestCount={activeRequestCount} setShowRecipientSelect={setShowRecipientSelect} router={router} />
+        ) : (
         <EnvelopeAnimation onOpen={() => setEnvelopeOpened(true)}>
           {/* 사연 제목 필드 */}
           {letter.ogTitle && (
@@ -491,25 +487,10 @@ export default function LetterDetailClient({
               initial="hidden"
               animate="visible"
             >
-              {/* 편지 보관하기 버튼 */}
-              <motion.div variants={staggerItem}>
-                <Button
-                  onClick={handleSaveLetter}
-                  className={`w-full sm:w-44 lg:w-56 h-12 sm:h-16 rounded-lg transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 ${
-                    isSaved
-                      ? "bg-[#FF9883] text-white border-2 border-[#FF9883] hover:bg-[#ff8a70]"
-                      : "bg-white text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50"
-                  }`}
-                  style={{ fontFamily: "Pretendard" }}
-                >
-                  {isSaved ? "보관됨 ✓" : "편지 보관하기"}
-                </Button>
-              </motion.div>
-
               {/* 편지 답장하기 버튼 */}
               <motion.div variants={staggerItem}>
                 <Button
-                  onClick={() => router.push("/write")}
+                  onClick={handleWriteClick}
                   className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
                   style={{ fontFamily: "Pretendard" }}
                 >
@@ -543,6 +524,7 @@ export default function LetterDetailClient({
             </motion.div>
           )}
         </EnvelopeAnimation>
+        )}
 
         {/* 편지 작성자용 섹션 */}
         {isAuthor && (
@@ -560,7 +542,7 @@ export default function LetterDetailClient({
                   lineHeight: "normal",
                 }}
               >
-                링크를 통해 편지를 공유해주세요
+                {isStory ? "링크를 통해 사연을 공유해주세요" : "링크를 통해 편지를 공유해주세요"}
               </h2>
 
               {/* 링크 복사 영역 */}
@@ -654,6 +636,11 @@ export default function LetterDetailClient({
             setShowAddressForm(true);
           }}
         />
+        <LoginDialog
+          isOpen={showLoginDialog}
+          onClose={() => setShowLoginDialog(false)}
+          callbackUrl="/write"
+        />
       </main>
 
       {/* 플로팅 액션 버튼 */}
@@ -668,24 +655,11 @@ export default function LetterDetailClient({
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             >
               <motion.button
-                onClick={handleSaveLetter}
-                className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-lg transition-colors ${
-                  isSaved
-                    ? "bg-[#FF9883] text-white"
-                    : "bg-white text-[#FF9883] border border-[#FF9883]"
-                }`}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                title="편지 보관"
-              >
-                {isSaved ? "✓" : "♡"}
-              </motion.button>
-              <motion.button
-                onClick={() => router.push("/write")}
+                onClick={handleWriteClick}
                 className="w-12 h-12 rounded-full bg-[#FF7F65] text-white shadow-lg flex items-center justify-center text-lg"
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
-                title="편지 답장"
+                title={isStory ? "나도 사연 남기기" : "편지 답장"}
               >
                 ✎
               </motion.button>
@@ -694,6 +668,229 @@ export default function LetterDetailClient({
         </AnimatePresence>
       )}
     </div>
+  );
+}
+
+/* 사연 전용 콘텐츠 - 봉투 없이 바로 표시 */
+function StoryContent({
+  letter,
+  isAuthor,
+  handleWriteClick,
+  letterPaperRef,
+  paperShadow,
+  session,
+  activeRequestCount,
+  setShowRecipientSelect,
+  router,
+}: {
+  letter: Letter;
+  isAuthor: boolean;
+  handleWriteClick: () => void;
+  letterPaperRef: React.RefObject<HTMLDivElement | null>;
+  paperShadow: any;
+  session: any;
+  activeRequestCount: number;
+  setShowRecipientSelect: (v: boolean) => void;
+  router: any;
+}) {
+  return (
+    <>
+      {/* 사연 제목 필드 */}
+      {letter.ogTitle && (
+        <motion.div
+          className="mb-4 rounded-lg border px-7 py-[18px]"
+          style={{
+            backgroundColor: "#FEFEFE",
+            borderColor: "#C4C4C4",
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <span
+            className="text-[#424242] text-base sm:text-xl"
+            style={{
+              fontFamily: "Pretendard, sans-serif",
+              fontWeight: 500,
+              lineHeight: "1.19",
+            }}
+          >
+            {letter.ogTitle}
+          </span>
+        </motion.div>
+      )}
+
+      {/* 사연 본문 - 편지지 스타일 없이 깔끔한 카드 */}
+      <motion.div
+        ref={letterPaperRef}
+        className="rounded-xl border overflow-hidden relative flex flex-col mb-12"
+        style={{
+          backgroundColor: "#FEFEFE",
+          borderColor: "#E8E8E8",
+          boxShadow: paperShadow,
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...springs.gentle, delay: 0.1 }}
+      >
+        {/* 사연 내용 영역 - 편지지 줄/장식 없음 */}
+        <div className="px-6 sm:px-12 py-8 sm:py-12 min-h-[300px] sm:min-h-[500px]">
+          {/* 사연 헤더 */}
+          <motion.div
+            className="mb-8"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div
+              className="text-right text-sm text-gray-500 mb-4"
+              variants={staggerItem}
+            >
+              {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </motion.div>
+            <motion.div
+              className="text-left text-base text-[#FF9883] mb-4 font-medium"
+              variants={staggerItem}
+            >
+              To. Letter
+            </motion.div>
+
+            {/* 제목 */}
+            {letter.ogTitle && (
+              <motion.div className="mb-6" variants={staggerItem}>
+                <h1
+                  className="text-xl font-semibold text-gray-800"
+                  style={{
+                    fontFamily: "'Noto Sans KR', sans-serif",
+                    lineHeight: "28px",
+                  }}
+                >
+                  {letter.ogTitle}
+                </h1>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* 사연 본문 */}
+          <motion.div
+            className="relative z-10 mb-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div
+              className="letter-content text-base sm:text-lg"
+              style={{
+                fontFamily: "Pretendard, sans-serif",
+                lineHeight: "32px",
+                color: "#424242",
+              }}
+              dangerouslySetInnerHTML={{ __html: letter.content }}
+            />
+          </motion.div>
+
+          {/* 사연 마무리 - From 사연자 */}
+          <motion.div
+            className="mt-12 flex justify-end items-center pb-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <span
+              style={{
+                fontFamily: "Pretendard, sans-serif",
+                fontSize: "18px",
+                lineHeight: "1.19",
+                color: "#757575",
+                textAlign: "right",
+              }}
+            >
+              From. 사연자
+            </span>
+            <motion.span
+              className="ml-2 text-xl"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ ...springs.bouncy, delay: 0.6 }}
+            >
+              📖
+            </motion.span>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* 좋아요 섹션 */}
+      <motion.section
+        className="mb-12 flex justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
+          <LikeButton
+            letterId={letter._id}
+            initialLikeCount={letter.likeCount || 0}
+            size="lg"
+            showCount
+          />
+        </div>
+      </motion.section>
+
+      {/* CTA 버튼 섹션 */}
+      {!isAuthor && (
+        <motion.div
+          className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-8 sm:mb-12"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* 나도 사연 남기기 */}
+          <motion.div variants={staggerItem}>
+            <Button
+              onClick={() => {
+                if (session) {
+                  router.push("/write?type=story");
+                } else {
+                  handleWriteClick();
+                }
+              }}
+              className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
+              style={{ fontFamily: "Pretendard" }}
+            >
+              나도 사연 남기기
+            </Button>
+          </motion.div>
+
+          {/* 실물 편지 신청 - 사연에도 허용 */}
+          {letter.authorSettings.allowPhysicalRequests && (
+            <motion.div variants={staggerItem}>
+              <Button
+                onClick={() => {
+                  if (!session) {
+                    router.push(`/letter/${letter._id}/request`);
+                  } else {
+                    setShowRecipientSelect(true);
+                  }
+                }}
+                disabled={
+                  !!session &&
+                  activeRequestCount >=
+                    letter.authorSettings.maxRequestsPerPerson
+                }
+                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontFamily: "Pretendard" }}
+              >
+                실물 편지 신청
+              </Button>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
+    </>
   );
 }
 

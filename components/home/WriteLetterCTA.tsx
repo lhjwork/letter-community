@@ -1,8 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import LoginDialog from "@/components/shareds/LoginDialog";
 
 export default function WriteLetterCTA() {
+  const [showLogin, setShowLogin] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
+
   return (
     <section className="text-center py-12">
       {/* AI 아이콘 */}
@@ -13,9 +20,24 @@ export default function WriteLetterCTA() {
       <p className="text-gray-600 mb-8">AI가 도와드리는 편지 작성으로 더욱 특별하게</p>
 
       {/* CTA 버튼 */}
-      <Link href="/write" className="inline-block px-8 py-4 bg-[#FF8B7B] text-white rounded-full font-semibold hover:bg-[#ff7a68] transition-colors shadow-lg hover:shadow-xl">
+      <button
+        onClick={() => {
+          if (session) {
+            router.push("/write");
+          } else {
+            setShowLogin(true);
+          }
+        }}
+        className="inline-block px-8 py-4 bg-[#FF8B7B] text-white rounded-full font-semibold hover:bg-[#ff7a68] transition-colors shadow-lg hover:shadow-xl"
+      >
         편지 작성하러 가기
-      </Link>
+      </button>
+
+      <LoginDialog
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        callbackUrl="/write"
+      />
     </section>
   );
 }

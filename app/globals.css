@@ -414,12 +414,103 @@ body {
   to { width: 100%; }
 }
 
+/* Scroll-triggered fade-in (uses IntersectionObserver via .in-view class) */
+@keyframes fadeInUpReveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleXReveal {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes fadeInReveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* GPU-accelerated floating for decorative elements */
+@keyframes floatEmoji1 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-5deg); }
+  33% { transform: translate3d(0, -15px, 0) rotate(3deg); }
+  66% { transform: translate3d(0, -8px, 0) rotate(-2deg); }
+}
+
+@keyframes floatEmoji2 {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(3deg); }
+  33% { transform: translate3d(0, -12px, 0) rotate(-4deg); }
+  66% { transform: translate3d(0, -5px, 0) rotate(2deg); }
+}
+
+/* Card shimmer hover effect (CSS only) */
+@keyframes cardShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
 /* Animation utility classes */
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-shimmer {
   background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.4) 50%, transparent 75%);
   background-size: 200% 100%;
   animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Scroll reveal utility - hidden by default, visible when .in-view is added */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: transform, opacity;
+}
+.scroll-reveal.in-view {
+  animation: fadeInUpReveal 0.6s ease-out forwards;
+}
+
+/* Staggered line reveal */
+.line-reveal {
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+.in-view .line-reveal {
+  animation: scaleXReveal 0.4s ease-out forwards;
+}
+
+/* Staggered content reveal */
+.content-reveal {
+  opacity: 0;
+  will-change: opacity;
+}
+.in-view .content-reveal {
+  animation: fadeInReveal 0.5s ease-out forwards;
+}
+
+/* Floating decorative elements - GPU accelerated */
+.animate-float-emoji-1 {
+  animation: floatEmoji1 7s ease-in-out infinite;
+  will-change: transform;
+}
+.animate-float-emoji-2 {
+  animation: floatEmoji2 9s ease-in-out infinite 1s;
+  will-change: transform;
+}
+
+/* Card shimmer on hover */
+.card-shimmer-hover {
+  overflow: hidden;
+}
+.card-shimmer-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.card-shimmer-hover:hover::before {
+  animation: cardShimmer 0.6s ease-out;
 }
 .animate-wiggle { animation: wiggle 0.6s ease-in-out; }
 .animate-sparkle { animation: sparkle 0.8s ease-in-out; }
@@ -453,8 +544,23 @@ body {
   .animate-gentle-sway,
   .animate-confetti,
   .animate-text-shimmer,
-  .animate-draw-line {
+  .animate-draw-line,
+  .animate-float-emoji-1,
+  .animate-float-emoji-2 {
     animation: none !important;
+  }
+
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .line-reveal {
+    transform: scaleX(1) !important;
+  }
+
+  .content-reveal {
+    opacity: 1 !important;
   }
 
   * {

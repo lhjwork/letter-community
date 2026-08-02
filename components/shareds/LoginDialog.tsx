@@ -14,9 +14,10 @@ import {
 interface LoginDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  callbackUrl?: string;
 }
 
-export default function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
+export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: LoginDialogProps) {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
@@ -30,7 +31,7 @@ export default function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
   const handleLogin = async (provider: "kakao" | "naver" | "instagram") => {
     if (!allAgreed) return;
     try {
-      await signIn(provider, { callbackUrl: "/" });
+      await signIn(provider, { callbackUrl });
     } catch (error) {
       console.error("로그인 실패:", error);
     }

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchDailyPrompt } from "@/lib/ai/daily-prompt";
+import LoginDialog from "@/components/shareds/LoginDialog";
 
 const FALLBACK_QUESTIONS = [
   "오늘 가장 오래 남은 감정은 뭐였나요?",
@@ -23,6 +25,8 @@ export function DailyPrompt() {
   const [question, setQuestion] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const { data: session } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -50,7 +54,11 @@ export function DailyPrompt() {
   }, []);
 
   const handleWriteClick = () => {
-    router.push("/write");
+    if (session) {
+      router.push("/write");
+    } else {
+      setShowLogin(true);
+    }
   };
 
   if (isLoading) {
@@ -71,6 +79,11 @@ export function DailyPrompt() {
 
   return (
     <div style={{ perspective: "1000px" }}>
+      <LoginDialog
+        isOpen={showLogin}
+        onClose={() => setShowLogin(false)}
+        callbackUrl="/write"
+      />
       <AnimatePresence mode="wait">
         {!isFlipped ? (
           // Back of card (question mark)
