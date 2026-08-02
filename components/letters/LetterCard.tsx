@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { deleteLetter, type Letter } from "@/lib/api";
 import { useSession } from "next-auth/react";
 
@@ -45,11 +46,18 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
   };
 
   return (
-    <div
-      className="relative bg-white rounded-2xl border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-lg"
+    <motion.div
+      className="relative bg-white rounded-2xl border border-gray-200 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleTap}
+      whileHover={{
+        scale: 1.02,
+        boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+        rotateY: 2,
+        rotateX: -1,
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
       style={{
         backgroundImage: `repeating-linear-gradient(
           transparent,
@@ -58,13 +66,19 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
           #e5e7eb 28px
         )`,
         backgroundSize: "100% 28px",
+        perspective: 800,
       }}
     >
       {/* 상단 헤더 */}
       <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
         <div className="flex items-center gap-2">
-          {/* 하트 이모지 (임시) */}
-          <span className="text-lg">❤️</span>
+          <motion.span
+            className="text-lg"
+            animate={isHovered ? { rotate: [0, -10, 10, -5, 0], scale: [1, 1.2, 1] } : {}}
+            transition={{ duration: 0.5 }}
+          >
+            ❤️
+          </motion.span>
         </div>
         <div className="text-sm text-gray-500">
           {formatDate(letter.createdAt)}
@@ -73,7 +87,6 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
 
       {/* 편지 내용 영역 */}
       <div className="p-4 pt-6">
-        {/* 편지 내용 미리보기 */}
         <div
           className="text-gray-700 text-sm leading-7"
           style={{
@@ -92,31 +105,39 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
       </div>
 
       {/* 호버 시 나타나는 액션 버튼들 */}
-      <div
-        className={`absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm flex items-center justify-center gap-4 transition-all duration-300 ease-in-out ${
-          isHovered ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
+      <motion.div
+        className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center gap-4"
+        initial={false}
+        animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        style={{ pointerEvents: isHovered ? "auto" : "none" }}
       >
-        <Link
-          href={`/letter/${letter._id}`}
-          className={`px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-all duration-200 font-medium shadow-lg transform ${
-            isHovered ? "translate-y-0 scale-100" : "translate-y-2 scale-95"
-          }`}
-          style={{ transitionDelay: isHovered ? "100ms" : "0ms" }}
+        <motion.div
+          initial={false}
+          animate={isHovered ? { y: 0, scale: 1, opacity: 1 } : { y: 10, scale: 0.95, opacity: 0 }}
+          transition={{ delay: isHovered ? 0.05 : 0, duration: 0.25, type: "spring", stiffness: 300, damping: 20 }}
         >
-          보기
-        </Link>
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className={`px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 cursor-pointer transform ${
-            isHovered ? "translate-y-0 scale-100" : "translate-y-2 scale-95"
-          }`}
-          style={{ transitionDelay: isHovered ? "150ms" : "0ms" }}
+          <Link
+            href={`/letter/${letter._id}`}
+            className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium shadow-lg inline-block"
+          >
+            보기
+          </Link>
+        </motion.div>
+        <motion.div
+          initial={false}
+          animate={isHovered ? { y: 0, scale: 1, opacity: 1 } : { y: 10, scale: 0.95, opacity: 0 }}
+          transition={{ delay: isHovered ? 0.1 : 0, duration: 0.25, type: "spring", stiffness: 300, damping: 20 }}
         >
-          {isDeleting ? "삭제중..." : "삭제"}
-        </button>
-      </div>
-    </div>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium shadow-lg disabled:opacity-50 cursor-pointer"
+          >
+            {isDeleting ? "삭제중..." : "삭제"}
+          </button>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

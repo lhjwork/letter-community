@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { LikeButton } from "@/components/like";
 import PostcodeSearch, {
   PostcodeResult,
@@ -13,6 +14,8 @@ import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
 import { Button } from "@/components/ui/button";
 import { HeroBanner } from "@/components/home";
 import { useIsAuthor } from "@/hooks/useIsAuthor";
+import EnvelopeAnimation from "@/components/effects/EnvelopeAnimation";
+import TypewriterText from "@/components/effects/TypewriterText";
 import {
   saveLetterRequest,
   getLetterRequests,
@@ -20,6 +23,7 @@ import {
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
 import { isLetterSaved, toggleSaveLetter } from "@/lib/saved-letters";
+import { fadeInUp, staggerContainer, staggerItem, springs } from "@/lib/animations/config";
 
 interface Letter {
   _id: string;
@@ -216,6 +220,35 @@ export default function LetterDetailClient({
     ).length;
   }, [userRequests]);
 
+  const [envelopeOpened, setEnvelopeOpened] = useState(false);
+
+  // 스크롤 연동 그림자 + 플로팅 버튼
+  const letterPaperRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: letterPaperRef,
+    offset: ["start end", "end start"],
+  });
+  const paperShadow = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.5, 0.7, 1],
+    [
+      "0 2px 8px rgba(255,152,131,0.05), 0 1px 4px rgba(0,0,0,0.03)",
+      "0 4px 20px rgba(255,152,131,0.1), 0 2px 8px rgba(0,0,0,0.05)",
+      "0 8px 32px rgba(255,152,131,0.15), 0 4px 12px rgba(0,0,0,0.08)",
+      "0 4px 20px rgba(255,152,131,0.1), 0 2px 8px rgba(0,0,0,0.05)",
+      "0 2px 8px rgba(255,152,131,0.05), 0 1px 4px rgba(0,0,0,0.03)",
+    ],
+  );
+
+  // 플로팅 버튼 표시 (스크롤 30% 이상)
+  const [showFloating, setShowFloating] = useState(false);
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (v) => {
+      setShowFloating(v > 0.15 && v < 0.85);
+    });
+    return unsubscribe;
+  }, [scrollYProgress]);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FEFEFE" }}>
       {/* 베너 */}
@@ -228,7 +261,12 @@ export default function LetterDetailClient({
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 뒤로가기 버튼 */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -236,11 +274,16 @@ export default function LetterDetailClient({
           >
             <span>← 뒤로가기</span>
           </Button>
-        </div>
+        </motion.div>
 
-        {/* To. 수신자 표시 */}
+        {/* To. 수신자 표시 - 타자기 효과 */}
         {!isAuthor && (
-          <div className="mb-6">
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
             <h2
               className="text-[#757575] text-2xl sm:text-4xl lg:text-[48px]"
               style={{
@@ -249,186 +292,257 @@ export default function LetterDetailClient({
                 lineHeight: "1.15",
               }}
             >
-              To. 당신에게 도착한 편지
+              {envelopeOpened ? (
+                "To. 당신에게 도착한 편지"
+              ) : (
+                <TypewriterText
+                  text="To. 당신에게 도착한 편지"
+                  speed={60}
+                  as="span"
+                />
+              )}
             </h2>
-          </div>
+          </motion.div>
         )}
 
-        {/* 사연 제목 필드 */}
-        {letter.ogTitle && (
-          <div
-            className="mb-4 rounded-lg border px-7 py-[18px]"
+        {/* 봉투 애니메이션 → 편지 내용 */}
+        <EnvelopeAnimation onOpen={() => setEnvelopeOpened(true)}>
+          {/* 사연 제목 필드 */}
+          {letter.ogTitle && (
+            <motion.div
+              className="mb-4 rounded-lg border px-7 py-[18px]"
+              style={{
+                backgroundColor: "#FEFEFE",
+                borderColor: "#C4C4C4",
+              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <span
+                className="text-[#424242] text-base sm:text-xl"
+                style={{
+                  fontFamily: "Pretendard, sans-serif",
+                  fontWeight: 500,
+                  lineHeight: "1.19",
+                }}
+              >
+                {letter.ogTitle}
+              </span>
+            </motion.div>
+          )}
+
+          {/* 편지 내용 - 종이 텍스처 강화 */}
+          <motion.div
+            ref={letterPaperRef}
+            className="rounded-lg border overflow-hidden relative flex flex-col mb-12"
             style={{
               backgroundColor: "#FEFEFE",
               borderColor: "#C4C4C4",
+              boxShadow: paperShadow,
             }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.gentle, delay: 0.2 }}
           >
-            <span
-              className="text-[#424242] text-base sm:text-xl"
+            {/* 편지지 장식 - 모바일에서 숨김 */}
+            <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+            <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+            <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+
+            {/* 종이 텍스처 오버레이 */}
+            <div
+              className="absolute inset-0 pointer-events-none z-0 opacity-30"
               style={{
-                fontFamily: "Pretendard, sans-serif",
-                fontWeight: 500,
-                lineHeight: "1.19",
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")`,
+              }}
+            />
+
+            {/* 편지지 내용 영역 */}
+            <div
+              className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 min-h-[400px] sm:min-h-[800px] relative"
+              style={{
+                backgroundImage: `repeating-linear-gradient(
+                  transparent,
+                  transparent 27px,
+                  #e5e7eb 27px,
+                  #e5e7eb 28px
+                )`,
+                backgroundSize: "100% 28px",
+                backgroundAttachment: "local",
               }}
             >
-              {letter.ogTitle}
-            </span>
-          </div>
-        )}
+              {/* 편지 헤더 */}
+              <motion.div
+                className="mb-8"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div
+                  className="text-right text-sm text-gray-500 mb-2"
+                  variants={staggerItem}
+                >
+                  {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </motion.div>
+                <motion.div
+                  className="text-left text-base text-gray-700 mb-4"
+                  variants={staggerItem}
+                >
+                  To Someone Special
+                </motion.div>
 
-        {/* 편지 내용 */}
-        <div
-          className="rounded-lg border overflow-hidden relative flex flex-col mb-12"
-          style={{
-            backgroundColor: "#FEFEFE",
-            borderColor: "#C4C4C4",
-          }}
-        >
-          {" "}
-          {/* 편지지 장식 - 모바일에서 숨김 */}
-          <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
-          <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
-          {/* 편지지 내용 영역 */}
-          <div
-            className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 min-h-[400px] sm:min-h-[800px] relative"
-            style={{
-              backgroundImage: `repeating-linear-gradient(
-                transparent,
-                transparent 27px,
-                #e5e7eb 27px,
-                #e5e7eb 28px
-              )`,
-              backgroundSize: "100% 28px",
-              backgroundAttachment: "local",
-            }}
-          >
-            {/* 편지 헤더 */}
-            <div className="mb-8">
-              <div className="text-right text-sm text-gray-500 mb-2">
-                {new Date(letter.createdAt).toLocaleDateString("ko-KR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </div>
-              <div className="text-left text-base text-gray-700 mb-4">
-                To Someone Special
-              </div>
+                {/* 제목 */}
+                {letter.ogTitle && (
+                  <motion.div className="mb-6" variants={staggerItem}>
+                    <h1
+                      className="text-xl font-semibold text-gray-800"
+                      style={{
+                        fontFamily: "'Noto Sans KR', sans-serif",
+                        lineHeight: "28px",
+                      }}
+                    >
+                      {letter.ogTitle}
+                    </h1>
+                  </motion.div>
+                )}
+              </motion.div>
 
-              {/* 제목 */}
-              {letter.ogTitle && (
-                <div className="mb-6">
-                  <h1
-                    className="text-xl font-semibold text-gray-800"
-                    style={{
-                      fontFamily: "'Noto Sans KR', sans-serif",
-                      lineHeight: "28px",
-                    }}
-                  >
-                    {letter.ogTitle}
-                  </h1>
-                </div>
-              )}
+              {/* 편지 본문 */}
+              <motion.div
+                className="relative z-10 mb-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              >
+                <div
+                  className="letter-content text-base sm:text-xl"
+                  style={{
+                    fontFamily: "Pretendard, sans-serif",
+                    lineHeight: "28px",
+                    color: "#424242",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: letter.content }}
+                />
+              </motion.div>
+
+              {/* 편지 마무리 - From 닉네임 + 💌 아이콘 */}
+              <motion.div
+                className="mt-12 flex justify-end items-center pb-8"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <span
+                  style={{
+                    fontFamily: "Pretendard, sans-serif",
+                    fontSize: "20px",
+                    lineHeight: "1.19",
+                    color: "#424242",
+                    textAlign: "right",
+                  }}
+                >
+                  From. Letter
+                </span>
+                <motion.span
+                  className="ml-2 text-2xl"
+                  initial={{ scale: 0, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ ...springs.bouncy, delay: 1.0 }}
+                >
+                  💌
+                </motion.span>
+              </motion.div>
             </div>
+          </motion.div>
 
-            {/* 편지 본문 */}
-            <div className="relative z-10 mb-20">
-              <div
-                className="letter-content text-base sm:text-xl"
-                style={{
-                  fontFamily: "Pretendard, sans-serif",
-                  lineHeight: "28px",
-                  color: "#424242",
-                }}
-                dangerouslySetInnerHTML={{ __html: letter.content }}
+          {/* 좋아요 섹션 */}
+          <motion.section
+            className="mb-12 flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
+              <LikeButton
+                letterId={letter._id}
+                initialLikeCount={letter.likeCount || 0}
+                size="lg"
+                showCount
               />
             </div>
+          </motion.section>
 
-            {/* 편지 마무리 - From 닉네임 + 💌 아이콘 */}
-            <div className="mt-12 flex justify-end items-center pb-8">
-              <span
-                style={{
-                  fontFamily: "Pretendard, sans-serif",
-                  fontSize: "20px",
-                  lineHeight: "1.19",
-                  color: "#424242",
-                  textAlign: "right",
-                }}
-              >
-                From. Letter
-              </span>
-              <span className="ml-2 text-2xl">💌</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 좋아요 섹션 */}
-        <section className="mb-12 flex justify-center">
-          <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
-            <LikeButton
-              letterId={letter._id}
-              initialLikeCount={letter.likeCount || 0}
-              size="lg"
-              showCount
-            />
-          </div>
-        </section>
-
-        {/* CTA 버튼 섹션 */}
-        {!isAuthor && (
-          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-8 sm:mb-12">
-            {/* 편지 보관하기 버튼 */}
-            <Button
-              onClick={handleSaveLetter}
-              className={`w-full sm:w-44 lg:w-56 h-12 sm:h-16 rounded-lg transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 ${
-                isSaved
-                  ? "bg-[#FF9883] text-white border-2 border-[#FF9883] hover:bg-[#ff8a70]"
-                  : "bg-white text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50"
-              }`}
-              style={{ fontFamily: "Pretendard" }}
+          {/* CTA 버튼 섹션 */}
+          {!isAuthor && (
+            <motion.div
+              className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-8 sm:mb-12"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
             >
-              {isSaved ? "보관됨 ✓" : "편지 보관하기"}
-            </Button>
+              {/* 편지 보관하기 버튼 */}
+              <motion.div variants={staggerItem}>
+                <Button
+                  onClick={handleSaveLetter}
+                  className={`w-full sm:w-44 lg:w-56 h-12 sm:h-16 rounded-lg transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 ${
+                    isSaved
+                      ? "bg-[#FF9883] text-white border-2 border-[#FF9883] hover:bg-[#ff8a70]"
+                      : "bg-white text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50"
+                  }`}
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  {isSaved ? "보관됨 ✓" : "편지 보관하기"}
+                </Button>
+              </motion.div>
 
-            {/* 편지 답장하기 버튼 */}
-            <Button
-              onClick={() => router.push("/write")}
-              className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
-              style={{ fontFamily: "Pretendard" }}
-            >
-              편지 답장하기
-            </Button>
+              {/* 편지 답장하기 버튼 */}
+              <motion.div variants={staggerItem}>
+                <Button
+                  onClick={() => router.push("/write")}
+                  className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  편지 답장하기
+                </Button>
+              </motion.div>
 
-            {/* 실물 편지 신청하기 버튼 */}
-            {letter.authorSettings.allowPhysicalRequests && (
-              <Button
-                onClick={() => {
-                  if (!session) {
-                    router.push(`/letter/${letter._id}/request`);
-                  } else {
-                    setShowRecipientSelect(true);
-                  }
-                }}
-                disabled={
-                  !!session &&
-                  activeRequestCount >=
-                    letter.authorSettings.maxRequestsPerPerson
-                }
-                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontFamily: "Pretendard" }}
-              >
-                실물 편지 신청 ✉️
-              </Button>
-            )}
-          </div>
-        )}
+              {/* 실물 편지 신청하기 버튼 */}
+              {letter.authorSettings.allowPhysicalRequests && (
+                <motion.div variants={staggerItem}>
+                  <Button
+                    onClick={() => {
+                      if (!session) {
+                        router.push(`/letter/${letter._id}/request`);
+                      } else {
+                        setShowRecipientSelect(true);
+                      }
+                    }}
+                    disabled={
+                      !!session &&
+                      activeRequestCount >=
+                        letter.authorSettings.maxRequestsPerPerson
+                    }
+                    className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF9883] text-white rounded-lg hover:bg-[#ff8a70] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ fontFamily: "Pretendard" }}
+                  >
+                    실물 편지 신청 ✉️
+                  </Button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </EnvelopeAnimation>
 
         {/* 편지 작성자용 섹션 */}
         {isAuthor && (
@@ -541,6 +655,44 @@ export default function LetterDetailClient({
           }}
         />
       </main>
+
+      {/* 플로팅 액션 버튼 */}
+      {!isAuthor && (
+        <AnimatePresence>
+          {showFloating && (
+            <motion.div
+              className="fixed bottom-6 right-6 z-40 flex flex-col gap-2"
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <motion.button
+                onClick={handleSaveLetter}
+                className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-lg transition-colors ${
+                  isSaved
+                    ? "bg-[#FF9883] text-white"
+                    : "bg-white text-[#FF9883] border border-[#FF9883]"
+                }`}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                title="편지 보관"
+              >
+                {isSaved ? "✓" : "♡"}
+              </motion.button>
+              <motion.button
+                onClick={() => router.push("/write")}
+                className="w-12 h-12 rounded-full bg-[#FF7F65] text-white shadow-lg flex items-center justify-center text-lg"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                title="편지 답장"
+              >
+                ✎
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 }

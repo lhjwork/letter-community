@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
@@ -30,6 +31,73 @@ function WritePageContent() {
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // 인터랙티브 효과 상태
+  const prevContentLenRef = useRef(0);
+  const [charCount, setCharCount] = useState(0);
+  const [milestone, setMilestone] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCrumpling, setIsCrumpling] = useState(false);
+  const letterPaperControls = useAnimation();
+  const envelopeControls = useAnimation();
+
+  // 글자 수 변화 감지 & 효과 트리거
+  const handleContentInteraction = useCallback((newContent: string) => {
+    const plainText = newContent.replace(/<[^>]*>/g, "").trim();
+    const newLen = plainText.length;
+    const prevLen = prevContentLenRef.current;
+
+    setCharCount(newLen);
+
+    // 타이핑 중 (글자 증가)
+    if (newLen > prevLen) {
+      setIsDeleting(false);
+      // 마일스톤 체크
+      const milestones = [100, 500, 1000];
+      for (const m of milestones) {
+        if (prevLen < m && newLen >= m) {
+          setMilestone(m);
+          setTimeout(() => setMilestone(null), 1500);
+          break;
+        }
+      }
+      // 💌 봉투 반응 (50자마다 살짝 커짐)
+      if (newLen > 0 && newLen % 50 < 3 && prevLen % 50 >= 48) {
+        envelopeControls.start({
+          scale: [1, 1.3, 1.1],
+          rotate: [0, -8, 5, 0],
+          transition: { duration: 0.5 },
+        });
+      }
+    }
+
+    // 삭제 중 (글자 감소)
+    if (newLen < prevLen) {
+      setIsDeleting(true);
+      // 편지지 흔들림
+      letterPaperControls.start({
+        x: [0, -1.5, 1.5, -0.5, 0],
+        transition: { duration: 0.25 },
+      });
+      // 전체 삭제 시 구겨짐
+      if (newLen === 0 && prevLen > 10) {
+        setIsCrumpling(true);
+        letterPaperControls.start({
+          scale: [1, 0.97, 1],
+          rotate: [0, -0.5, 0],
+          transition: { duration: 0.4, ease: "easeOut" },
+        }).then(() => setIsCrumpling(false));
+      }
+    }
+
+    prevContentLenRef.current = newLen;
+  }, [letterPaperControls, envelopeControls]);
+
+  // 잉크 프로그레스 (최대 2000자 기준)
+  const inkProgress = Math.min(charCount / 2000, 1);
+  const inkColor = isDeleting
+    ? `rgba(255, 152, 131, ${0.3 + inkProgress * 0.4})`
+    : `rgba(255, 152, 131, ${0.5 + inkProgress * 0.5})`;
 
   // 정적 배너 데이터 (fs 모듈 사용 불가로 인한 임시 해결)
   const bannerSlides = [
@@ -63,6 +131,7 @@ function WritePageContent() {
     onChange: (newContent) => {
       setContent(newContent);
       setHasUnsavedChanges(true);
+      handleContentInteraction(newContent);
     },
     placeholder: "여기에 당신의 마음을 담아주세요...",
     enableImages: false, // 일반 편지는 이미지 비활성화
@@ -280,15 +349,25 @@ function WritePageContent() {
     <div className="min-h-screen bg-gray-50">
       {/* 베너 */}
       {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
+        <motion.div
+          className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" as const }}
+        >
           <HeroBanner bannerSlides={bannerSlides} />
-        </div>
+        </motion.div>
       )}
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 뒤로가기 버튼 */}
-        <div className="mb-4 sm:mb-8">
+        <motion.div
+          className="mb-4 sm:mb-8"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -297,18 +376,31 @@ function WritePageContent() {
             <ArrowLeft className="w-4 h-4" />
             <span>뒤로가기</span>
           </Button>
-        </div>
+        </motion.div>
 
         {/* 제목 입력 */}
-        <section className="mb-6 sm:mb-12">
-          <h2
+        <motion.section
+          className="mb-6 sm:mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" as const }}
+        >
+          <motion.h2
             className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
             편지의 제목을 정해주세요
-          </h2>
+          </motion.h2>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7">
+          <motion.div
+            className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7"
+            whileFocus={{ borderColor: "#FF9883", boxShadow: "0 0 0 2px rgba(255, 152, 131, 0.2)" }}
+            whileHover={{ borderColor: "#FF9883" }}
+            transition={{ duration: 0.2 }}
+          >
             <input
               type="text"
               value={title}
@@ -316,25 +408,40 @@ function WritePageContent() {
               placeholder="내용을 입력해주세요"
               className="w-full text-base sm:text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
             />
-          </div>
+          </motion.div>
 
           <p className="text-gray-600 text-sm sm:text-xl mt-2 sm:mt-4">
             편지 내용을 작성한 후 AI 제목 생성 버튼을 클릭하여 제목을 자동으로
             생성할 수 있습니다.
           </p>
-        </section>
+        </motion.section>
 
         {/* 내용 작성 */}
-        <section className="mb-6 sm:mb-12">
-          <h2
+        <motion.section
+          className="mb-6 sm:mb-12"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" as const }}
+        >
+          <motion.h2
             className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
           >
             어떤 마음을 전하고 싶으신가요?
-          </h2>
+          </motion.h2>
 
           {/* 편지지 스타일 컨테이너 */}
-          <div className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
+          <motion.div
+            className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col"
+            animate={letterPaperControls}
+            whileHover={{
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
+            }}
+            transition={{ duration: 0.3 }}
+          >
             {/* 에디터 툴바 (상단 고정) */}
             <div className="relative z-20 bg-white border-b">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between">
@@ -457,44 +564,119 @@ function WritePageContent() {
                 <span className="text-gray-600">
                   From. {session?.user?.name || "익명"}
                 </span>
-                <span className="ml-2 text-2xl">💌</span>
+                <motion.span
+                  className="ml-2 text-2xl inline-block"
+                  animate={envelopeControls}
+                  style={{ scale: 1 + charCount * 0.00005 }}
+                >
+                  💌
+                </motion.span>
               </div>
             </div>
-          </div>
-        </section>
 
-        <div className="w-full h-px bg-[#C4C4C4] mb-14"></div>
+            {/* 잉크 프로그레스 바 */}
+            <div className="relative h-1 bg-gray-100">
+              <motion.div
+                className="absolute left-0 top-0 h-full rounded-r-full"
+                style={{ backgroundColor: inkColor }}
+                animate={{ width: `${inkProgress * 100}%` }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
+            </div>
+
+            {/* 글자 수 카운터 */}
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-50 text-xs text-gray-400">
+              <div className="flex items-center gap-2">
+                <motion.span
+                  key={charCount}
+                  initial={charCount > 0 ? { scale: 1.3, color: "#FF9883" } : false}
+                  animate={{ scale: 1, color: "#9ca3af" }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {charCount}자
+                </motion.span>
+                {isDeleting && charCount > 0 && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-red-300"
+                  >
+                    ✎ 수정 중
+                  </motion.span>
+                )}
+              </div>
+              <span className="text-gray-300">잉크 {Math.round(inkProgress * 100)}%</span>
+            </div>
+
+            {/* 마일스톤 축하 */}
+            <AnimatePresence>
+              {milestone && (
+                <motion.div
+                  className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 bg-[#FF9883] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: [0.8, 1.15, 1] }}
+                  exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  🎉 {milestone}자 달성!
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.section>
+
+        <motion.div
+          className="w-full h-px bg-[#C4C4C4] mb-14"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" as const }}
+          style={{ transformOrigin: "left" }}
+        />
 
         {/* 액션 버튼 */}
-        <section className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16">
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isSubmitting}
-            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
+        <motion.section
+          className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.9 }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
-            취소
-          </Button>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-12 sm:h-[60px]"
+            >
+              취소
+            </Button>
+          </motion.div>
 
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
+          <motion.div
+            whileHover={{ scale: 1.05, boxShadow: "0 8px 25px rgba(255, 152, 131, 0.4)" }}
+            whileTap={{ scale: 0.95 }}
           >
-            {isSubmitting ? "편지 생성 중..." : "편지 만들기"}
-          </Button>
-        </section>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-12 sm:h-[60px]"
+            >
+              {isSubmitting ? "편지 생성 중..." : "편지 만들기"}
+            </Button>
+          </motion.div>
+        </motion.section>
       </main>
 
       {/* URL 공유 모달 */}
-      {shareData && (
-        <ShareModal
-          isOpen={showShareModal}
-          onClose={handleShareModalClose}
-          letterUrl={shareData.url}
-          letterTitle={shareData.title}
-        />
-      )}
+      <ShareModal
+        isOpen={showShareModal && !!shareData}
+        onClose={handleShareModalClose}
+        letterUrl={shareData?.url || ""}
+        letterTitle={shareData?.title || ""}
+      />
     </div>
   );
 }
