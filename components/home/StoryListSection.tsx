@@ -37,7 +37,7 @@ function StoryCard({ story, index }: StoryCardProps) {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <Link href={`/letter/${story._id}`}>
-        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-6 sm:p-8 w-full sm:w-[285px] h-[280px] sm:h-[312px] relative cursor-pointer overflow-hidden">
+        <div className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl p-5 sm:p-8 w-full sm:w-[285px] h-[240px] sm:h-[312px] relative cursor-pointer overflow-hidden">
           {/* Shimmer overlay on hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
@@ -46,21 +46,21 @@ function StoryCard({ story, index }: StoryCardProps) {
           />
 
           {/* Horizontal lines */}
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-px bg-[#EDEDED]" />
             ))}
           </div>
 
           {/* Date */}
-          <div className="absolute top-8 right-8">
-            <span className="text-lg text-[#424242]">{formatDate(story.createdAt)}</span>
+          <div className="absolute top-5 right-5 sm:top-8 sm:right-8">
+            <span className="text-base sm:text-lg text-[#424242]">{formatDate(story.createdAt)}</span>
           </div>
 
           {/* Category badge */}
           {story.category && (
             <motion.div
-              className="absolute top-8 left-8"
+              className="absolute top-5 left-5 sm:top-8 sm:left-8"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.3 + index * 0.1 }}
@@ -70,18 +70,18 @@ function StoryCard({ story, index }: StoryCardProps) {
           )}
 
           {/* Title / content preview */}
-          <div className="absolute top-20 left-8 right-8">
+          <div className="absolute top-16 left-5 right-5 sm:top-20 sm:left-8 sm:right-8">
             <p className="text-base text-[#424242] line-clamp-3">{story.title || getPlainText(story.content || "")}</p>
           </div>
 
           {/* Author */}
-          <div className="absolute bottom-8 right-8 flex items-center gap-2">
-            <span className="text-xl font-medium text-[#424242]">{story.authorName || "익명"}</span>
+          <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 flex items-center gap-2">
+            <span className="text-lg sm:text-xl font-medium text-[#424242]">{story.authorName || "익명"}</span>
           </div>
 
           {/* Stats */}
           {(story.viewCount || story.likeCount) && (
-            <div className="absolute bottom-8 left-8 flex items-center gap-3 text-sm text-[#757575]">
+            <div className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8 flex items-center gap-3 text-sm text-[#757575]">
               {story.viewCount !== undefined && <span>👁 {story.viewCount}</span>}
               {story.likeCount !== undefined && <span>❤️ {story.likeCount}</span>}
             </div>
@@ -125,23 +125,23 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
   const { ref, controls } = useScrollReveal();
 
   return (
-    <section className="w-full py-16">
+    <section className="w-full py-10 sm:py-16">
       <div className="container mx-auto px-4 sm:px-8 lg:px-20">
         {/* Title - scroll reveal */}
         <motion.div
           ref={ref}
-          className="text-center mb-8 sm:mb-16"
+          className="text-center mb-6 sm:mb-12"
           variants={fadeInUp}
           initial="hidden"
           animate={controls}
         >
-          <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-2 sm:mb-4">사연을 남겨주세요</h2>
+          <h2 className="text-2xl sm:text-4xl lg:text-[52px] leading-tight sm:leading-[60px] text-[#424242] font-['NanumJangMiCe'] mb-1 sm:mb-3">사연을 남겨주세요</h2>
           <p className="text-base sm:text-xl lg:text-2xl text-[#757575]">당신의 이야기가 한장의 편지로 이어집니다</p>
         </motion.div>
 
         {/* Story cards - stagger grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6"
           variants={staggerContainerWide}
           initial="hidden"
           whileInView="visible"
