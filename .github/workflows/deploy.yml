@@ -1,17 +1,20 @@
 name: Deploy
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 concurrency:
   group: deploy
   cancel-in-progress: false
-
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy
-        run: /home/ubuntu/letter-projects/deploy.sh community
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 15m
+          script: /home/ubuntu/letter-projects/deploy.sh community
