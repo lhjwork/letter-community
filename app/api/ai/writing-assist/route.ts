@@ -1,3 +1,15 @@
+// ⚠️ Anthropic API 크레딧 소진으로 일시 비활성화 (2026-08-04)
+// 크레딧 결제 후: 아래 임시 응답을 지우고 파일 하단의 원본 구현 주석을 해제하세요.
+import { AI_DISABLED_MESSAGE } from "@/lib/ai/client";
+
+export async function POST() {
+  return Response.json(
+    { error: AI_DISABLED_MESSAGE, suggestion: null },
+    { status: 503 }
+  );
+}
+
+/* ===== 크레딧 결제 후 복구할 원본 구현 =====
 import { generateText } from "ai";
 import { z } from "zod";
 import { isAIEnabled, getHaikuModel, AI_DISABLED_MESSAGE } from "@/lib/ai/client";
@@ -96,3 +108,4 @@ export async function POST(request: Request) {
     );
   }
 }
+===== 원본 구현 끝 ===== */
