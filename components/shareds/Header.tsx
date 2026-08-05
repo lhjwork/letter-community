@@ -5,12 +5,14 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import LoginDialog from "./LoginDialog";
+import MobileSideMenu from "./MobileSideMenu";
 
 export default function Header() {
   const { data: session, status } = useSession();
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [loginCallbackUrl, setLoginCallbackUrl] = useState("/");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const openLoginDialog = (callbackUrl = "/") => {
     setLoginCallbackUrl(callbackUrl);
@@ -32,7 +34,45 @@ export default function Header() {
 
   return (
     <>
-      <header className="w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[52px] py-3 sm:py-4 xxl:py-[14px] pb-4 sm:pb-6 xxl:pb-[26px] rounded-2xl xxl:rounded-[24px] border-2 border-[#C4C4C4]">
+      {/* 모바일 헤더 - md 미만에서만 표시 */}
+      <header className="md:hidden w-full h-11 flex items-center justify-between px-[17px] border-b border-[#EDEDED] bg-white">
+        {/* 로고 */}
+        <Link
+          href={status === "authenticated" ? "/home" : "/"}
+          className="flex items-center gap-0"
+        >
+          <Image
+            src="/icons/letter-logo.svg"
+            alt="Letter Logo"
+            width={44}
+            height={30}
+            className="w-[44px] h-[30px]"
+            priority
+          />
+          <span
+            className="text-[19px] text-[#4C261E]"
+            style={{ fontFamily: "NanumJangMiCe, cursive" }}
+          >
+            Letter
+          </span>
+        </Link>
+
+        {/* 햄버거 메뉴 버튼 */}
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="w-6 h-6 cursor-pointer"
+        >
+          <Image
+            src="/icons/mobile/menu-hamburger.svg"
+            alt="메뉴"
+            width={24}
+            height={24}
+          />
+        </button>
+      </header>
+
+      {/* 데스크톱 헤더 - md 이상에서만 표시 */}
+      <header className="hidden md:block w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[52px] py-3 sm:py-4 xxl:py-[14px] pb-4 sm:pb-6 xxl:pb-[26px] rounded-2xl xxl:rounded-[24px] border-2 border-[#C4C4C4]">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           {/* 왼쪽 로고 */}
           <Link
@@ -44,19 +84,19 @@ export default function Header() {
               alt="Letter Logo"
               width={88}
               height={60}
-              className="w-12 h-8 sm:w-16 sm:h-11 md:w-[70px] md:h-[48px] xxl:w-[88px] xxl:h-[60px]"
+              className="md:w-[70px] md:h-[48px] xxl:w-[88px] xxl:h-[60px]"
               priority
             />
             <span
-              className="text-2xl sm:text-3xl md:text-[32px] xxl:text-[40px] text-black whitespace-nowrap"
+              className="md:text-[32px] xxl:text-[40px] text-black whitespace-nowrap"
               style={{ fontFamily: "NanumJangMiCe, cursive" }}
             >
               Letter
             </span>
           </Link>
 
-          {/* 중간 네비게이션 - 태블릿 이상에서만 표시 */}
-          <nav className="hidden md:flex items-center gap-4 md:gap-6 xxl:gap-[120px] flex-1 justify-center">
+          {/* 중간 네비게이션 */}
+          <nav className="flex items-center gap-4 md:gap-6 xxl:gap-[120px] flex-1 justify-center">
             {status === "authenticated" ? (
               <>
                 <Link
@@ -171,53 +211,14 @@ export default function Header() {
             )}
           </div>
         </div>
-
-        {/* 모바일 네비게이션 - 모바일에서만 표시 */}
-        <nav className="md:hidden flex items-center justify-around gap-4 mt-4 pt-4 border-t border-gray-200">
-          {status === "authenticated" ? (
-            <>
-              <Link
-                href="/write"
-                className="text-base text-[#757575] hover:text-black transition-colors"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                편지 쓰기
-              </Link>
-              <Link
-                href="/my-page"
-                className="text-base text-[#757575] hover:text-black transition-colors"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                우편함
-              </Link>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => openLoginDialog("/write")}
-                className="text-base text-[#757575] hover:text-black transition-colors cursor-pointer"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                사연 작성
-              </button>
-              <Link
-                href="/stories"
-                className="text-base text-[#757575] hover:text-black transition-colors"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                사연 목록
-              </Link>
-              <Link
-                href="/community"
-                className="text-base text-[#757575] hover:text-black transition-colors"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                커뮤니티
-              </Link>
-            </>
-          )}
-        </nav>
       </header>
+
+      {/* 모바일 사이드 메뉴 */}
+      <MobileSideMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        onLoginClick={() => openLoginDialog("/")}
+      />
 
       {/* 로그인 다이얼로그 */}
       <LoginDialog

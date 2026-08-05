@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -39,117 +40,268 @@ export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: Logi
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      {/* 데스크톱: 기존 모달 / 모바일: 전체 화면 */}
       <DialogContent
-        className="!w-[95vw] sm:!w-[800px] !h-auto sm:!h-[600px] !max-w-[800px] flex flex-col sm:flex-row p-0 bg-white rounded-lg overflow-hidden"
+        className="!w-full !h-full sm:!w-[800px] sm:!h-[600px] !max-w-none sm:!max-w-[800px] flex flex-col sm:flex-row p-0 bg-white sm:rounded-lg rounded-none overflow-hidden"
         showCloseButton={false}
       >
-        {/* 왼쪽 일러스트 영역 - 모바일에서 숨김 */}
-        <LoginModalIllustration className="hidden sm:block w-[344px] h-[600px]" />
+        {/* 모바일 전체 화면 로그인 */}
+        <div className="sm:hidden flex flex-col w-full h-full bg-white relative">
+          {/* 닫기 버튼 */}
+          <button
+            onClick={onClose}
+            className="absolute top-[26px] left-[27px] w-6 h-6 cursor-pointer z-10"
+          >
+            <Image
+              src="/icons/mobile/close-x.svg"
+              alt="닫기"
+              width={24}
+              height={24}
+            />
+          </button>
 
-        {/* 오른쪽 로그인 폼 영역 */}
-        <div className="w-full sm:w-[456px] bg-white flex flex-col items-center justify-center py-8 sm:py-0">
-          {/* 로고 */}
-          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-10">
-            <LetterLogo className="w-[60px] h-[40px] sm:w-[88px] sm:h-[60px]" />
-            <span className="text-[#4C261E] text-2xl sm:text-[38px]">Letter</span>
-          </div>
+          {/* 로고 + 설명 */}
+          <div className="flex-1 flex flex-col items-center justify-center px-[17px]">
+            <div className="flex flex-col items-center mb-6">
+              {/* 로고 */}
+              <div className="flex items-center gap-1 mb-4">
+                <Image
+                  src="/icons/letter-logo.svg"
+                  alt="Letter Logo"
+                  width={88}
+                  height={60}
+                  className="w-[88px] h-[60px]"
+                />
+                <span
+                  className="text-[38px] text-[#4C261E]"
+                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
+                >
+                  Letter
+                </span>
+              </div>
 
-          {/* 설명 텍스트 */}
-          <div className="text-center mb-6 sm:mb-10 px-4">
-            <p className="text-[#757575] text-base sm:text-[24px] font-medium leading-relaxed sm:leading-[32px]">
-              당신의 사연을 들려주세요
-              <br />
-              진심을 전하는 편지 서비스 레터
+              {/* 설명 텍스트 */}
+              <p className="text-[#424242] text-xl font-medium leading-8 text-center">
+                당신의 사연을 들려주세요
+                <br />
+                진심을 전하는 편지 서비스 레터
+              </p>
+            </div>
+
+            {/* SNS 간편 로그인 텍스트 */}
+            <p className="text-[#757575] text-base font-medium mb-4 text-center">
+              SNS계정으로 간편 로그인
             </p>
+
+            {/* 동의 체크박스 영역 */}
+            <div className="w-full px-2 mb-4">
+              <label className="flex items-center gap-2.5 cursor-pointer mb-3 pb-3 border-b border-[#F0E0DC]">
+                <input
+                  type="checkbox"
+                  checked={allAgreed}
+                  onChange={(e) => handleAgreeAll(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm font-semibold text-[#333]">
+                  전체 동의
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2.5 cursor-pointer mb-2">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-xs text-[#555]">
+                  <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
+                  <Link href="/terms" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
+                    서비스 이용약관
+                  </Link>
+                  에 동의합니다
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreePrivacy}
+                  onChange={(e) => setAgreePrivacy(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-xs text-[#555]">
+                  <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
+                  <Link href="/privacy" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
+                    개인정보 수집·이용
+                  </Link>
+                  에 동의합니다
+                </span>
+              </label>
+            </div>
+
+            {/* 로그인 버튼들 */}
+            <div className="w-full space-y-3 px-0">
+              {/* 카카오 로그인 */}
+              <button
+                onClick={() => handleLogin("kakao")}
+                disabled={!allAgreed}
+                className="w-full h-[52px] bg-[#FEE500] hover:bg-[#FDD835] rounded flex items-center justify-center gap-3 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEE500]"
+              >
+                <Image
+                  src="/icons/mobile/kakao-logo-login.svg"
+                  alt="카카오"
+                  width={24}
+                  height={24}
+                />
+                <span className="text-black/85 text-xl font-normal">
+                  카카오 로그인
+                </span>
+              </button>
+
+              {/* 네이버 로그인 */}
+              <button
+                onClick={() => handleLogin("naver")}
+                disabled={!allAgreed}
+                className="w-full h-[52px] bg-[#03C75A] hover:bg-[#02B34F] rounded flex items-center justify-center gap-[15px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#03C75A]"
+              >
+                <Image
+                  src="/icons/mobile/naver-logo-login.svg"
+                  alt="네이버"
+                  width={24}
+                  height={24}
+                />
+                <span className="text-white text-xl font-normal">
+                  네이버 로그인
+                </span>
+              </button>
+            </div>
           </div>
+        </div>
 
-          {/* 동의 체크박스 영역 */}
-          <div className="w-full px-6 sm:px-11 mb-5 sm:mb-6">
-            <label className="flex items-center gap-2.5 cursor-pointer mb-3 pb-3 border-b border-[#F0E0DC]">
-              <input
-                type="checkbox"
-                checked={allAgreed}
-                onChange={(e) => handleAgreeAll(e.target.checked)}
-                className="peer sr-only"
-              />
-              <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </span>
-              <span className="text-sm sm:text-base font-semibold text-[#333]">
-                전체 동의
-              </span>
-            </label>
+        {/* 데스크톱 로그인 (기존) */}
+        <div className="hidden sm:contents">
+          {/* 왼쪽 일러스트 영역 */}
+          <LoginModalIllustration className="w-[344px] h-[600px]" />
 
-            <label className="flex items-center gap-2.5 cursor-pointer mb-2">
-              <input
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="peer sr-only"
-              />
-              <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </span>
-              <span className="text-xs sm:text-sm text-[#555]">
-                <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
-                <Link href="/terms" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
-                  서비스 이용약관
-                </Link>
-                에 동의합니다
-              </span>
-            </label>
+          {/* 오른쪽 로그인 폼 영역 */}
+          <div className="w-[456px] bg-white flex flex-col items-center justify-center">
+            {/* 로고 */}
+            <div className="flex items-center gap-4 mb-10">
+              <LetterLogo className="w-[88px] h-[60px]" />
+              <span className="text-[#4C261E] text-[38px]">Letter</span>
+            </div>
 
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreePrivacy}
-                onChange={(e) => setAgreePrivacy(e.target.checked)}
-                className="peer sr-only"
-              />
-              <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </span>
-              <span className="text-xs sm:text-sm text-[#555]">
-                <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
-                <Link href="/privacy" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
-                  개인정보 수집·이용
-                </Link>
-                에 동의합니다
-              </span>
-            </label>
-          </div>
+            {/* 설명 텍스트 */}
+            <div className="text-center mb-10 px-4">
+              <p className="text-[#757575] text-[24px] font-medium leading-[32px]">
+                당신의 사연을 들려주세요
+                <br />
+                진심을 전하는 편지 서비스 레터
+              </p>
+            </div>
 
-          {/* 로그인 버튼들 */}
-          <div className="space-y-3 sm:space-y-4 px-6 sm:px-0 w-full sm:w-auto">
-            {/* 카카오 로그인 */}
-            <button
-              onClick={() => handleLogin("kakao")}
-              disabled={!allAgreed}
-              className="w-full sm:w-[368px] h-14 sm:h-[64px] bg-[#FEE500] hover:bg-[#FDD835] rounded-xl sm:rounded-[12px] flex items-center justify-center gap-3 sm:gap-4 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEE500]"
-            >
-              <KakaoLogo className="w-7 h-7 sm:w-[32px] sm:h-[32px]" />
-              <span className="text-black text-lg sm:text-[26px] font-normal opacity-85">
-                카카오 로그인
-              </span>
-            </button>
+            {/* 동의 체크박스 영역 */}
+            <div className="w-full px-11 mb-6">
+              <label className="flex items-center gap-2.5 cursor-pointer mb-3 pb-3 border-b border-[#F0E0DC]">
+                <input
+                  type="checkbox"
+                  checked={allAgreed}
+                  onChange={(e) => handleAgreeAll(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-base font-semibold text-[#333]">
+                  전체 동의
+                </span>
+              </label>
 
-            {/* 네이버 로그인 */}
-            <button
-              onClick={() => handleLogin("naver")}
-              disabled={!allAgreed}
-              className="w-full sm:w-[368px] h-14 sm:h-[64px] bg-[#03C75A] hover:bg-[#02B34F] rounded-xl sm:rounded-[12px] flex items-center justify-center gap-3 sm:gap-[15px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#03C75A]"
-            >
-              <NaverLogo className="w-7 h-7 sm:w-[32px] sm:h-[32px]" />
-              <span className="text-white text-lg sm:text-[26px] font-normal">
-                네이버 로그인
-              </span>
-            </button>
+              <label className="flex items-center gap-2.5 cursor-pointer mb-2">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm text-[#555]">
+                  <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
+                  <Link href="/terms" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
+                    서비스 이용약관
+                  </Link>
+                  에 동의합니다
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreePrivacy}
+                  onChange={(e) => setAgreePrivacy(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <span className="w-5 h-5 rounded border-2 border-[#ccc] flex items-center justify-center shrink-0 peer-checked:bg-[#FF9883] peer-checked:border-[#FF9883] transition-colors">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm text-[#555]">
+                  <span className="text-[#FF9883] font-medium">[필수]</span>{" "}
+                  <Link href="/privacy" target="_blank" className="underline underline-offset-2 hover:text-[#FF9883]">
+                    개인정보 수집·이용
+                  </Link>
+                  에 동의합니다
+                </span>
+              </label>
+            </div>
+
+            {/* 로그인 버튼들 */}
+            <div className="space-y-4">
+              <button
+                onClick={() => handleLogin("kakao")}
+                disabled={!allAgreed}
+                className="w-[368px] h-[64px] bg-[#FEE500] hover:bg-[#FDD835] rounded-[12px] flex items-center justify-center gap-4 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEE500]"
+              >
+                <KakaoLogo className="w-[32px] h-[32px]" />
+                <span className="text-black text-[26px] font-normal opacity-85">
+                  카카오 로그인
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleLogin("naver")}
+                disabled={!allAgreed}
+                className="w-[368px] h-[64px] bg-[#03C75A] hover:bg-[#02B34F] rounded-[12px] flex items-center justify-center gap-[15px] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#03C75A]"
+              >
+                <NaverLogo className="w-[32px] h-[32px]" />
+                <span className="text-white text-[26px] font-normal">
+                  네이버 로그인
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </DialogContent>

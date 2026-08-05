@@ -1,0 +1,1487 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-08-05T02:50:55.440Z",
+  "activeFeatures": [
+    "letter-community",
+    "(beforeLogin)",
+    "home",
+    "letter-box",
+    "write",
+    "[letterId]",
+    "my-page",
+    "story-update",
+    "shareds",
+    "letters",
+    "likes",
+    "ai",
+    "prompts",
+    "writing-assist",
+    "editor",
+    "daily-prompt",
+    "stories",
+    "emotion-chat",
+    "(afterLogin)",
+    "og",
+    "animations",
+    "like",
+    "effects",
+    "terms",
+    "privacy"
+  ],
+  "primaryFeature": "letter-community",
+  "features": {
+    "letter-community": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:05:45.995Z",
+        "lastUpdated": "2026-08-02T02:04:11.667Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/ShareModal.tsx"
+    },
+    "(beforeLogin)": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:12:18.411Z",
+        "lastUpdated": "2026-05-16T06:31:40.992Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(beforeLogin)/page.tsx"
+    },
+    "home": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:12:19.417Z",
+        "lastUpdated": "2026-08-02T09:53:56.401Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/home/WriteLetterCTA.tsx"
+    },
+    "letter-box": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:14:41.041Z",
+        "lastUpdated": "2026-03-16T11:14:46.745Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(afterLogin)/letter-box/page.tsx"
+    },
+    "write": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:14:54.354Z",
+        "lastUpdated": "2026-08-02T09:03:28.519Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/(afterLogin)/write/page.tsx"
+    },
+    "[letterId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:15:41.039Z",
+        "lastUpdated": "2026-08-02T10:11:00.972Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/letter/[letterId]/LetterDetailClient.tsx"
+    },
+    "my-page": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T11:17:00.882Z",
+        "lastUpdated": "2026-03-16T11:17:32.875Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(afterLogin)/my-page/page.tsx"
+    },
+    "story-update": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T12:21:54.402Z",
+        "lastUpdated": "2026-07-22T14:49:31.915Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/(afterLogin)/story-update/page.tsx"
+    },
+    "shareds": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T12:23:19.934Z",
+        "lastUpdated": "2026-08-05T02:50:55.440Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/shareds/LoginDialog.tsx"
+    },
+    "letters": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T12:23:44.853Z",
+        "lastUpdated": "2026-07-22T15:14:46.397Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/letters/LetterCard.tsx"
+    },
+    "likes": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-16T12:23:51.325Z",
+        "lastUpdated": "2026-03-16T12:23:51.325Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(afterLogin)/letter-box/likes/page.tsx"
+    },
+    "ai": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T05:56:55.933Z",
+        "lastUpdated": "2026-08-02T09:57:57.923Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/ai/DailyPrompt.tsx"
+    },
+    "prompts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T05:57:50.721Z",
+        "lastUpdated": "2026-05-16T06:41:27.761Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/lib/ai/prompts/emotion-chat.ts"
+    },
+    "writing-assist": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T05:58:12.592Z",
+        "lastUpdated": "2026-05-16T06:07:19.519Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/api/ai/writing-assist/route.ts"
+    },
+    "editor": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T06:01:54.758Z",
+        "lastUpdated": "2026-05-16T06:01:54.758Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/components/editor/WritingSuggestion.tsx"
+    },
+    "daily-prompt": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T06:16:34.168Z",
+        "lastUpdated": "2026-05-16T06:16:34.168Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/api/ai/daily-prompt/route.ts"
+    },
+    "stories": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T06:20:13.948Z",
+        "lastUpdated": "2026-05-16T06:20:46.809Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(afterLogin)/stories/page.tsx"
+    },
+    "emotion-chat": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T06:41:35.509Z",
+        "lastUpdated": "2026-05-16T06:50:54.781Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/api/ai/emotion-chat/route.ts"
+    },
+    "(afterLogin)": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-05-16T06:42:20.932Z",
+        "lastUpdated": "2026-05-16T07:03:01.098Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-community/app/(afterLogin)/layout.tsx"
+    },
+    "og": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-22T14:49:48.735Z",
+        "lastUpdated": "2026-07-22T14:49:48.735Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/api/og/route.tsx"
+    },
+    "animations": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-22T15:13:14.823Z",
+        "lastUpdated": "2026-08-02T01:56:48.921Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/lib/animations/config.ts"
+    },
+    "like": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-22T15:14:24.881Z",
+        "lastUpdated": "2026-07-22T15:14:24.881Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/like/LikeButton.tsx"
+    },
+    "effects": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-30T04:19:15.316Z",
+        "lastUpdated": "2026-07-30T04:20:40.429Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/components/effects/TypewriterText.tsx"
+    },
+    "terms": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-02T09:11:29.530Z",
+        "lastUpdated": "2026-08-02T09:18:15.808Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/terms/page.tsx"
+    },
+    "privacy": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-02T09:11:48.865Z",
+        "lastUpdated": "2026-08-02T09:29:37.482Z"
+      },
+      "lastFile": "/Users/hanjinlee/Desktop/projects/letter-projects/letter-community/app/privacy/page.tsx"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-03-16T10:55:33.351Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-08-05T02:50:55.440Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-16T11:05:45.995Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:12:11.603Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:12:18.411Z",
+      "feature": "(beforeLogin)",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:12:19.417Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:12:54.258Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:13:32.235Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:13:41.763Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:13:47.806Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:13:56.811Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:03.374Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:13.160Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:18.305Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:23.905Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:29.263Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:34.978Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:41.041Z",
+      "feature": "letter-box",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:46.745Z",
+      "feature": "letter-box",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:14:54.354Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:15:07.107Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:15:24.413Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:15:34.564Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:15:41.039Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:15:47.775Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:16:02.892Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:16:21.565Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:16:31.553Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:16:40.340Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:16:51.698Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:00.882Z",
+      "feature": "my-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:08.732Z",
+      "feature": "my-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:19.433Z",
+      "feature": "my-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:26.302Z",
+      "feature": "my-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:32.875Z",
+      "feature": "my-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:38.774Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:17:48.176Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T11:19:00.252Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:21:54.402Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:22:16.140Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:22:35.597Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:00.685Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:19.934Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:28.222Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:37.908Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:44.853Z",
+      "feature": "letters",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:51.325Z",
+      "feature": "likes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-16T12:23:58.045Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:56:55.933Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:57:50.721Z",
+      "feature": "prompts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:58:12.592Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:58:38.934Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:58:49.843Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T05:59:12.157Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:00:08.839Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:01:54.758Z",
+      "feature": "editor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:02:06.297Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:02:16.047Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:06:51.327Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:06:59.174Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:07:19.519Z",
+      "feature": "writing-assist",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:14:32.308Z",
+      "feature": "prompts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:14:45.259Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:16:02.810Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:16:34.168Z",
+      "feature": "daily-prompt",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:17:04.477Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:17:58.869Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:19:57.213Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:20:13.948Z",
+      "feature": "stories",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:20:46.809Z",
+      "feature": "stories",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:30:11.472Z",
+      "feature": "(beforeLogin)",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:31:40.992Z",
+      "feature": "(beforeLogin)",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:32:05.315Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:36:49.136Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:41:27.761Z",
+      "feature": "prompts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:41:35.509Z",
+      "feature": "emotion-chat",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:41:54.439Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:42:20.932Z",
+      "feature": "(afterLogin)",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:49:58.031Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:50:18.835Z",
+      "feature": "emotion-chat",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:50:54.781Z",
+      "feature": "emotion-chat",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T06:51:05.179Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T07:02:47.232Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T07:02:51.055Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-05-16T07:03:01.098Z",
+      "feature": "(afterLogin)",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:49:24.012Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:49:31.915Z",
+      "feature": "story-update",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:49:33.297Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:49:33.818Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:49:48.735Z",
+      "feature": "og",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T14:50:04.633Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T15:13:14.823Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T15:13:26.732Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T15:14:24.881Z",
+      "feature": "like",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-22T15:14:46.397Z",
+      "feature": "letters",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T04:19:15.316Z",
+      "feature": "effects",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T04:20:40.429Z",
+      "feature": "effects",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T04:44:19.545Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T04:48:05.863Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T05:07:57.004Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T05:28:42.657Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T05:36:38.766Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:56:48.921Z",
+      "feature": "animations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:57:46.365Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:58:36.133Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:58:45.500Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:58:52.074Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:59:23.600Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:59:36.569Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T01:59:53.381Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:00:25.992Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:02:25.556Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:02:54.908Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:03:36.434Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:03:42.102Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:04:11.667Z",
+      "feature": "letter-community",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T02:04:21.368Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T08:56:07.736Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T08:58:01.922Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T08:58:12.410Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T08:58:25.008Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:03:04.403Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:03:28.519Z",
+      "feature": "write",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:03:42.030Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:03:53.161Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:04:02.199Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:04:13.661Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:11:29.530Z",
+      "feature": "terms",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:11:48.865Z",
+      "feature": "privacy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:12:20.761Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:18:15.808Z",
+      "feature": "terms",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:24:25.613Z",
+      "feature": "privacy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:29:33.086Z",
+      "feature": "privacy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:29:37.482Z",
+      "feature": "privacy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:35:11.332Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:35:21.473Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:35:41.576Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:37:51.978Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:37:55.874Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:39:53.630Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:40:03.832Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:45:46.487Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:46:04.501Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:46:39.071Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:47:01.500Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:47:11.864Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:14.987Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:18.596Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:22.274Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:26.756Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:31.625Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:39.999Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:44.058Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:53:56.401Z",
+      "feature": "home",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:01.624Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:08.264Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:13.380Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:19.472Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:22.922Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:27.781Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:35.976Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:41.762Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:45.871Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:49.652Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:57:57.923Z",
+      "feature": "ai",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:58:03.580Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:58:08.464Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:58:13.534Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:58:19.312Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T09:58:25.076Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:00.837Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:05.981Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:15.296Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:18.686Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:23.769Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:28.119Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:05:32.684Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:06:09.378Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:12.864Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:19.505Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:25.411Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:33.887Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:46.041Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:10:53.182Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-02T10:11:00.972Z",
+      "feature": "[letterId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-05T02:49:15.083Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-05T02:49:48.675Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-05T02:50:55.440Z",
+      "feature": "shareds",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}
