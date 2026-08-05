@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useRef, useEffect, useState } from "react";
@@ -116,12 +117,7 @@ export default function WriteLetterSection() {
               className="absolute bottom-[40px] sm:bottom-[68px] right-6 sm:right-12 flex items-center gap-2 sm:gap-3 content-reveal"
               style={{ animationDelay: "1.0s" }}
             >
-              <div className="w-5 h-4 sm:w-7 sm:h-6">
-                <svg viewBox="0 0 28 24" fill="none">
-                  <path d="M2 0H26C27.1 0 28 0.9 28 2V22C28 23.1 27.1 24 26 24H2C0.9 24 0 23.1 0 22V2C0 0.9 0.9 0 2 0Z" fill="#FF7F65" />
-                  <path d="M2 2L14 13L26 2" stroke="black" strokeWidth="2" fill="none" />
-                </svg>
-              </div>
+              <Image src="/icons/envelope-icon-small.png" alt="" width={28} height={24} className="w-5 h-4 sm:w-7 sm:h-6" />
               <span className="text-base sm:text-xl font-medium text-[#424242]">레터 이용자</span>
             </div>
           </div>

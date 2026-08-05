@@ -98,53 +98,57 @@ export default function Header() {
           {/* 중간 네비게이션 */}
           <nav className="flex items-center gap-4 md:gap-6 xxl:gap-[120px] flex-1 justify-center">
             {status === "authenticated" ? (
-              <>
-                <Link
-                  href="/write"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  편지 쓰기
-                </Link>
-                <Link
-                  href="/story-update"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  사연 작성
-                </Link>
-                <Link
-                  href="/letter-box"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  우편함
-                </Link>
-              </>
+              <Link
+                href="/write"
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                편지 쓰기
+              </Link>
             ) : (
-              <>
-                <button
-                  onClick={() => openLoginDialog("/write")}
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  사연 작성
-                </button>
-                <Link
-                  href="/stories"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  사연 목록
-                </Link>
-                <Link
-                  href="/community"
-                  className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                  style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                >
-                  커뮤니티
-                </Link>
-              </>
+              <button
+                onClick={() => openLoginDialog("/write")}
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                편지 쓰기
+              </button>
+            )}
+
+            {status === "authenticated" ? (
+              <Link
+                href="/write?type=story"
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                사연 작성
+              </Link>
+            ) : (
+              <button
+                onClick={() => openLoginDialog("/write?type=story")}
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                사연 작성
+              </button>
+            )}
+
+            {status === "authenticated" ? (
+              <Link
+                href="/letter-box"
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                우편함
+              </Link>
+            ) : (
+              <button
+                onClick={() => openLoginDialog("/letter-box")}
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                우편함
+              </button>
             )}
           </nav>
 

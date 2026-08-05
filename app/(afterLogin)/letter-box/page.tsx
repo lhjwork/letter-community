@@ -1,81 +1,95 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useCallback, useState, Suspense } from "react";
+import { useCallback, useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useMyLetters } from "@/hooks/useMyLetters";
-import { useInfiniteStories } from "@/hooks/useStories";
-import { useStoriesFilter } from "@/hooks/useStoriesFilter";
-import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { LetterCard } from "@/components/letters";
+import Image from "next/image";
+import { getMyLetters, getMyStories, type Letter, type Story, type Pagination } from "@/lib/api";
 import { HeroBanner } from "@/components/home";
-import AdCarousel from "@/components/ads/AdCarousel";
 
-function MyPageContent() {
-  const { status } = useSession();
+function MailboxContent() {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"letters" | "stories">("letters");
+  const token = (session as any)?.backendToken;
 
-  // 정적 배너 데이터
+  const [activeTab, setActiveTab] = useState<"letters" | "stories">("letters");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("");
+
+  // Letters state
+  const [letters, setLetters] = useState<Letter[]>([]);
+  const [letterPagination, setLetterPagination] = useState<Pagination | null>(null);
+  const [isLettersLoading, setIsLettersLoading] = useState(true);
+  const [letterPage, setLetterPage] = useState(1);
+
+  // Stories state
+  const [stories, setStories] = useState<Story[]>([]);
+  const [storyPagination, setStoryPagination] = useState<Pagination | null>(null);
+  const [isStoriesLoading, setIsStoriesLoading] = useState(true);
+  const [storyPage, setStoryPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 12;
+
+  // Banner data
   const bannerSlides = [
-    {
-      id: 1,
-      image: "/images/mainbanner/banner-1.png",
-      alt: "배너 1",
-    },
+    { id: 1, image: "/images/mainbanner/banner-1.png", alt: "배너 1" },
   ];
 
-  // 내 편지 관련 훅
-  const {
-    letters,
-    pagination: letterPagination,
-    isLoading: isLettersLoading,
-    isFetchingNextPage: isLettersFetching,
-    hasNextPage: hasLettersNextPage,
-    fetchNextPage: fetchLettersNextPage,
-    refetch: refetchLetters,
-  } = useMyLetters(20);
-
-  // 사연 관련 훅
-  const { search, sort, category, updateFilter } = useStoriesFilter();
-  const {
-    stories,
-    pagination: storiesPagination,
-    isLoading: isStoriesLoading,
-    isFetchingNextPage: isStoriesFetching,
-    hasNextPage: hasStoriesNextPage,
-    fetchNextPage: fetchStoriesNextPage,
-  } = useInfiniteStories({ search, sort, category, limit: 20 });
-
-  // 내 편지 무한 스크롤
-  const loadMoreLetters = useCallback(() => {
-    if (hasLettersNextPage && !isLettersFetching) {
-      fetchLettersNextPage();
+  // Fetch letters
+  const fetchLetters = useCallback(async (page: number) => {
+    if (!token) return;
+    setIsLettersLoading(true);
+    try {
+      const response = await getMyLetters(token, { page, limit: ITEMS_PER_PAGE });
+      setLetters(response.data);
+      setLetterPagination(response.pagination);
+    } catch (error) {
+      console.error("편지 목록 로드 실패:", error);
+    } finally {
+      setIsLettersLoading(false);
     }
-  }, [hasLettersNextPage, isLettersFetching, fetchLettersNextPage]);
+  }, [token]);
 
-  const { ref: lettersLoadMoreRef } = useIntersectionObserver({
-    onIntersect: loadMoreLetters,
-    rootMargin: "200px",
-  });
-
-  // 사연 무한 스크롤
-  const loadMoreStories = useCallback(() => {
-    if (hasStoriesNextPage && !isStoriesFetching) {
-      fetchStoriesNextPage();
+  // Fetch stories
+  const fetchStories = useCallback(async (page: number, search?: string, cat?: string) => {
+    if (!token) return;
+    setIsStoriesLoading(true);
+    try {
+      const response = await getMyStories(token, {
+        page,
+        limit: ITEMS_PER_PAGE,
+        search: search || undefined,
+        category: cat || undefined,
+      });
+      setStories(response.data);
+      setStoryPagination(response.pagination);
+    } catch (error) {
+      console.error("사연 목록 로드 실패:", error);
+    } finally {
+      setIsStoriesLoading(false);
     }
-  }, [hasStoriesNextPage, isStoriesFetching, fetchStoriesNextPage]);
+  }, [token]);
 
-  const { ref: storiesLoadMoreRef } = useIntersectionObserver({
-    onIntersect: loadMoreStories,
-    rootMargin: "200px",
-  });
+  useEffect(() => {
+    if (token) {
+      fetchLetters(letterPage);
+    }
+  }, [token, letterPage, fetchLetters]);
 
-  const handleLetterDelete = useCallback(() => {
-    refetchLetters();
-  }, [refetchLetters]);
+  useEffect(() => {
+    if (token) {
+      fetchStories(storyPage, searchQuery, category);
+    }
+  }, [token, storyPage, searchQuery, category, fetchStories]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (activeTab === "stories") {
+      setStoryPage(1);
+      fetchStories(1, searchQuery, category);
+    }
+  };
 
   if (status === "unauthenticated") {
     router.push("/");
@@ -84,469 +98,326 @@ function MyPageContent() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#FEFEFE]">
+        <div className="w-12 h-12 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  // 검색 필터링된 편지들
-  const filteredLetters = letters.filter(
-    (letter) =>
-      letter.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      letter.content.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const currentPagination = activeTab === "letters" ? letterPagination : storyPagination;
+  const currentPage = activeTab === "letters" ? letterPage : storyPage;
+  const setCurrentPage = activeTab === "letters" ? setLetterPage : setStoryPage;
 
-  // 사연 검색 필터링
-  const filteredStories = stories.filter(
-    (story) =>
-      story.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (story.content &&
-        story.content.toLowerCase().includes(searchQuery.toLowerCase())),
-  );
+  const renderPagination = () => {
+    if (!currentPagination || currentPagination.totalPages <= 1) return null;
+    const { totalPages } = currentPagination;
+
+    // Calculate visible page range
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-12">
+        <button
+          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+          disabled={currentPage === 1}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-[#EDEDED] hover:bg-[#ddd] disabled:opacity-40 transition-colors"
+        >
+          <Image src="/icons/arrow-left.svg" alt="이전" width={24} height={24} />
+        </button>
+
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => setCurrentPage(page)}
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
+              page === currentPage
+                ? "bg-[#FF7F65] text-white"
+                : "text-[#757575] hover:bg-[#EDEDED]"
+            }`}
+            style={{ fontFamily: "Pretendard, sans-serif" }}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+          disabled={currentPage === totalPages}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FF7F65] hover:bg-[#ff6b50] disabled:opacity-40 transition-colors"
+        >
+          <Image src="/icons/arrow-right.svg" alt="다음" width={24} height={24} />
+        </button>
+      </div>
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}.${m}.${d}`;
+  };
+
+  // Masonry height pattern: 3 sizes for visual variety
+  const getCardHeight = (index: number) => {
+    const pattern = [280, 360, 280, 440, 360, 280, 440, 280, 360, 280, 360, 440];
+    return pattern[index % pattern.length];
+  };
+
+  // Generate horizontal line positions based on card height
+  const getLinePositions = (height: number) => {
+    const lines = [];
+    for (let y = 48; y < height - 20; y += 48) {
+      lines.push(y);
+    }
+    return lines;
+  };
+
+  // Calculate max text lines based on card height
+  const getMaxLines = (height: number) => {
+    if (height >= 440) return 10;
+    if (height >= 360) return 7;
+    return 4;
+  };
+
+  const renderMailboxCard = (item: { _id: string; title?: string; content?: string; authorName?: string; createdAt: string }, index: number) => {
+    const cardHeight = getCardHeight(index);
+    const lines = getLinePositions(cardHeight);
+    const maxLines = getMaxLines(cardHeight);
+
+    return (
+      <Link href={`/letter/${item._id}`} key={item._id} className="block w-full break-inside-avoid mb-4 sm:mb-5">
+        <div
+          className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl w-full relative cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] overflow-hidden"
+          style={{ height: `${cardHeight}px` }}
+        >
+          {/* Horizontal lines */}
+          {lines.map((lineY) => (
+            <div
+              key={lineY}
+              className="absolute left-0 right-0 h-0.5 bg-[#EDEDED]"
+              style={{ top: `${lineY}px` }}
+            />
+          ))}
+
+          {/* Envelope icon - top left */}
+          <div className="absolute top-3.5 left-3">
+            <Image src="/icons/envelope-icon.png" alt="" width={28} height={24} className="w-7 h-6" />
+          </div>
+
+          {/* Date - top right */}
+          <div className="absolute top-4 right-3 sm:right-4">
+            <span className="text-[16px] sm:text-[18px] text-[#424242] font-['Pretendard']">
+              {formatDate(item.createdAt)}
+            </span>
+          </div>
+
+          {/* Title/Content preview */}
+          <div className="absolute top-14 left-4 right-4 sm:left-5 sm:right-5 bottom-14">
+            <p
+              className="text-[15px] sm:text-[16px] text-[#424242] leading-relaxed font-['Pretendard'] overflow-hidden"
+              style={{ display: "-webkit-box", WebkitLineClamp: maxLines, WebkitBoxOrient: "vertical" }}
+            >
+              {item.title || (item.content ? item.content.replace(/<[^>]*>/g, "").substring(0, 200) : "")}
+            </p>
+          </div>
+
+          {/* Author - bottom right */}
+          <div className="absolute bottom-4 right-3 sm:right-4">
+            <span className="text-[18px] sm:text-[20px] font-medium text-[#424242] font-['Pretendard']">
+              {item.authorName || "익명"}
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 베너 */}
+    <div className="min-h-screen bg-[#FEFEFE]">
+      {/* Banner */}
       {bannerSlides.length > 0 && (
         <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
           <HeroBanner bannerSlides={bannerSlides} />
         </div>
       )}
 
-      {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 탭 네비게이션 */}
-        <div className="mb-8">
-          <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab("letters")}
-              className={`text-xl sm:text-3xl font-bold pb-2 border-b-2 transition-colors ${
-                activeTab === "letters"
-                  ? "text-gray-800 border-gray-800"
-                  : "text-gray-400 border-transparent hover:text-gray-600"
-              }`}
-            >
-              내 편지
-            </button>
-            <button
-              onClick={() => setActiveTab("stories")}
-              className={`text-xl sm:text-3xl font-bold pb-2 border-b-2 transition-colors ${
-                activeTab === "stories"
-                  ? "text-gray-800 border-gray-800"
-                  : "text-gray-400 border-transparent hover:text-gray-600"
-              }`}
-            >
-              사연 목록
-            </button>
-          </div>
+      {/* Main content */}
+      <main className="container mx-auto px-4 sm:px-8 lg:px-20 pb-16">
+        {/* Tabs */}
+        <div className="flex gap-6 sm:gap-10 mb-8 sm:mb-12">
+          <button
+            onClick={() => setActiveTab("letters")}
+            className={`text-2xl sm:text-4xl lg:text-[48px] transition-colors ${
+              activeTab === "letters" ? "text-[#757575]" : "text-[#EDEDED] hover:text-[#C4C4C4]"
+            }`}
+            style={{ fontFamily: "NanumJangMiCe, cursive" }}
+          >
+            작성된 편지
+          </button>
+          <button
+            onClick={() => setActiveTab("stories")}
+            className={`text-2xl sm:text-4xl lg:text-[48px] transition-colors ${
+              activeTab === "stories" ? "text-[#757575]" : "text-[#EDEDED] hover:text-[#C4C4C4]"
+            }`}
+            style={{ fontFamily: "NanumJangMiCe, cursive" }}
+          >
+            사연 목록
+          </button>
         </div>
 
-        {/* 탭 컨텐츠 */}
+        {/* Controls row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+          {/* Category dropdown - only for stories tab */}
+          {activeTab === "stories" && (
+            <div className="relative">
+              <select
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setStoryPage(1);
+                }}
+                className="appearance-none h-[48px] sm:h-[64px] px-4 sm:px-5 pr-10 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl cursor-pointer focus:outline-none focus:border-[#FF7F65]"
+                style={{ fontFamily: "Pretendard, sans-serif" }}
+              >
+                <option value="">카테고리</option>
+                <option value="가족">가족</option>
+                <option value="사랑">사랑</option>
+                <option value="우정">우정</option>
+                <option value="성장">성장</option>
+                <option value="위로">위로</option>
+                <option value="추억">추억</option>
+                <option value="감사">감사</option>
+                <option value="기타">기타</option>
+              </select>
+              <svg
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#757575] pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          )}
+
+          {/* Search field */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-[360px]">
+            <div className="relative">
+              <svg
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C4C4C4]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="검색"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-[48px] sm:h-[64px] pl-12 pr-4 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl text-[#424242] placeholder-[#C4C4C4] focus:outline-none focus:border-[#FF7F65]"
+                style={{ fontFamily: "Pretendard, sans-serif" }}
+              />
+            </div>
+          </form>
+
+          {/* Action button */}
+          <Link
+            href={activeTab === "letters" ? "/write" : "/write?type=story"}
+            className="h-[48px] sm:h-[64px] px-5 sm:px-6 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl font-medium text-[#424242] flex items-center justify-center hover:bg-[#F5F5F5] transition-colors whitespace-nowrap"
+            style={{ fontFamily: "Pretendard, sans-serif" }}
+          >
+            {activeTab === "letters" ? "편지 작성" : "사연 작성"}
+          </Link>
+        </div>
+
+        {/* Content */}
         {activeTab === "letters" ? (
           <>
-            {/* 검색바와 작성 버튼 - 편지 탭 */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <svg
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="검색"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
-                  />
-                </div>
-              </div>
-              <Link
-                href="/write"
-                className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
-              >
-                편지 작성
-              </Link>
-            </div>
-
-            {/* 편지 목록 */}
-            {/* 빠른 액션 버튼들 */}
-            {/* <div className="flex justify-center gap-4 mb-8">
-              <Link
-                href="/letter-box/addresses"
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
-              >
-                <svg
-                  className="w-4 h-4 text-[#FF9883]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">배송지 관리</span>
-              </Link>
-              <Link
-                href="/letter-box/likes"
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-[#FF9883] hover:bg-orange-50 transition-colors"
-              >
-                <svg
-                  className="w-4 h-4 text-[#FF9883]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
-                <span className="text-sm font-medium">좋아요한 사연</span>
-              </Link>
-            </div> */}
-
             {isLettersLoading ? (
               <div className="flex justify-center items-center h-64">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 border-4 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-gray-400">로딩 중...</p>
-                </div>
+                <div className="w-10 h-10 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : filteredLetters.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-4">📝</div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  {searchQuery
-                    ? "검색 결과가 없습니다"
-                    : "아직 작성한 편지가 없습니다"}
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  {searchQuery
-                    ? "다른 검색어로 시도해보세요"
-                    : "첫 번째 편지를 작성해보세요"}
+            ) : letters.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-2xl text-[#C4C4C4] mb-4" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                  아직 작성한 편지가 없습니다
                 </p>
-                {!searchQuery && (
-                  <Link
-                    href="/write"
-                    className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    편지 쓰기
-                  </Link>
-                )}
+                <Link
+                  href="/write"
+                  className="inline-block px-6 py-3 bg-[#FF7F65] text-white text-lg font-semibold rounded-lg hover:bg-[#ff6b50] transition-colors"
+                >
+                  첫 편지 쓰기
+                </Link>
               </div>
             ) : (
-              <>
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                  {filteredLetters.map((letter) => (
-                    <div key={letter._id} className="break-inside-avoid mb-4">
-                      <LetterCard
-                        letter={letter}
-                        onDelete={handleLetterDelete}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* 무한 스크롤 로더 - 검색 중이 아닐 때만 표시 */}
-                {!searchQuery && (
-                  <div
-                    ref={lettersLoadMoreRef}
-                    className="py-8 flex justify-center"
-                  >
-                    {isLettersFetching ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 border-2 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
-                        <span className="text-gray-400">로딩 중...</span>
-                      </div>
-                    ) : hasLettersNextPage ? (
-                      <span className="text-gray-400">스크롤하여 더 보기</span>
-                    ) : (
-                      <span className="text-gray-400">
-                        모든 편지를 불러왔습니다 ✓
-                      </span>
-                    )}
-                  </div>
-                )}
-              </>
+              <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-5">
+                {letters.map((letter, index) => renderMailboxCard(letter, index))}
+              </div>
             )}
+            {renderPagination()}
           </>
         ) : (
-          // 사연 목록
           <>
-            {/* 검색바, 카테고리, 작성 버튼 */}
-            <div className="flex items-center gap-3 mb-8">
-              {/* 카테고리 드롭다운 */}
-              <div className="relative">
-                <select
-                  value={category}
-                  onChange={(e) => updateFilter({ category: e.target.value })}
-                  className="appearance-none px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent bg-white text-gray-700 cursor-pointer"
-                >
-                  <option value="">카테고리</option>
-                  <option value="가족">👨‍👩‍👧‍👦 가족</option>
-                  <option value="사랑">💕 사랑</option>
-                  <option value="우정">💛 우정</option>
-                  <option value="성장">🌱 성장</option>
-                  <option value="위로">🫂 위로</option>
-                  <option value="추억">📷 추억</option>
-                  <option value="감사">⚠️ 감사</option>
-                  <option value="기타">📝 기타</option>
-                </select>
-                <svg
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-
-              {/* 검색바 */}
-              <div className="flex-1">
-                <div className="relative">
-                  <svg
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="검색"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF9883] focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* 사연 작성 버튼 */}
-              <Link
-                href="/write"
-                className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors font-medium whitespace-nowrap"
-              >
-                사연 작성
-              </Link>
-            </div>
-
             {isStoriesLoading ? (
               <div className="flex justify-center items-center h-64">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 border-4 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-gray-400">로딩 중...</p>
-                </div>
+                <div className="w-10 h-10 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : filteredStories.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-4">📖</div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  {searchQuery ? "검색 결과가 없습니다" : "사연이 없습니다"}
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  {searchQuery
-                    ? "다른 검색어로 시도해보세요"
-                    : "첫 번째 사연을 작성해보세요"}
+            ) : stories.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-2xl text-[#C4C4C4] mb-4" style={{ fontFamily: "NanumJangMiCe, cursive" }}>
+                  아직 작성한 사연이 없습니다
                 </p>
-                {!searchQuery && (
-                  <Link
-                    href="/write"
-                    className="px-6 py-3 bg-[#FF9883] text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    사연 쓰기
-                  </Link>
-                )}
+                <Link
+                  href="/write?type=story"
+                  className="inline-block px-6 py-3 bg-[#FF7F65] text-white text-lg font-semibold rounded-lg hover:bg-[#ff6b50] transition-colors"
+                >
+                  첫 사연 작성하기
+                </Link>
               </div>
             ) : (
-              <>
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                  {filteredStories.map((story, index) => {
-                    // Story를 Letter 형식으로 변환
-                    const letterFromStory = {
-                      _id: story._id,
-                      title: story.title || "제목 없음",
-                      content: story.content || "",
-                      authorName: story.authorName || "익명",
-                      createdAt: story.createdAt,
-                      category: story.category,
-                    };
-
-                    return (
-                      <div key={story._id} className="break-inside-avoid mb-4">
-                        <LetterCard letter={letterFromStory} />
-                        {(index + 1) % 20 === 0 && (
-                          <div className="mb-4 col-span-full">
-                            <AdCarousel
-                              placement="banner"
-                              limit={2}
-                              aspectRatio="16:9"
-                              autoPlay={true}
-                              autoPlayInterval={7000}
-                              showControls={false}
-                              showIndicators={true}
-                              showDebugInfo={
-                                process.env.NODE_ENV === "development"
-                              }
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* 무한 스크롤 로더 - 검색 중이 아닐 때만 표시 */}
-                {!searchQuery && (
-                  <div
-                    ref={storiesLoadMoreRef}
-                    className="py-8 flex justify-center"
-                  >
-                    {isStoriesFetching ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 border-2 border-[#FF9883] border-t-transparent rounded-full animate-spin" />
-                        <span className="text-gray-400">로딩 중...</span>
-                      </div>
-                    ) : hasStoriesNextPage ? (
-                      <span className="text-gray-400">스크롤하여 더 보기</span>
-                    ) : (
-                      <span className="text-gray-400">
-                        모든 사연을 불러왔습니다 ✓
-                      </span>
-                    )}
-                  </div>
+              <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-5">
+                {stories.map((story, index) =>
+                  renderMailboxCard({
+                    _id: story._id,
+                    title: story.title,
+                    content: story.content,
+                    authorName: story.authorName,
+                    createdAt: story.createdAt,
+                  }, index)
                 )}
-              </>
+              </div>
             )}
+            {renderPagination()}
           </>
-        )}
-
-        {/* 페이지네이션 */}
-        {((activeTab === "letters" &&
-          letterPagination &&
-          letterPagination.totalPages > 1) ||
-          (activeTab === "stories" &&
-            storiesPagination &&
-            storiesPagination.totalPages > 1)) && (
-          <div className="flex justify-center items-center gap-2 mt-8">
-            <button
-              onClick={() => {
-                /* 이전 페이지 로직 */
-              }}
-              disabled={
-                activeTab === "letters"
-                  ? letterPagination?.page === 1
-                  : storiesPagination?.page === 1
-              }
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
-            >
-              ‹
-            </button>
-
-            {Array.from(
-              {
-                length: Math.min(
-                  5,
-                  activeTab === "letters"
-                    ? letterPagination?.totalPages || 0
-                    : storiesPagination?.totalPages || 0,
-                ),
-              },
-              (_, i) => {
-                const pageNum = i + 1;
-                const currentPage =
-                  activeTab === "letters"
-                    ? letterPagination?.page
-                    : storiesPagination?.page;
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => {
-                      /* 페이지 이동 로직 */
-                    }}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                      pageNum === currentPage
-                        ? "bg-[#FF9883] text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              },
-            )}
-
-            <button
-              onClick={() => {
-                /* 다음 페이지 로직 */
-              }}
-              disabled={
-                activeTab === "letters"
-                  ? letterPagination?.page === letterPagination?.totalPages
-                  : storiesPagination?.page === storiesPagination?.totalPages
-              }
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
-            >
-              ›
-            </button>
-          </div>
         )}
       </main>
     </div>
   );
 }
 
-export default function MyPage() {
+export default function MailboxPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">로딩 중...</p>
-          </div>
+        <div className="min-h-screen flex items-center justify-center bg-[#FEFEFE]">
+          <div className="w-12 h-12 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
-      <MyPageContent />
+      <MailboxContent />
     </Suspense>
   );
 }

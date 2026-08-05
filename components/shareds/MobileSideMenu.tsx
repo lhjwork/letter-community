@@ -82,7 +82,7 @@ export default function MobileSideMenu({
           <nav className="flex flex-col gap-[28px]">
             {status === "authenticated" ? (
               <Link
-                href="/story-update"
+                href="/write"
                 onClick={handleMenuClick}
                 className="flex items-center gap-2"
               >
@@ -93,7 +93,7 @@ export default function MobileSideMenu({
                   height={24}
                 />
                 <span className="text-[#757575] text-base font-medium">
-                  사연 작성
+                  편지 쓰기
                 </span>
               </Link>
             ) : (
@@ -108,42 +108,76 @@ export default function MobileSideMenu({
                   height={24}
                 />
                 <span className="text-[#757575] text-base font-medium">
+                  편지 쓰기
+                </span>
+              </button>
+            )}
+
+            {status === "authenticated" ? (
+              <Link
+                href="/write?type=story"
+                onClick={handleMenuClick}
+                className="flex items-center gap-2"
+              >
+                <Image
+                  src="/icons/mobile/featured-play-list.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+                <span className="text-[#757575] text-base font-medium">
+                  사연 작성
+                </span>
+              </Link>
+            ) : (
+              <button
+                onClick={handleLoginClick}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Image
+                  src="/icons/mobile/featured-play-list.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+                <span className="text-[#757575] text-base font-medium">
                   사연 작성
                 </span>
               </button>
             )}
 
-            <Link
-              href="/stories"
-              onClick={handleMenuClick}
-              className="flex items-center gap-2"
-            >
-              <Image
-                src="/icons/mobile/featured-play-list.svg"
-                alt=""
-                width={24}
-                height={24}
-              />
-              <span className="text-[#757575] text-base font-medium">
-                사연 목록
-              </span>
-            </Link>
-
-            <Link
-              href="/community"
-              onClick={handleMenuClick}
-              className="flex items-center gap-2"
-            >
-              <Image
-                src="/icons/mobile/forum.svg"
-                alt=""
-                width={24}
-                height={24}
-              />
-              <span className="text-[#757575] text-base font-medium">
-                커뮤니티
-              </span>
-            </Link>
+            {status === "authenticated" ? (
+              <Link
+                href="/letter-box"
+                onClick={handleMenuClick}
+                className="flex items-center gap-2"
+              >
+                <Image
+                  src="/icons/mobile/forum.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+                <span className="text-[#757575] text-base font-medium">
+                  우편함
+                </span>
+              </Link>
+            ) : (
+              <button
+                onClick={handleLoginClick}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Image
+                  src="/icons/mobile/forum.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+                <span className="text-[#757575] text-base font-medium">
+                  우편함
+                </span>
+              </button>
+            )}
           </nav>
         </div>
 

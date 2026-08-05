@@ -3,7 +3,7 @@ import WriteLetterSection from "@/components/home/WriteLetterSection";
 import StoryListSection from "@/components/home/StoryListSection";
 import FeatureSection from "@/components/home/FeatureSection";
 import ContactSection from "@/components/home/ContactSection";
-import { DailyPrompt } from "@/components/ai/DailyPrompt";
+// import { DailyPrompt } from "@/components/ai/DailyPrompt";
 import { getBannerSlides } from "@/lib/banner-utils";
 import { getFeaturedStories, type Story } from "@/lib/api";
 
@@ -29,10 +29,11 @@ export default async function LandingPage() {
         </div>
       )}
 
-      {/* 오늘의 감정 질문 */}
+      {/* 오늘의 감정 질문 - AI API 비활성화로 주석 처리
       <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6">
         <DailyPrompt />
       </div>
+      */}
 
       {/* Write Letter Section */}
       <WriteLetterSection />

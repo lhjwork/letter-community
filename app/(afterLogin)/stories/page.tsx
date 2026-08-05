@@ -12,7 +12,7 @@ import {
   StoryCard,
   EmptyState,
 } from "@/components/stories";
-import { DailyPrompt } from "@/components/ai/DailyPrompt";
+// import { DailyPrompt } from "@/components/ai/DailyPrompt";
 import AdCarousel from "@/components/ads/AdCarousel";
 import type { SortOption } from "@/lib/api";
 
@@ -67,12 +67,13 @@ function StoriesContent() {
         </div>
       </section>
 
-      {/* 오���의 감정 질문 */}
+      {/* 오늘의 감정 질문 - AI API 비활성화로 주석 처리
       <section className="bg-white py-6 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <DailyPrompt />
         </div>
       </section>
+      */}
 
       {/* 검색 및 필터 섹션 */}
       <section className="bg-white py-6 border-b sticky top-0 z-10 shadow-sm">

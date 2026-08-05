@@ -283,6 +283,28 @@ export async function getMyLetters(
 }
 
 /**
+ * 내 사연 목록 조회
+ */
+export async function getMyStories(
+  token: string,
+  params?: { page?: number; limit?: number; search?: string; category?: string },
+): Promise<StoriesResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.category) queryParams.append("category", params.category);
+
+  const qs = queryParams.toString();
+  const endpoint = qs ? `/api/letters/my/stories?${qs}` : "/api/letters/my/stories";
+
+  return apiRequest<StoriesResponse>(endpoint, {
+    method: "GET",
+    token,
+  });
+}
+
+/**
  * 편지 삭제
  */
 export async function deleteLetter(

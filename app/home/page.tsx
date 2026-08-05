@@ -13,15 +13,9 @@ export default async function HomePage() {
   let featuredStories: Story[] = [];
   try {
     const response = await getFeaturedStories();
-    console.log("Featured Stories API Response:", response);
-    featuredStories = response.data || [];
+    featuredStories = response?.data || [];
   } catch (error) {
     console.error("Featured stories 로드 실패:", error);
-    if (error instanceof Error) {
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
-    }
-    // 에러가 발생해도 빈 배열로 계속 진행
     featuredStories = [];
   }
 

@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ShareModal from "@/components/ShareModal";
 import { WritingSuggestion } from "@/components/editor/WritingSuggestion";
-import { DailyPrompt } from "@/components/ai/DailyPrompt";
+// import { DailyPrompt } from "@/components/ai/DailyPrompt";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import { getDraft } from "@/lib/draft-api";
@@ -546,12 +546,13 @@ function WritePageContent() {
                 </div>
               </div>
 
-              {/* 오늘의 감정 질문 (빈 에디터일 때만 표시) */}
+              {/* 오늘의 감정 질문 - AI API 비활성화로 주석 처리
               {!content.replace(/<[^>]*>/g, "").trim() && (
                 <div className="mb-6">
                   <DailyPrompt />
                 </div>
               )}
+              */}
 
               {/* Tiptap 에디터 */}
               <div className="relative z-10 mb-20">
