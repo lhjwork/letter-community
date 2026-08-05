@@ -72,12 +72,12 @@ export default function Header() {
       </header>
 
       {/* 데스크톱 헤더 - md 이상에서만 표시 */}
-      <header className="hidden md:block w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[52px] py-3 sm:py-4 xxl:py-[14px] pb-4 sm:pb-6 xxl:pb-[26px] rounded-2xl xxl:rounded-[24px] border-2 border-[#C4C4C4]">
+      <header className="hidden md:block w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[40px] py-3 sm:py-4 xxl:py-[20px] pb-4 sm:pb-6 xxl:pb-[20px] rounded-[24px] border border-[#C4C4C4]">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           {/* 왼쪽 로고 */}
           <Link
             href={status === "authenticated" ? "/home" : "/"}
-            className="flex items-center gap-2 sm:gap-3 xxl:gap-4 shrink-0"
+            className="flex items-center gap-0 shrink-0"
           >
             <Image
               src="/icons/letter-logo.svg"
@@ -88,7 +88,7 @@ export default function Header() {
               priority
             />
             <span
-              className="md:text-[32px] xxl:text-[40px] text-black whitespace-nowrap"
+              className="md:text-[30px] xxl:text-[38px] text-[#4C261E] whitespace-nowrap"
               style={{ fontFamily: "NanumJangMiCe, cursive" }}
             >
               Letter
@@ -167,11 +167,11 @@ export default function Header() {
                   : "로그인"}
               </span>
               <svg
-                width="18"
-                height="18"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-[#757575] sm:w-5 sm:h-5 md:w-5 md:h-5"
+                className="text-[#757575]"
               >
                 <path
                   d="M6 9L12 15L18 9"
