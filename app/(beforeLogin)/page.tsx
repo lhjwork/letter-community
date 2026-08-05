@@ -14,9 +14,10 @@ export default async function LandingPage() {
   let featuredStories: Story[] = [];
   try {
     const response = await getFeaturedStories();
-    featuredStories = response.data || [];
+    featuredStories = response?.data || [];
   } catch (error) {
     console.error("Featured stories 로드 실패:", error);
+    featuredStories = [];
   }
 
   return (

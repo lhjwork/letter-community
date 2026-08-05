@@ -1,7 +1,10 @@
 import { RecipientAddressInput } from "@/types/recipient";
 
 // 클라이언트와 서버 모두에서 사용 가능하도록 NEXT_PUBLIC_ 환경 변수 사용
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+// 서버 사이드에서는 BACKEND_URL도 fallback으로 사용
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (typeof window === "undefined" ? process.env.BACKEND_URL : undefined);
 
 interface ApiRequestOptions extends RequestInit {
   token?: string;
@@ -32,6 +35,10 @@ export async function apiRequest<T>(
   // 백엔드 토큰이 있으면 Authorization 헤더 추가
   if (token) {
     defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
+  if (!BACKEND_URL) {
+    throw new Error("Backend URL is not configured");
   }
 
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
