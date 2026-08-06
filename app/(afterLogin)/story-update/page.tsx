@@ -12,7 +12,7 @@ import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import SaveIndicator from "@/components/letter/SaveIndicator";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckSquare } from "lucide-react";
+import Image from "next/image";
 import { Suspense } from "react";
 import { getFeaturedStories, type Story } from "@/lib/api";
 import { HeroBanner } from "@/components/home";
@@ -228,40 +228,41 @@ function StoryUpdateContent() {
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+            className="text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] rounded-lg min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-16 text-sm sm:text-base xl:text-2xl font-medium"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>뒤로가기</span>
+            뒤로가기
           </Button>
         </div>
 
         {/* 카테고리 선택 */}
         <section className="mb-6 sm:mb-12">
           <h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 색깔을 골라주세요
           </h2>
 
-          <div className="flex flex-wrap gap-3 sm:gap-8 mb-4 sm:mb-6">
+          <div className="flex flex-wrap gap-2 sm:gap-4 xl:gap-8 mb-4 sm:mb-6">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`px-4 sm:px-6 py-3 sm:py-4 rounded-lg border-2 transition-colors ${
+                className={`w-16 sm:w-20 xl:w-[100px] h-10 sm:h-12 xl:h-16 flex items-center justify-center rounded-lg border-2 transition-colors ${
                   selectedCategory === category.id
                     ? "bg-[#FF7F65] text-white border-[#FF7F65]"
-                    : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
+                    : "bg-white text-gray-600 border-gray-400 hover:border-[#FF9883]"
                 }`}
               >
-                <span className="font-semibold text-base sm:text-xl">{category.label}</span>
+                <span className="font-semibold text-sm sm:text-lg xl:text-2xl leading-5">
+                  {category.label}
+                </span>
               </button>
             ))}
           </div>
 
           {selectedCategoryInfo && (
-            <p className="text-gray-600 text-sm sm:text-xl">
+            <p className="text-gray-600 text-sm sm:text-base xl:text-xl">
               {selectedCategoryInfo.description}
             </p>
           )}
@@ -270,23 +271,23 @@ function StoryUpdateContent() {
         {/* 제목 입력 */}
         <section className="mb-6 sm:mb-12">
           <h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             편지의 제목을 정해주세요
           </h2>
 
-          <div className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7">
+          <div className="bg-white border border-gray-400 rounded-lg px-5 sm:px-7 h-10 sm:h-12 xl:h-16 flex items-center">
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="내용을 입력해주세요"
-              className="w-full text-base sm:text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
+              className="w-full text-sm sm:text-base xl:text-xl text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent"
             />
           </div>
 
-          <p className="text-gray-600 text-sm sm:text-xl mt-2 sm:mt-4">
+          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-4">
             제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
             제안해드려요.
           </p>
@@ -295,14 +296,14 @@ function StoryUpdateContent() {
         {/* 내용 작성 */}
         <section className="mb-6 sm:mb-12">
           <h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             어떤 이야기를 건네고 싶으신가요?
           </h2>
 
           {/* 편지지 스타일 컨테이너 */}
-          <div className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col">
+          <div className="w-full bg-white rounded-lg border border-gray-400 overflow-hidden relative flex flex-col">
             {/* 에디터 툴바 (상단 고정) */}
             <div className="relative z-20 bg-white border-b">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between">
@@ -372,78 +373,112 @@ function StoryUpdateContent() {
                   }}
                   readOnly
                 />
-                <span className="ml-2">💌</span>
+                <Image
+                  src="/icons/letter-heart-icon.svg"
+                  alt="편지 아이콘"
+                  width={28}
+                  height={24}
+                  className="ml-2 w-7 h-6"
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* 구분선 */}
-        <div className="border-t border-gray-300 mb-12"></div>
-
         {/* 공개 여부 선택 */}
         <section className="mb-6 sm:mb-12">
           <h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
           >
             사연의 공개 여부를 선택해주세요
           </h2>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
             {/* 공개하기 버튼 */}
             <button
+              type="button"
               onClick={() => setIsPublic(true)}
-              className="flex items-center justify-between sm:justify-start space-x-4 px-5 sm:px-7 py-3 sm:py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[288px]"
+              className={`flex items-center justify-between w-full sm:w-60 xl:w-[288px] h-10 sm:h-12 xl:h-[60px] px-5 sm:px-6 xl:px-10 bg-white border rounded-lg transition-colors ${
+                isPublic ? "border-[#FF9883]" : "border-gray-400"
+              }`}
             >
-              <span className="text-gray-800 text-base sm:text-xl font-medium">
+              <span className="text-sm sm:text-base xl:text-xl text-gray-800">
                 모두에게 공개하기
               </span>
               {isPublic ? (
-                <CheckSquare className="w-6 h-6 text-[#FF9883] shrink-0" />
+                <svg
+                  className="w-6 h-6 text-[#FF9883]"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.29 13.29a.996.996 0 0 1-1.41 0L5.71 12.7a.996.996 0 1 1 1.41-1.41L10 14.17l6.88-6.88a.996.996 0 1 1 1.41 1.41l-7.58 7.59z" />
+                </svg>
               ) : (
-                <div className="w-6 h-6 border-2 border-gray-400 rounded shrink-0"></div>
+                <svg
+                  className="w-6 h-6 text-gray-800"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                </svg>
               )}
             </button>
 
             {/* 비공개 버튼 */}
             <button
+              type="button"
               onClick={() => setIsPublic(false)}
-              className="flex items-center justify-between sm:justify-start space-x-4 px-5 sm:px-7 py-3 sm:py-4 rounded-lg border bg-white border-[#C4C4C4] hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[288px]"
+              className={`flex items-center justify-between w-full sm:w-60 xl:w-[288px] h-10 sm:h-12 xl:h-[60px] px-5 sm:px-6 xl:px-10 bg-white border rounded-lg transition-colors ${
+                !isPublic ? "border-[#FF9883]" : "border-gray-400"
+              }`}
             >
-              <span className="text-gray-800 text-base sm:text-xl font-medium">
+              <span className="text-sm sm:text-base xl:text-xl text-gray-800">
                 공개하지 않기
               </span>
               {!isPublic ? (
-                <CheckSquare className="w-6 h-6 text-[#FF9883] shrink-0" />
+                <svg
+                  className="w-6 h-6 text-[#FF9883]"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.29 13.29a.996.996 0 0 1-1.41 0L5.71 12.7a.996.996 0 1 1 1.41-1.41L10 14.17l6.88-6.88a.996.996 0 1 1 1.41 1.41l-7.58 7.59z" />
+                </svg>
               ) : (
-                <div className="w-6 h-6 border-2 border-gray-400 rounded shrink-0"></div>
+                <svg
+                  className="w-6 h-6 text-gray-800"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                </svg>
               )}
             </button>
           </div>
 
-          <p className="text-gray-600 text-sm sm:text-xl">
+          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-6">
             공개하지 않은 사연은 레터만 확인할 수 있어요
           </p>
         </section>
 
-        <div className="w-full h-[1px] bg-[#C4C4C4] mb-8 sm:mb-14"></div>
+        <div className="w-full h-px bg-[#C4C4C4] mb-8 sm:mb-14"></div>
 
         {/* 액션 버튼 */}
-        <section className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16">
+        <section className="flex justify-end space-x-4 sm:space-x-6 mb-8 sm:mb-16">
           <Button
             variant="outline"
             onClick={handleCancel}
             disabled={isSubmitting}
-            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
+            className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium border-2 border-gray-400 text-gray-600 hover:bg-gray-50 hover:text-gray-600 min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
           >
             취소
           </Button>
 
           <Button
+            variant="outline"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-[48px] sm:h-[60px]"
+            className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium bg-white border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
           >
             {isSubmitting ? "작성 중..." : "작성 완료"}
           </Button>

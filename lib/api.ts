@@ -156,6 +156,7 @@ export async function createLetter(
     type: "friend" | "story";
     ogTitle?: string;
     ogPreviewText?: string;
+    isPublic?: boolean; // 공개 여부
     authorName?: string; // 사연용
     category?: string; // 사연용 AI 분류 카테고리
     recipientAddresses?: RecipientAddressInput[]; // 수신자 주소 목록

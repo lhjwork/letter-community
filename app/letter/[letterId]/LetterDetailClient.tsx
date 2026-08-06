@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -87,6 +88,14 @@ export default function LetterDetailClient({
   ];
 
   const letterId = letter._id;
+
+  // 공유 URL (클라이언트에서 origin 기준으로 갱신)
+  const [shareUrl, setShareUrl] = useState(
+    `https://letter-community.vercel.app/letter/${letter._id}`,
+  );
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/letter/${letter._id}`);
+  }, [letter._id]);
 
   // 사용자 신청 목록 조회 함수 (localStorage 기반)
   const loadUserRequests = useCallback(async () => {
@@ -251,21 +260,23 @@ export default function LetterDetailClient({
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* 뒤로가기 버튼 */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+        {/* 뒤로가기 버튼 - 작성자 편지 확인 화면에서는 미표시 */}
+        {!(isAuthor && !isStory) && (
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
           >
-            <span>← 뒤로가기</span>
-          </Button>
-        </motion.div>
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+            >
+              <span>← 뒤로가기</span>
+            </Button>
+          </motion.div>
+        )}
 
         {/* To. 수신자 표시 - 타자기 효과 */}
         {!isAuthor && (
@@ -298,9 +309,14 @@ export default function LetterDetailClient({
           </motion.div>
         )}
 
-        {/* 사연: 바로 표시 / 편지: 봉투 애니메이션 */}
+        {/* 사연: 바로 표시 / 작성자 편지: 확인 화면 / 수신자 편지: 봉투 애니메이션 */}
         {isStory ? (
           <StoryContent letter={letter} isAuthor={isAuthor} handleWriteClick={handleWriteClick} letterPaperRef={letterPaperRef} paperShadow={paperShadow} session={session} activeRequestCount={activeRequestCount} setShowRecipientSelect={setShowRecipientSelect} router={router} />
+        ) : isAuthor ? (
+          <AuthorLetterView
+            letter={letter}
+            authorName={session?.user?.name || "Letter"}
+          />
         ) : (
         <EnvelopeAnimation onOpen={() => setEnvelopeOpened(true)}>
           {/* 사연 제목 필드 */}
@@ -451,12 +467,18 @@ export default function LetterDetailClient({
                   From. Letter
                 </span>
                 <motion.span
-                  className="ml-2 text-2xl"
+                  className="ml-2 inline-block"
                   initial={{ scale: 0, rotate: -30 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ ...springs.bouncy, delay: 1.0 }}
                 >
-                  💌
+                  <Image
+                    src="/icons/letter-heart-icon.svg"
+                    alt="편지 아이콘"
+                    width={28}
+                    height={24}
+                    className="w-7 h-6"
+                  />
                 </motion.span>
               </motion.div>
             </div>
@@ -528,14 +550,13 @@ export default function LetterDetailClient({
 
         {/* 편지 작성자용 섹션 */}
         {isAuthor && (
-          <div className="mt-12">
-            <div className="w-full h-px bg-[#C4C4C4]"></div>
-
+          <div className="mt-8 sm:mt-16">
             {/* 링크 공유 섹션 */}
-            <div className="rounded-lg p-4 sm:p-12">
+            <div>
               <h2
                 className="mb-4 sm:mb-8 text-2xl sm:text-4xl lg:text-[48px]"
                 style={{
+                  fontFamily: "NanumJangMiCe, cursive",
                   color: "#757575",
                   fontStyle: "normal",
                   fontWeight: 400,
@@ -546,47 +567,42 @@ export default function LetterDetailClient({
               </h2>
 
               {/* 링크 복사 영역 */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-12">
-                <div className="flex-1 bg-white rounded-lg border border-gray-300 h-12 sm:h-16">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6 mb-8 sm:mb-16">
+                <div className="flex-1 bg-white rounded-lg border border-gray-400 h-12 sm:h-16 flex items-center px-5 sm:px-7">
                   <input
                     type="text"
-                    value={`https://letter-community.vercel.app/letter/69d3600b6433643e74d5174`}
+                    value={shareUrl}
                     readOnly
-                    className="w-full h-full px-4 border-none outline-none text-gray-600 bg-transparent text-base rounded-lg"
+                    className="w-full border-none outline-none text-[#424242] bg-transparent text-base sm:text-xl"
+                    style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500 }}
                   />
                 </div>
                 <Button
+                  variant="outline"
                   onClick={() => {
-                    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/letter/${letter._id}`;
-                    navigator.clipboard.writeText(url);
+                    navigator.clipboard.writeText(shareUrl);
                     alert("링크가 복사되었습니다!");
                   }}
-                  className="px-6 sm:px-8 h-12 sm:h-16 bg-white rounded-lg hover:bg-[#FF9883] cursor-pointer transition-colors font-medium text-sm sm:text-base border border-[#FF9883]"
-                  style={{ color: "#FF9883" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "#FF9883";
-                  }}
+                  className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] cursor-pointer transition-colors font-semibold text-base sm:text-2xl leading-5"
+                  style={{ fontFamily: "Pretendard" }}
                 >
                   링크 복사하기
                 </Button>
               </div>
 
               {/* 네비게이션 버튼들 */}
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-16">
                 <Button
                   onClick={() => router.push("/letter-box")}
                   variant="outline"
-                  className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 border-2 border-gray-300 hover:bg-gray-50 rounded-lg bg-white text-[#757575] text-center text-base sm:text-lg lg:text-2xl font-semibold leading-5"
+                  className="w-full sm:w-56 h-12 sm:h-16 border-2 border-gray-400 hover:bg-gray-50 rounded-lg bg-white text-[#757575] hover:text-[#757575] text-center text-base sm:text-2xl font-semibold leading-5"
                   style={{ fontFamily: "Pretendard" }}
                 >
                   마이페이지 이동
                 </Button>
                 <Button
                   onClick={() => router.push("/")}
-                  className="flex w-full sm:w-44 lg:w-56 h-12 sm:h-16 px-6 py-2 justify-center items-center gap-2.5 rounded-lg bg-[#FF9883] text-white hover:bg-orange-600 transition-colors text-base sm:text-lg lg:text-2xl font-semibold leading-5"
+                  className="flex w-full sm:w-56 h-12 sm:h-16 px-6 py-2 justify-center items-center gap-2.5 rounded-lg bg-[#FF7F65] text-white hover:bg-[#ff6b4d] transition-colors text-base sm:text-2xl font-semibold leading-5"
                   style={{ fontFamily: "Pretendard" }}
                 >
                   메인페이지 이동
@@ -668,6 +684,127 @@ export default function LetterDetailClient({
         </AnimatePresence>
       )}
     </div>
+  );
+}
+
+/* 작성자 전용 편지 확인 화면 - 피그마 "편지 공유" 디자인 */
+function AuthorLetterView({
+  letter,
+  authorName,
+}: {
+  letter: Letter;
+  authorName: string;
+}) {
+  return (
+    <>
+      {/* 헤딩 */}
+      <motion.h2
+        className="mb-4 sm:mb-8 text-2xl sm:text-4xl lg:text-[48px]"
+        style={{
+          fontFamily: "NanumJangMiCe, cursive",
+          color: "#757575",
+          fontWeight: 400,
+          lineHeight: "normal",
+        }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        완성 된 편지를 확인해볼까요?
+      </motion.h2>
+
+      {/* 제목 필드 */}
+      {letter.ogTitle && (
+        <motion.div
+          className="mb-4 sm:mb-5 rounded-lg border px-5 sm:px-7 h-12 sm:h-[60px] flex items-center"
+          style={{ backgroundColor: "#FEFEFE", borderColor: "#C4C4C4" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <span
+            className="text-[#424242] text-base sm:text-xl truncate"
+            style={{
+              fontFamily: "Pretendard, sans-serif",
+              fontWeight: 500,
+              lineHeight: "1.19",
+            }}
+          >
+            {letter.ogTitle}
+          </span>
+        </motion.div>
+      )}
+
+      {/* 편지 내용 카드 - 편지 쓰기 화면과 동일한 편지지 배경 */}
+      <motion.div
+        className="rounded-lg border overflow-hidden relative flex flex-col"
+        style={{ backgroundColor: "#FEFEFE", borderColor: "#C4C4C4" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...springs.gentle, delay: 0.2 }}
+      >
+        {/* 편지지 장식 (빨간 세로선 + 바인더 구멍) - 모바일에서 숨김 */}
+        <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-red-300 z-10 pointer-events-none"></div>
+        <div className="hidden sm:block absolute left-6 top-[60px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 top-[100px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 top-[140px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 top-[180px] w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 bottom-28 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 bottom-20 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 bottom-12 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+        <div className="hidden sm:block absolute left-6 bottom-4 w-3 h-3 bg-gray-200 rounded-full border border-gray-300 z-10"></div>
+
+        <div
+          className="pl-4 sm:pl-16 pr-4 sm:pr-8 py-6 sm:py-12 min-h-[300px] flex flex-col"
+          style={{
+            backgroundImage: `repeating-linear-gradient(
+              transparent,
+              transparent 27px,
+              #e5e7eb 27px,
+              #e5e7eb 28px
+            )`,
+            backgroundSize: "100% 28px",
+            backgroundAttachment: "local",
+          }}
+        >
+          <div
+            className="letter-content text-base sm:text-xl flex-1"
+            style={{
+              fontFamily: "Pretendard, sans-serif",
+              lineHeight: "28px",
+              color: "#424242",
+            }}
+            dangerouslySetInnerHTML={{ __html: letter.content }}
+          />
+
+          {/* From. 닉네임 + 하트 편지 아이콘 - 항상 카드 맨 아래 */}
+          <motion.div
+            className="mt-auto pt-8 flex justify-end items-center gap-3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Image
+              src="/icons/letter-heart-icon.svg"
+              alt="편지 아이콘"
+              width={28}
+              height={24}
+              className="w-7 h-6"
+            />
+            <span
+              className="text-base sm:text-xl"
+              style={{
+                fontFamily: "Pretendard, sans-serif",
+                color: "#424242",
+                textAlign: "right",
+              }}
+            >
+              From. {authorName}
+            </span>
+          </motion.div>
+        </div>
+      </motion.div>
+    </>
   );
 }
 
@@ -853,7 +990,7 @@ function StoryContent({
             <Button
               onClick={() => {
                 if (session) {
-                  router.push("/write?type=story");
+                  router.push("/story-update");
                 } else {
                   handleWriteClick();
                 }

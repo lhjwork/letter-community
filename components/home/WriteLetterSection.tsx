@@ -131,7 +131,7 @@ export default function WriteLetterSection() {
           <button
             onClick={() => {
               if (session) {
-                router.push("/write?type=story");
+                router.push("/story-update");
               } else {
                 setShowLogin(true);
               }
@@ -149,7 +149,7 @@ export default function WriteLetterSection() {
       <LoginDialog
         isOpen={showLogin}
         onClose={() => setShowLogin(false)}
-        callbackUrl="/write?type=story"
+        callbackUrl="/story-update"
       />
     </section>
   );

@@ -117,7 +117,7 @@ export default function Header() {
 
             {status === "authenticated" ? (
               <Link
-                href="/write?type=story"
+                href="/story-update"
                 className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
                 style={{ fontFamily: "NanumJangMiCe, cursive" }}
               >
@@ -125,7 +125,7 @@ export default function Header() {
               </Link>
             ) : (
               <button
-                onClick={() => openLoginDialog("/write?type=story")}
+                onClick={() => openLoginDialog("/story-update")}
                 className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
                 style={{ fontFamily: "NanumJangMiCe, cursive" }}
               >

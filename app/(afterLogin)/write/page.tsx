@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
@@ -19,7 +20,6 @@ import SaveIndicator from "@/components/letter/SaveIndicator";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
 import DraftLoadButton from "@/components/drafts/DraftLoadButton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { Suspense } from "react";
 import { DraftLetter } from "@/types/draft";
 import { HeroBanner } from "@/components/home";
@@ -31,6 +31,7 @@ function WritePageContent() {
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
   const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
 
   // 인터랙티브 효과 상태
   const prevContentLenRef = useRef(0);
@@ -284,6 +285,7 @@ function WritePageContent() {
           type: "friend",
           ogTitle: title.trim(),
           ogPreviewText,
+          isPublic,
         },
         token,
       );
@@ -371,10 +373,9 @@ function WritePageContent() {
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+            className="text-[#FF9883] border-2 border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] rounded-lg min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-16 text-sm sm:text-base xl:text-2xl font-medium"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>뒤로가기</span>
+            뒤로가기
           </Button>
         </motion.div>
 
@@ -386,7 +387,7 @@ function WritePageContent() {
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" as const }}
         >
           <motion.h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -396,7 +397,7 @@ function WritePageContent() {
           </motion.h2>
 
           <motion.div
-            className="bg-white border border-gray-300 rounded-lg p-4 sm:p-7"
+            className="bg-white border border-gray-400 rounded-lg px-5 sm:px-7 h-10 sm:h-12 xl:h-16 flex items-center"
             whileFocus={{ borderColor: "#FF9883", boxShadow: "0 0 0 2px rgba(255, 152, 131, 0.2)" }}
             whileHover={{ borderColor: "#FF9883" }}
             transition={{ duration: 0.2 }}
@@ -406,13 +407,13 @@ function WritePageContent() {
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="내용을 입력해주세요"
-              className="w-full text-base sm:text-xl text-gray-700 placeholder-gray-400 border-none outline-none"
+              className="w-full text-sm sm:text-base xl:text-xl text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent"
             />
           </motion.div>
 
-          <p className="text-gray-600 text-sm sm:text-xl mt-2 sm:mt-4">
-            편지 내용을 작성한 후 AI 제목 생성 버튼을 클릭하여 제목을 자동으로
-            생성할 수 있습니다.
+          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-6">
+            제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
+            제안해드려요.
           </p>
         </motion.section>
 
@@ -424,18 +425,18 @@ function WritePageContent() {
           transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" as const }}
         >
           <motion.h2
-            className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
             style={{ fontFamily: "NanumJangMiCe, cursive" }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            어떤 마음을 전하고 싶으신가요?
+            어떤 이야기를 건네고 싶으신가요?
           </motion.h2>
 
           {/* 편지지 스타일 컨테이너 */}
           <motion.div
-            className="w-full bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden relative flex flex-col"
+            className="w-full bg-white rounded-lg border border-gray-400 overflow-hidden relative flex flex-col"
             animate={letterPaperControls}
             whileHover={{
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
@@ -566,11 +567,17 @@ function WritePageContent() {
                   From. {session?.user?.name || "익명"}
                 </span>
                 <motion.span
-                  className="ml-2 text-2xl inline-block"
+                  className="ml-2 inline-block"
                   animate={envelopeControls}
                   style={{ scale: 1 + charCount * 0.00005 }}
                 >
-                  💌
+                  <Image
+                    src="/icons/letter-heart-icon.svg"
+                    alt="편지 아이콘"
+                    width={30}
+                    height={27}
+                    className="w-7 h-6"
+                  />
                 </motion.span>
               </div>
             </div>
@@ -627,6 +634,92 @@ function WritePageContent() {
           </motion.div>
         </motion.section>
 
+        {/* 공개 여부 선택 */}
+        <motion.section
+          className="mb-6 sm:mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7, ease: "easeOut" as const }}
+        >
+          <motion.h2
+            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
+            style={{ fontFamily: "NanumJangMiCe, cursive" }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            편지의 공개 여부를 선택해주세요
+          </motion.h2>
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
+            <motion.button
+              type="button"
+              onClick={() => setIsPublic(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center justify-between w-full sm:w-60 xl:w-[288px] h-10 sm:h-12 xl:h-[60px] px-5 sm:px-6 xl:px-10 bg-white border rounded-lg transition-colors ${
+                isPublic ? "border-[#FF9883]" : "border-gray-400"
+              }`}
+            >
+              <span className="text-sm sm:text-base xl:text-xl text-gray-800">
+                모두에게 공개하기
+              </span>
+              {isPublic ? (
+                <svg
+                  className="w-6 h-6 text-[#FF9883]"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.29 13.29a.996.996 0 0 1-1.41 0L5.71 12.7a.996.996 0 1 1 1.41-1.41L10 14.17l6.88-6.88a.996.996 0 1 1 1.41 1.41l-7.58 7.59z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6 text-gray-800"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                </svg>
+              )}
+            </motion.button>
+
+            <motion.button
+              type="button"
+              onClick={() => setIsPublic(false)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`flex items-center justify-between w-full sm:w-60 xl:w-[288px] h-10 sm:h-12 xl:h-[60px] px-5 sm:px-6 xl:px-10 bg-white border rounded-lg transition-colors ${
+                !isPublic ? "border-[#FF9883]" : "border-gray-400"
+              }`}
+            >
+              <span className="text-sm sm:text-base xl:text-xl text-gray-800">
+                공개하지 않기
+              </span>
+              {!isPublic ? (
+                <svg
+                  className="w-6 h-6 text-[#FF9883]"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.29 13.29a.996.996 0 0 1-1.41 0L5.71 12.7a.996.996 0 1 1 1.41-1.41L10 14.17l6.88-6.88a.996.996 0 1 1 1.41 1.41l-7.58 7.59z" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6 text-gray-800"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19 5v14H5V5h14zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+                </svg>
+              )}
+            </motion.button>
+          </div>
+
+          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-6">
+            공개하지 않은 편지는 나와 링크를 가진 대상만 확인할 수 있어요
+          </p>
+        </motion.section>
+
         <motion.div
           className="w-full h-px bg-[#C4C4C4] mb-14"
           initial={{ scaleX: 0 }}
@@ -637,7 +730,7 @@ function WritePageContent() {
 
         {/* 액션 버튼 */}
         <motion.section
-          className="flex justify-end space-x-4 sm:space-x-8 mb-8 sm:mb-16"
+          className="flex justify-end space-x-4 sm:space-x-6 mb-8 sm:mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.9 }}
@@ -650,7 +743,7 @@ function WritePageContent() {
               variant="outline"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl border-gray-400 text-gray-600 hover:bg-gray-50 min-w-[120px] sm:min-w-[168px] h-12 sm:h-[60px]"
+              className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium border-2 border-gray-400 text-gray-600 hover:bg-gray-50 hover:text-gray-600 min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
             >
               취소
             </Button>
@@ -661,11 +754,12 @@ function WritePageContent() {
             whileTap={{ scale: 0.95 }}
           >
             <Button
+              variant="outline"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-xl bg-[#FF9883] text-white border-[#FF9883] hover:bg-orange-600 min-w-[120px] sm:min-w-[168px] h-12 sm:h-[60px]"
+              className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium bg-white border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
             >
-              {isSubmitting ? "편지 생성 중..." : "편지 만들기"}
+              {isSubmitting ? "편지 생성 중..." : "작성 완료"}
             </Button>
           </motion.div>
         </motion.section>

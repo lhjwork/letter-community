@@ -115,7 +115,7 @@ export default function MobileSideMenu({
 
             {status === "authenticated" ? (
               <Link
-                href="/write?type=story"
+                href="/story-update"
                 onClick={handleMenuClick}
                 className="flex items-center gap-2"
               >
