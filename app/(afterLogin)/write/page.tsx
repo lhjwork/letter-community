@@ -12,6 +12,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ShareModal from "@/components/ShareModal";
 import { WritingSuggestion } from "@/components/editor/WritingSuggestion";
+import WritingAmbience from "@/components/effects/WritingAmbience";
+import TypingRevealEffect from "@/components/effects/TypingRevealEffect";
 // import { DailyPrompt } from "@/components/ai/DailyPrompt";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
@@ -558,6 +560,8 @@ function WritePageContent() {
               {/* Tiptap 에디터 */}
               <div className="relative z-10 mb-20">
                 <EditorContent editor={editor} />
+                <WritingAmbience editor={editor} />
+                <TypingRevealEffect editor={editor} />
                 <WritingSuggestion editor={editor} />
               </div>
 

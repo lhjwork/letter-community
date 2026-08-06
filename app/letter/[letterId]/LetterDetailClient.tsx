@@ -18,6 +18,7 @@ import { HeroBanner } from "@/components/home";
 import { useIsAuthor } from "@/hooks/useIsAuthor";
 import EnvelopeAnimation from "@/components/effects/EnvelopeAnimation";
 import TypewriterText from "@/components/effects/TypewriterText";
+import HandwritingReveal from "@/components/effects/HandwritingReveal";
 import {
   saveLetterRequest,
   getLetterRequests,
@@ -437,14 +438,13 @@ export default function LetterDetailClient({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
               >
-                <div
+                <HandwritingReveal
+                  html={letter.content}
                   className="letter-content text-base sm:text-xl"
                   style={{
-                    fontFamily: "Pretendard, sans-serif",
                     lineHeight: "28px",
                     color: "#424242",
                   }}
-                  dangerouslySetInnerHTML={{ __html: letter.content }}
                 />
               </motion.div>
 
@@ -767,14 +767,13 @@ function AuthorLetterView({
             backgroundAttachment: "local",
           }}
         >
-          <div
+          <HandwritingReveal
+            html={letter.content}
             className="letter-content text-base sm:text-xl flex-1"
             style={{
-              fontFamily: "Pretendard, sans-serif",
               lineHeight: "28px",
               color: "#424242",
             }}
-            dangerouslySetInnerHTML={{ __html: letter.content }}
           />
 
           {/* From. 닉네임 + 하트 편지 아이콘 - 항상 카드 맨 아래 */}
@@ -919,14 +918,13 @@ function StoryContent({
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div
+            <HandwritingReveal
+              html={letter.content}
               className="letter-content text-base sm:text-lg"
               style={{
-                fontFamily: "Pretendard, sans-serif",
                 lineHeight: "32px",
                 color: "#424242",
               }}
-              dangerouslySetInnerHTML={{ __html: letter.content }}
             />
           </motion.div>
 

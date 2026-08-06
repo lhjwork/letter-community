@@ -40,8 +40,8 @@ export function useLetterEditor({ content, onChange, placeholder = "여기에 �
     content,
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] text-lg leading-7 text-gray-800 max-w-none",
-        style: "line-height: 28px; font-family: 'Noto Sans KR', sans-serif;",
+        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] text-xl leading-7 text-gray-800 max-w-none",
+        style: "line-height: 28px; font-family: 'NanumJangMiCe', 'Noto Sans KR', sans-serif;",
       },
     },
     onUpdate: ({ editor }) => {

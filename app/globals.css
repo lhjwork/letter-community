@@ -531,6 +531,137 @@ body {
 }
 .animate-draw-line { animation: draw-line 1s ease-out forwards; }
 
+/* 손글씨 잉크 효과 - 글자가 잉크 스며들 듯 나타남 */
+@keyframes inkCharIn {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(2px);
+  }
+  60% {
+    opacity: 0.9;
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+.ink-reveal-char {
+  display: inline;
+  opacity: 0;
+  animation: inkCharIn 0.45s ease-out forwards;
+}
+
+/* 손글씨 획 리빌 - 글자가 붓질하듯 왼쪽에서 오른쪽으로 쓸려 나타남 */
+.ink-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+@keyframes strokeCharIn {
+  0% {
+    opacity: 0;
+    clip-path: inset(-10% 110% -10% -10%);
+    transform: rotate(-5deg) translateY(2px);
+    filter: blur(2px);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0.4px);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(-10% -10% -10% -10%);
+    transform: rotate(0deg) translateY(0);
+    filter: blur(0);
+  }
+}
+.ink-stroke-char {
+  display: inline-block;
+  opacity: 0;
+  animation: strokeCharIn 0.34s ease-out forwards;
+  will-change: clip-path, transform, opacity;
+}
+
+/* 리빌을 따라다니는 펜 */
+@keyframes penScribble {
+  0% {
+    transform: rotate(-6deg) translateY(0);
+  }
+  100% {
+    transform: rotate(4deg) translateY(-2px);
+  }
+}
+.handwriting-pen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 24px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+.handwriting-pen .pen-inner {
+  display: inline-block;
+  animation: penScribble 0.16s ease-in-out infinite alternate;
+}
+
+/* 에디터 펜 커서 - 코랄색 펜으로 쓰는 느낌 */
+.ProseMirror {
+  caret-color: #ff7f65;
+}
+
+/* 방금 쓴 글자를 덮었다가 서서히 걷어내는 덮개 - 잉크가 선명해지듯 */
+@keyframes inkCoverFade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.ink-cover {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.92);
+  /* 덮개가 걷히는 동안 아래 글자가 뿌옇게 → 또렷하게 */
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  border-radius: 3px;
+  pointer-events: none;
+  animation: inkCoverFade 0.6s ease-out forwards;
+}
+
+/* 잉크 마르는 광택 (타이핑 멈춤 시 한 번) */
+@keyframes inkDrySheen {
+  0% {
+    transform: translateX(-20%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(320%);
+    opacity: 0;
+  }
+}
+.ink-dry-sheen {
+  position: absolute;
+  left: 0;
+  width: 30%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 152, 131, 0.18),
+    transparent
+  );
+  animation: inkDrySheen 1.2s ease-in-out forwards;
+  pointer-events: none;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
@@ -561,6 +692,21 @@ body {
 
   .content-reveal {
     opacity: 1 !important;
+  }
+
+  .ink-reveal-char,
+  .ink-stroke-char {
+    opacity: 1 !important;
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  .handwriting-pen,
+  .ink-dry-sheen,
+  .ink-cover {
+    display: none !important;
   }
 
   * {

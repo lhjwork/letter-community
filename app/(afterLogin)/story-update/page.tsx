@@ -10,6 +10,8 @@ import { useSession } from "next-auth/react";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import SaveIndicator from "@/components/letter/SaveIndicator";
+import WritingAmbience from "@/components/effects/WritingAmbience";
+import TypingRevealEffect from "@/components/effects/TypingRevealEffect";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -359,6 +361,8 @@ function StoryUpdateContent() {
               {/* Tiptap 에디터 */}
               <div className="relative z-10 mb-20">
                 <EditorContent editor={editor} />
+                <WritingAmbience editor={editor} />
+                <TypingRevealEffect editor={editor} />
               </div>
 
               {/* 편지 마무리 */}
