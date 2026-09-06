@@ -9,6 +9,7 @@ import {
   removeSavedLetter,
   SavedLetter,
 } from "@/lib/saved-letters";
+import { updateUser } from "@/lib/api";
 
 type TabType = "letters" | "stories" | "saved";
 type FilterType = "all" | "sent" | "received";
@@ -41,8 +42,26 @@ interface Story {
 }
 
 export default function MyPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  const handleSaveName = async () => {
+    const name = nameInput.trim();
+    if (!name || !session?.backendToken) return;
+    setSavingName(true);
+    try {
+      await updateUser(session.backendToken, { name });
+      await update({ name });
+      setEditingName(false);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "닉네임 변경에 실패했습니다");
+    } finally {
+      setSavingName(false);
+    }
+  };
   const [activeTab, setActiveTab] = useState<TabType>("letters");
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
@@ -181,25 +200,59 @@ export default function MyPage() {
               </div>
 
               {/* 닉네임 수정 */}
-              <div className="mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between">
-                <span className="text-gray-600">
-                  {session?.user?.name || "닉네임"}
-                </span>
-                <button className="text-gray-600 hover:text-gray-800">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              <div className="mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between gap-2">
+                {editingName ? (
+                  <>
+                    <input
+                      type="text"
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      maxLength={20}
+                      className="flex-1 min-w-0 text-gray-600 border-b border-gray-400 outline-none bg-transparent"
+                      autoFocus
                     />
-                  </svg>
-                </button>
+                    <button
+                      onClick={handleSaveName}
+                      disabled={savingName}
+                      className="text-[#FF9883] font-bold shrink-0 disabled:opacity-50"
+                    >
+                      {savingName ? "저장 중..." : "저장"}
+                    </button>
+                    <button
+                      onClick={() => setEditingName(false)}
+                      className="text-gray-400 shrink-0"
+                    >
+                      취소
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-gray-600">
+                      {session?.user?.name || "닉네임"}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setNameInput(session?.user?.name || "");
+                        setEditingName(true);
+                      }}
+                      className="text-gray-600 hover:text-gray-800"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* 배송정보 관리 */}

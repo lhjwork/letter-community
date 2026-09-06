@@ -37,7 +37,12 @@ export const authConfig = {
     authorized() {
       return true; // 모든 페이지 접근 허용
     },
-    async jwt({ token, account, profile, user }) {
+    async jwt({ token, account, profile, user, trigger, session }) {
+      // 마이페이지에서 닉네임 변경 시 세션 갱신
+      if (trigger === "update" && session?.name) {
+        token.name = session.name;
+        return token;
+      }
       // OAuth 로그인 시 백엔드 API 호출
       if (account && profile) {
         try {
@@ -79,6 +84,7 @@ export const authConfig = {
           // 백엔드에서 받은 토큰과 사용자 정보 저장
           return {
             ...token,
+            name: data.data.user.name, // 백엔드가 생성한 익명 닉네임 사용
             backendToken: data.data.token,
             userId: data.data.user._id,
             provider: account.provider,
