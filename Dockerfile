@@ -8,9 +8,12 @@ RUN pnpm run build
 
 FROM node:20-alpine
 WORKDIR /app
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+ENV NODE_ENV=production
+RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
+COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nextjs /app/public ./public
+USER nextjs
 EXPOSE 3001
 ENV PORT=3001
 CMD ["node", "server.js"]

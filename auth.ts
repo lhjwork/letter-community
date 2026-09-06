@@ -61,11 +61,14 @@ export const authConfig = {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
             },
             body: JSON.stringify({
               provider: account.provider,
               providerId: account.providerAccountId,
               email: email,
+              // 카카오는 is_email_verified 제공, 네이버/인스타는 provider 검증 이메일로 간주
+              emailVerified: (profile as any)?.kakao_account ? (profile as any).kakao_account.is_email_verified === true : Boolean(email),
               name: oauthProfile.name || token.name,
               image: oauthProfile.picture || oauthProfile.profile_image || token.picture,
               accessToken: account.access_token,
@@ -107,7 +110,6 @@ export const authConfig = {
           provider: token.provider as string,
         },
         backendToken: token.backendToken as string,
-        accessToken: token.accessToken as string,
       };
     },
   },
