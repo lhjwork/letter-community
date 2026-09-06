@@ -7,6 +7,9 @@ import ContactSection from "@/components/home/ContactSection";
 import { getBannerSlides } from "@/lib/banner-utils";
 import { getFeaturedStories, type Story } from "@/lib/api";
 
+// 사연 목록이 빌드 시점에 고정되지 않도록 60초마다 재검증 (ISR)
+export const revalidate = 60;
+
 export default async function LandingPage() {
   const bannerSlides = getBannerSlides();
 
