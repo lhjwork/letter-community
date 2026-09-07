@@ -11,16 +11,7 @@ export function useDraftManagement() {
   // JWT 토큰 획득
   const getToken = useCallback((): string | null => {
     // NextAuth 세션에서 백엔드 토큰 가져오기
-    if (session?.backendToken) {
-      return session.backendToken;
-    }
-
-    // localStorage에서 토큰 가져오기 (fallback)
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("authToken");
-    }
-
-    return null;
+    return session?.backendToken ?? null;
   }, [session?.backendToken]);
 
   const handleDeleteDraft = useCallback(

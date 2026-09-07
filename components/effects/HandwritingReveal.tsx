@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import DOMPurify from "isomorphic-dompurify";
 
 interface HandwritingRevealProps {
   html: string;
@@ -128,7 +129,7 @@ export default function HandwritingReveal({
       className={`relative ${className || ""}`}
       style={style}
     >
-      <div ref={contentRef} dangerouslySetInnerHTML={{ __html: html }} />
+      <div ref={contentRef} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
       {showPen && (
         <span ref={penRef} className="handwriting-pen" aria-hidden="true">
           <span className="pen-inner">✍️</span>

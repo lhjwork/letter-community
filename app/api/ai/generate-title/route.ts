@@ -1,6 +1,10 @@
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { z } from "zod";
+import { auth } from "@/auth";
+import { checkRateLimit } from "@/lib/ai/rate-limit";
+
+const RequestSchema = z.object({ content: z.string().max(5000) });
 
 // Disable telemetry for Vercel AI SDK
 process.env.VERCEL_AI_TELEMETRY_OPT_OUT = "1";
@@ -22,8 +26,21 @@ const TITLE_GENERATION_PROMPT = `
 `;
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return Response.json({ error: "로그인이 필요합니다." }, { status: 401 });
+  }
+  const rateLimit = checkRateLimit(session.user.id);
+  if (!rateLimit.allowed) {
+    return Response.json({ error: rateLimit.message }, { status: 429 });
+  }
+
   try {
-    const { content } = await request.json();
+    const parsed = RequestSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return Response.json({ error: "편지 내용이 올바르지 않습니다. (최대 5000자)" }, { status: 400 });
+    }
+    const { content } = parsed.data;
 
     if (!content || content.trim().length === 0) {
       return Response.json({ error: "편지 내용이 필요합니다." }, { status: 400 });

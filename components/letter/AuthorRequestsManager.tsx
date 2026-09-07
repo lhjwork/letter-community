@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,7 @@ interface PhysicalRequest {
 }
 
 export default function AuthorRequestsManager({ letterId, letterStats, authorSettings }: AuthorRequestsManagerProps) {
+  const { data: session } = useSession();
   const [requests, setRequests] = useState<PhysicalRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
@@ -114,9 +116,7 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
     return <Badge className={config.color}>{config.label}</Badge>;
   };
 
-  const getAuthToken = () => {
-    return localStorage.getItem("authToken") || "";
-  };
+  const getAuthToken = () => session?.backendToken || "";
 
   return (
     <Card className="mt-8">

@@ -7,9 +7,6 @@ export async function handleTokenExpiration() {
   // 사용자 친화적 메시지 표시
   if (typeof window !== "undefined") {
     alert("로그인 세션이 만료되었습니다.\n다시 로그인해 주세요.");
-
-    // localStorage에서 토큰 제거
-    localStorage.removeItem("authToken");
   }
 
   // NextAuth 세션 종료 및 메인 페이지로 리다이렉트

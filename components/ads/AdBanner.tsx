@@ -1,4 +1,5 @@
 "use client";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 import { useEffect, useState, useRef } from "react";
 import { adService } from "@/lib/services/adService";
@@ -275,7 +276,7 @@ export default function AdBanner({
             {/* CTA 버튼 */}
             <div className="flex items-center justify-between">
               <a
-                href={ad.content.targetUrl}
+                href={safeHttpUrl(ad.content.targetUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleAdClick(ad, "cta")}

@@ -1,4 +1,5 @@
 "use client";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 import { useEffect, useRef, useState } from "react";
 import { adService } from "@/lib/services/adService";
@@ -78,7 +79,7 @@ export default function AdLandingClient({ ad, letterId, utm }: Props) {
     });
 
     // 광고주 사이트로 이동
-    window.location.href = ad.content.targetUrl;
+    window.location.href = safeHttpUrl(ad.content.targetUrl);
   };
 
   // 테마별 스타일

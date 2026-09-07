@@ -36,7 +36,7 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
   });
 
   const fetchDrafts = async (page = 1) => {
-    const token = session?.backendToken || (typeof window !== "undefined" ? localStorage.getItem("authToken") : null);
+    const token = session?.backendToken;
 
     if (!token) {
       console.error("No auth token available");
@@ -76,7 +76,7 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
   }, [session?.backendToken, filters]);
 
   const handleDeleteDraft = async (draftId: string) => {
-    const token = session?.backendToken || (typeof window !== "undefined" ? localStorage.getItem("authToken") : null);
+    const token = session?.backendToken;
 
     if (!token) {
       alert("로그인이 필요합니다.");
@@ -105,7 +105,7 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
   };
 
   const handlePublishDraft = async (draftId: string) => {
-    const token = session?.backendToken || (typeof window !== "undefined" ? localStorage.getItem("authToken") : null);
+    const token = session?.backendToken;
 
     if (!token) {
       alert("로그인이 필요합니다.");
