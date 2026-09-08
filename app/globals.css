@@ -461,7 +461,6 @@ body {
 .scroll-reveal {
   opacity: 0;
   transform: translateY(24px);
-  will-change: transform, opacity;
 }
 .scroll-reveal.in-view {
   animation: fadeInUpReveal 0.6s ease-out forwards;
@@ -471,7 +470,6 @@ body {
 .line-reveal {
   transform: scaleX(0);
   transform-origin: left;
-  will-change: transform;
 }
 .in-view .line-reveal {
   animation: scaleXReveal 0.4s ease-out forwards;
@@ -480,7 +478,6 @@ body {
 /* Staggered content reveal */
 .content-reveal {
   opacity: 0;
-  will-change: opacity;
 }
 .in-view .content-reveal {
   animation: fadeInReveal 0.5s ease-out forwards;
@@ -489,11 +486,9 @@ body {
 /* Floating decorative elements - GPU accelerated */
 .animate-float-emoji-1 {
   animation: floatEmoji1 7s ease-in-out infinite;
-  will-change: transform;
 }
 .animate-float-emoji-2 {
   animation: floatEmoji2 9s ease-in-out infinite 1s;
-  will-change: transform;
 }
 
 /* Card shimmer on hover */
@@ -581,7 +576,6 @@ body {
   display: inline-block;
   opacity: 0;
   animation: strokeCharIn 0.34s ease-out forwards;
-  will-change: clip-path, transform, opacity;
 }
 
 /* 리빌을 따라다니는 펜 */
