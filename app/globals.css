@@ -530,16 +530,13 @@ body {
 @keyframes inkCharIn {
   0% {
     opacity: 0;
-    filter: blur(3px);
     transform: translateY(2px);
   }
   60% {
     opacity: 0.9;
-    filter: blur(0.5px);
   }
   100% {
     opacity: 1;
-    filter: blur(0);
     transform: translateY(0);
   }
 }
@@ -559,17 +556,14 @@ body {
     opacity: 0;
     clip-path: inset(-10% 110% -10% -10%);
     transform: rotate(-5deg) translateY(2px);
-    filter: blur(2px);
   }
   55% {
     opacity: 1;
-    filter: blur(0.4px);
   }
   100% {
     opacity: 1;
     clip-path: inset(-10% -10% -10% -10%);
     transform: rotate(0deg) translateY(0);
-    filter: blur(0);
   }
 }
 .ink-stroke-char {

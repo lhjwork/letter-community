@@ -3,6 +3,9 @@
 import { useEffect, useRef } from "react";
 import DOMPurify from "isomorphic-dompurify";
 
+/** 이 글자 수를 넘는 부분은 애니메이션 없이 바로 표시. 실기기 보고 조정 */
+const MAX_ANIMATED_CHARS = 1200;
+
 interface HandwritingRevealProps {
   html: string;
   className?: string;
@@ -61,10 +64,13 @@ export default function HandwritingReveal({
         word.className = "ink-word";
         for (const ch of part) {
           const span = document.createElement("span");
-          span.className = "ink-stroke-char";
           span.textContent = ch;
           word.appendChild(span);
-          charSpans.push(span);
+          // 상한 초과 글자는 애니메이션 없이 즉시 표시 (저사양 기기 보호)
+          if (charSpans.length < MAX_ANIMATED_CHARS) {
+            span.className = "ink-stroke-char";
+            charSpans.push(span);
+          }
         }
         frag.appendChild(word);
       }
