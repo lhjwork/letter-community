@@ -15,16 +15,15 @@ export default function FeatureSection() {
         </p>
       </div>
 
-      {/* 모바일은 일러스트(우측)만 보이도록 크롭, sm 이상은 원본 비율 */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[1200/395]">
-        <Image
-          src="/images/sections/main/main-feature-section-img.png"
-          alt="레터를 통해 진심을 공유해보세요"
-          fill
-          className="object-cover object-right sm:object-center"
-          sizes="100vw"
-        />
-      </div>
+      {/* 크롭 없이 원본 비율 유지: 가로 100%, 세로 자동 */}
+      <Image
+        src="/images/sections/main/main-feature-section-img.png"
+        alt="레터를 통해 진심을 공유해보세요"
+        width={2400}
+        height={790}
+        className="w-full h-auto"
+        sizes="100vw"
+      />
 
       {/* Floating decorative envelopes - CSS only */}
       <span
