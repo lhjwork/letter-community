@@ -90,16 +90,17 @@ export default function StoryListSection({ stories }: StoryListSectionProps) {
 
   const [cardsPerPage, setCardsPerPage] = useState(4);
 
+  // iOS Safari는 스크롤로 주소창이 접힐 때마다 resize를 쏘므로, 값이 바뀔 때만 상태 갱신
   useEffect(() => {
-    const update = () => {
-      const newPerPage = getCardsPerPage();
-      setCardsPerPage(newPerPage);
-      setCurrentPage(0);
-    };
+    const update = () => setCardsPerPage(getCardsPerPage());
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [cardsPerPage]);
 
   const totalPages = Math.ceil(totalStories / cardsPerPage);
 
