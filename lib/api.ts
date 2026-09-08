@@ -404,8 +404,10 @@ export async function getFeaturedStories(): Promise<{
   success: boolean;
   data: Story[];
 }> {
+  // 홈은 매 요청 렌더링하되 이 fetch 결과를 60초 캐시 (빌드 시 빈 결과가 굳는 문제 방지)
   return apiRequest("/api/letters/stories/featured", {
     method: "GET",
+    next: { revalidate: 60 },
   });
 }
 
