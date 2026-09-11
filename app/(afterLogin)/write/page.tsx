@@ -114,6 +114,7 @@ function WritePageContent() {
   // 임시저장 관련 상태
   const searchParams = useSearchParams();
   const draftId = searchParams.get("draftId");
+  const replyTo = searchParams.get("replyTo"); // 사연 답장 모드
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(
     draftId || undefined,
   );
@@ -288,6 +289,7 @@ function WritePageContent() {
           ogTitle: title.trim(),
           ogPreviewText,
           isPublic,
+          replyToId: replyTo || undefined,
         },
         token,
       );
@@ -314,8 +316,8 @@ function WritePageContent() {
   const handleShareModalClose = () => {
     setShowShareModal(false);
     setShareData(null);
-    // 편지 작성 완료 후 홈으로 이동
-    router.push("/");
+    // 사연 답장이면 원본 사연으로, 아니면 홈으로 이동
+    router.push(replyTo ? `/letter/${replyTo}` : "/");
   };
 
   // 임시저장 불러오기 핸들러

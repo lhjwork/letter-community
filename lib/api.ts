@@ -160,6 +160,7 @@ export async function createLetter(
     authorName?: string; // 사연용
     category?: string; // 사연용 AI 분류 카테고리
     recipientAddresses?: RecipientAddressInput[]; // 수신자 주소 목록
+    replyToId?: string; // 사연 답장인 경우 원본 사연 ID
     aiMetadata?: {
       confidence: number;
       reason: string;
@@ -183,6 +184,27 @@ export async function createLetter(
     method: "POST",
     token,
     body: JSON.stringify(data),
+  });
+}
+
+export interface StoryReply {
+  _id: string;
+  title: string;
+  ogPreviewText?: string;
+  plainContent?: string;
+  authorName: string;
+  createdAt: string;
+}
+
+/**
+ * 사연에 달린 답장 목록 조회
+ */
+export async function getStoryReplies(
+  storyId: string,
+): Promise<{ data: StoryReply[] }> {
+  return apiRequest(`/api/letters/${storyId}/replies`, {
+    method: "GET",
+    cache: "no-store",
   });
 }
 

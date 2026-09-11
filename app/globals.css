@@ -712,3 +712,26 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
+/* 사연 상세 카드 - 피그마 48px 간격 배경선 */
+.story-lined {
+  line-height: 48px;
+  background-image: repeating-linear-gradient(
+    transparent 0,
+    transparent 47px,
+    #c4c4c4 47px,
+    #c4c4c4 48px
+  );
+  background-attachment: local;
+}
+.story-lined p,
+.story-lined li,
+.story-lined ul,
+.story-lined ol,
+.story-lined blockquote,
+.story-lined h1,
+.story-lined h2,
+.story-lined h3 {
+  line-height: 48px;
+  margin: 0;
+}
