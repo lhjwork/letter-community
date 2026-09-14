@@ -93,6 +93,9 @@ export async function generateMetadata({
 
   // 본문 앞 2줄만 OG 이미지에 표시
   const previewText = (letter.content || "")
+    .replace(/<\/(p|div|br)>|<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter(Boolean)
