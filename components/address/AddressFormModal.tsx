@@ -114,103 +114,103 @@ export default function AddressFormModal({ open, onOpenChange, onSubmit, editAdd
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px] md:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{editAddress ? "배송지 수정" : "배송지 추가"}</DialogTitle>
+          <DialogTitle className="text-3xl text-[#424242] font-normal" style={{ fontFamily: "NanumJangMiCe, cursive" }}>{editAddress ? "배송지 수정" : "배송지 추가"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           {/* 배송지명 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">
-              배송지명 <span className="text-red-500">*</span>
+            <label className="block text-lg font-medium text-[#424242] mb-2">
+              배송지명 <span className="text-[#FF7F65]">*</span>
             </label>
             <input
               type="text"
               value={formData.addressName}
               onChange={(e) => setFormData((prev) => ({ ...prev, addressName: e.target.value }))}
               placeholder="예: 집, 회사"
-              className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
               maxLength={20}
             />
-            {errors.addressName && <p className="text-red-500 text-lg mt-2">{errors.addressName}</p>}
+            {errors.addressName && <p className="text-[#FF7F65] text-sm mt-1">{errors.addressName}</p>}
           </div>
 
           {/* 수령인 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">
-              수령인 <span className="text-red-500">*</span>
+            <label className="block text-lg font-medium text-[#424242] mb-2">
+              수령인 <span className="text-[#FF7F65]">*</span>
             </label>
             <input
               type="text"
               value={formData.recipientName}
               onChange={(e) => setFormData((prev) => ({ ...prev, recipientName: e.target.value }))}
               placeholder="수령인 이름"
-              className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
               maxLength={50}
             />
-            {errors.recipientName && <p className="text-red-500 text-lg mt-2">{errors.recipientName}</p>}
+            {errors.recipientName && <p className="text-[#FF7F65] text-sm mt-1">{errors.recipientName}</p>}
           </div>
 
           {/* 우편번호 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">
-              우편번호 <span className="text-red-500">*</span>
+            <label className="block text-lg font-medium text-[#424242] mb-2">
+              우편번호 <span className="text-[#FF7F65]">*</span>
             </label>
             <div className="flex gap-3">
-              <input type="text" value={formData.zipCode} readOnly placeholder="우편번호" className="flex-1 px-5 py-4 text-xl border border-gray-300 rounded-lg bg-gray-50" />
-              <PostcodeSearch onComplete={handlePostcodeComplete} className="px-6 py-4 text-xl h-auto" />
+              <input type="text" value={formData.zipCode} readOnly placeholder="우편번호" className="flex-1 px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg bg-[#F5F5F5] text-[#424242]" />
+              <PostcodeSearch onComplete={handlePostcodeComplete} className="px-5 py-3 text-lg h-auto border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883]" />
             </div>
-            {errors.zipCode && <p className="text-red-500 text-lg mt-2">{errors.zipCode}</p>}
+            {errors.zipCode && <p className="text-[#FF7F65] text-sm mt-1">{errors.zipCode}</p>}
           </div>
 
           {/* 주소 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">
-              주소 <span className="text-red-500">*</span>
+            <label className="block text-lg font-medium text-[#424242] mb-2">
+              주소 <span className="text-[#FF7F65]">*</span>
             </label>
-            <input type="text" value={formData.address} readOnly placeholder="주소" className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg bg-gray-50" />
-            {errors.address && <p className="text-red-500 text-lg mt-2">{errors.address}</p>}
+            <input type="text" value={formData.address} readOnly placeholder="주소" className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg bg-[#F5F5F5] text-[#424242]" />
+            {errors.address && <p className="text-[#FF7F65] text-sm mt-1">{errors.address}</p>}
           </div>
 
           {/* 상세주소 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">상세주소</label>
+            <label className="block text-lg font-medium text-[#424242] mb-2">상세주소</label>
             <input
               type="text"
               value={formData.addressDetail}
               onChange={(e) => setFormData((prev) => ({ ...prev, addressDetail: e.target.value }))}
               placeholder="상세주소 (동/호수 등)"
-              className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
               maxLength={100}
             />
-            {errors.addressDetail && <p className="text-red-500 text-lg mt-2">{errors.addressDetail}</p>}
+            {errors.addressDetail && <p className="text-[#FF7F65] text-sm mt-1">{errors.addressDetail}</p>}
           </div>
 
           {/* 휴대전화 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">
-              휴대전화 <span className="text-red-500">*</span>
+            <label className="block text-lg font-medium text-[#424242] mb-2">
+              휴대전화 <span className="text-[#FF7F65]">*</span>
             </label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
               placeholder="010-0000-0000"
-              className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
             />
-            {errors.phone && <p className="text-red-500 text-lg mt-2">{errors.phone}</p>}
+            {errors.phone && <p className="text-[#FF7F65] text-sm mt-1">{errors.phone}</p>}
           </div>
 
           {/* 연락처 */}
           <div>
-            <label className="block text-xl font-medium text-gray-700 mb-3">연락처 (선택)</label>
+            <label className="block text-lg font-medium text-[#424242] mb-2">연락처 (선택)</label>
             <input
               type="tel"
               value={formData.tel}
               onChange={(e) => setFormData((prev) => ({ ...prev, tel: e.target.value }))}
               placeholder="02-0000-0000"
-              className="w-full px-5 py-4 text-xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
             />
-            {errors.tel && <p className="text-red-500 text-lg mt-2">{errors.tel}</p>}
+            {errors.tel && <p className="text-[#FF7F65] text-sm mt-1">{errors.tel}</p>}
           </div>
 
           {/* 기본 배송지 설정 */}
@@ -220,18 +220,18 @@ export default function AddressFormModal({ open, onOpenChange, onSubmit, editAdd
               id="isDefault"
               checked={formData.isDefault}
               onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-              className="w-6 h-6 text-pink-500 rounded focus:ring-pink-500"
+              className="w-5 h-5 accent-[#FF9883] rounded"
             />
-            <label htmlFor="isDefault" className="text-xl text-gray-700">
+            <label htmlFor="isDefault" className="text-lg text-[#424242]">
               기본 배송지로 설정
             </label>
           </div>
 
           <DialogFooter className="pt-6">
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="px-8 py-4 text-xl h-auto">
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="px-8 py-3 text-lg h-auto border-2 border-[#C4C4C4] text-[#757575] hover:bg-[#F5F5F5]">
               취소
             </Button>
-            <Button type="submit" disabled={isLoading} className="bg-pink-500 hover:bg-pink-600 px-8 py-4 text-xl h-auto">
+            <Button type="submit" disabled={isLoading} className="bg-[#FF7F65] hover:bg-[#ff6b50] text-white px-8 py-3 text-lg h-auto">
               {isLoading ? "저장 중..." : editAddress ? "수정" : "추가"}
             </Button>
           </DialogFooter>
