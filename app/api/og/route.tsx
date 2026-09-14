@@ -9,7 +9,8 @@ export const runtime = "edge";
  */
 export async function GET(request: NextRequest) {
   const text = (request.nextUrl.searchParams.get("text") || "편지로 마음을 전하는 특별한 공간").slice(0, 120);
-  const iconUrl = `${request.nextUrl.origin}/icons/letter-heart-icon.svg`;
+  // 컨테이너 내부 호스트명이 아닌 공개 URL로 아이콘을 가져와야 함
+  const iconUrl = `${process.env.NEXT_PUBLIC_URL || request.nextUrl.origin}/icons/letter-heart-icon.svg`;
 
   try {
     return new ImageResponse(
