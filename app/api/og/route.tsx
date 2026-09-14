@@ -1,13 +1,16 @@
 import { ImageResponse } from "@vercel/og";
+import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
 /**
- * OG 이미지 - 항상 브랜드 로고 이미지를 반환
- * S3 무료 서비스 종료로 편지별 동적 이미지 대신 고정 로고 사용
- * URL: /api/og (letterId 파라미터 무시)
+ * OG 이미지 - 편지 하트 아이콘 + 본문 미리보기(최대 2줄)
+ * URL: /api/og?text=<본문 앞부분>
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const text = (request.nextUrl.searchParams.get("text") || "편지로 마음을 전하는 특별한 공간").slice(0, 120);
+  const iconUrl = `${request.nextUrl.origin}/icons/letter-heart-icon.svg`;
+
   try {
     return new ImageResponse(
       (
@@ -21,49 +24,37 @@ export async function GET() {
             justifyContent: "center",
             backgroundColor: "#FFF5F5",
             backgroundImage: "linear-gradient(135deg, #FFF5F5 0%, #FFE4E1 100%)",
-            padding: "60px",
+            padding: "80px 120px",
             fontFamily: "sans-serif",
           }}
         >
-          {/* 봉투 아이콘 */}
-          <div
-            style={{
-              fontSize: "140px",
-              marginBottom: "30px",
-            }}
-          >
-            💌
-          </div>
+          {/* 편지 하트 아이콘 */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={iconUrl} width={200} height={180} alt="" style={{ marginBottom: "48px" }} />
 
-          {/* 브랜드 로고 */}
+          {/* 본문 미리보기 (2줄) */}
           <div
             style={{
-              fontSize: "56px",
-              fontWeight: "bold",
-              color: "#FF6B9D",
-              marginBottom: "20px",
-              letterSpacing: "6px",
-            }}
-          >
-            LETTER
-          </div>
-
-          {/* 슬로건 */}
-          <div
-            style={{
-              fontSize: "28px",
-              color: "#999",
+              display: "block",
+              fontSize: "40px",
+              lineHeight: 1.5,
+              color: "#424242",
               textAlign: "center",
+              maxWidth: "960px",
+              lineClamp: 2,
+              overflow: "hidden",
             }}
           >
-            편지로 마음을 전하는 특별한 공간
+            {text}
+          </div>
+
+          {/* 브랜드 */}
+          <div style={{ position: "absolute", bottom: "40px", fontSize: "26px", color: "#FF9883", letterSpacing: "6px" }}>
+            LETTER
           </div>
         </div>
       ),
-      {
-        width: 1200,
-        height: 630,
-      }
+      { width: 1200, height: 630 }
     );
   } catch (error) {
     console.error("OG Image generation error:", error);
