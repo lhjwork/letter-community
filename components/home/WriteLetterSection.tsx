@@ -117,7 +117,7 @@ export default function WriteLetterSection() {
               className="absolute bottom-[40px] sm:bottom-[68px] right-6 sm:right-12 flex items-center gap-2 sm:gap-3 content-reveal"
               style={{ animationDelay: "1.0s" }}
             >
-              <Image src="/icons/envelope-icon-small.png" alt="" width={28} height={24} className="w-5 h-4 sm:w-7 sm:h-6" />
+              <Image src="/icons/letter-heart-icon.svg" alt="" width={30} height={27} className="w-5 h-4 sm:w-7 sm:h-6" />
               <span className="text-base sm:text-xl font-medium text-[#424242]">레터 이용자</span>
             </div>
           </div>
