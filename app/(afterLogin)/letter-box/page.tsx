@@ -287,7 +287,7 @@ function MailboxContent() {
                   setCategory(e.target.value);
                   setStoryPage(1);
                 }}
-                className="appearance-none h-[48px] sm:h-[64px] px-4 sm:px-5 pr-10 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl cursor-pointer focus:outline-none focus:border-[#FF7F65]"
+                className="appearance-none h-[48px] sm:h-[64px] pl-4 sm:pl-5 pr-10 sm:pr-12 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl cursor-pointer focus:outline-none focus:border-[#FF7F65]"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
                 <option value="">카테고리</option>
