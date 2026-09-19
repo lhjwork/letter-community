@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { updateUser } from "@/lib/api";
+import { getCurrentUser, updateUser } from "@/lib/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type TabType = "letters" | "stories";
@@ -59,6 +59,8 @@ export default function MyPage() {
   const router = useRouter();
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
+  const [nameMessage, setNameMessage] = useState<{ text: string; ok: boolean } | null>(null);
+  const [nameUpdatedAt, setNameUpdatedAt] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("letters");
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
@@ -69,15 +71,38 @@ export default function MyPage() {
     setNameInput(session?.user?.name || "");
   }, [session?.user?.name]);
 
+  // 닉네임 마지막 변경일 (한 달에 한 번만 변경 가능)
+  useEffect(() => {
+    const token = session?.backendToken;
+    if (!token) return;
+    getCurrentUser(token)
+      .then((res) => setNameUpdatedAt((res as { data?: { nameUpdatedAt?: string } })?.data?.nameUpdatedAt ?? null))
+      .catch(() => {});
+  }, [session?.backendToken]);
+
   const handleSaveName = async () => {
     const name = nameInput.trim();
-    if (!name || name === session?.user?.name || !session?.backendToken) return;
+    if (!session?.backendToken) return;
+    if (!name) {
+      setNameMessage({ text: "닉네임을 입력해주세요", ok: false });
+      return;
+    }
+    if (name === session.user?.name) {
+      setNameMessage({ text: "지금 닉네임과 같습니다", ok: false });
+      return;
+    }
     setSavingName(true);
+    setNameMessage(null);
     try {
       await updateUser(session.backendToken, { name });
       await update({ name });
+      setNameUpdatedAt(new Date().toISOString());
+      setNameMessage({ text: `닉네임이 "${name}"(으)로 변경되었습니다`, ok: true });
     } catch (e) {
-      alert(e instanceof Error ? e.message : "닉네임 변경에 실패했습니다");
+      setNameMessage({
+        text: e instanceof Error ? e.message : "닉네임 변경에 실패했습니다",
+        ok: false,
+      });
     } finally {
       setSavingName(false);
     }
@@ -158,6 +183,12 @@ export default function MyPage() {
     return null;
   }
 
+  // 닉네임은 마지막 변경일로부터 30일 뒤에 다시 변경 가능
+  const nextNameChangeAt = nameUpdatedAt
+    ? new Date(new Date(nameUpdatedAt).getTime() + 30 * 24 * 60 * 60 * 1000)
+    : null;
+  const nameLocked = !!nextNameChangeAt && nextNameChangeAt > new Date();
+
   const emptyMessage = () => {
     if (activeTab === "stories") return "작성한 사연이 없습니다";
     if (filter === "sent") return "보낸 편지가 없습니다";
@@ -205,33 +236,57 @@ export default function MyPage() {
                     {session?.user?.email || "이메일 없음"}
                   </div>
 
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSaveName();
-                    }}
-                    className="h-16 px-6 border-2 border-[#FF9883] rounded-lg flex items-center gap-2"
-                  >
-                    <input
-                      type="text"
-                      value={nameInput}
-                      onChange={(e) => setNameInput(e.target.value)}
-                      maxLength={20}
-                      placeholder="닉네임을 입력해주세요"
-                      className="flex-1 min-w-0 bg-transparent outline-none text-xl text-[#757575] placeholder-[#C4C4C4]"
-                      style={{ fontFamily: "Pretendard, sans-serif" }}
-                    />
-                    <button
-                      type="submit"
-                      disabled={savingName}
-                      className="shrink-0 text-[#FF7F65] disabled:opacity-40"
-                      aria-label="닉네임 저장"
+                  <div>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSaveName();
+                      }}
+                      className={`h-16 px-6 border-2 rounded-lg flex items-center gap-2 ${
+                        nameLocked ? "border-[#C4C4C4] bg-[#F9F9F9]" : "border-[#FF9883]"
+                      }`}
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </button>
-                  </form>
+                      <input
+                        type="text"
+                        value={nameInput}
+                        onChange={(e) => {
+                          setNameInput(e.target.value);
+                          setNameMessage(null);
+                        }}
+                        maxLength={20}
+                        disabled={nameLocked || savingName}
+                        placeholder="닉네임을 입력해주세요"
+                        className="flex-1 min-w-0 bg-transparent outline-none text-xl text-[#757575] placeholder-[#C4C4C4] disabled:cursor-not-allowed"
+                        style={{ fontFamily: "Pretendard, sans-serif" }}
+                      />
+                      <button
+                        type="submit"
+                        disabled={nameLocked || savingName}
+                        className="shrink-0 text-[#FF7F65] disabled:text-[#C4C4C4]"
+                        aria-label="닉네임 저장"
+                      >
+                        {savingName ? (
+                          <span className="block w-6 h-6 border-2 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    </form>
+                    <p
+                      className={`mt-2 px-1 text-sm ${
+                        nameMessage ? (nameMessage.ok ? "text-[#FF7F65]" : "text-[#E5484D]") : "text-[#C4C4C4]"
+                      }`}
+                      style={{ fontFamily: "Pretendard, sans-serif" }}
+                    >
+                      {nameMessage
+                        ? nameMessage.text
+                        : nameLocked
+                          ? `닉네임은 한 달에 한 번만 변경할 수 있어요 (${nextNameChangeAt!.toLocaleDateString("ko-KR")}부터 가능)`
+                          : "닉네임은 한 달에 한 번만 변경할 수 있어요. 변경하려면 체크를 눌러주세요"}
+                    </p>
+                  </div>
 
                   <Link
                     href="/letter-box/addresses"
