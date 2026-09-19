@@ -209,7 +209,7 @@ function MailboxContent() {
               }}
             >
               <SelectTrigger
-                className="h-[48px] sm:h-[64px] min-w-[140px] sm:min-w-[160px] pl-4 sm:pl-5 pr-3 sm:pr-4 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl shadow-none data-[placeholder]:text-[#424242] data-[state=open]:border-[#FF7F65] focus-visible:border-[#FF7F65] focus-visible:ring-0 [&_svg]:size-5 [&_svg]:text-[#757575] [&_svg]:opacity-100"
+                className="!h-[48px] sm:!h-[64px] min-w-[140px] sm:min-w-[160px] pl-4 sm:pl-5 pr-3 sm:pr-4 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl shadow-none data-[placeholder]:text-[#424242] data-[state=open]:border-[#FF7F65] focus-visible:border-[#FF7F65] focus-visible:ring-0 [&_svg]:size-5 [&_svg]:text-[#757575] [&_svg]:opacity-100"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
                 <SelectValue />
