@@ -4,15 +4,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import {
-  getSavedLetters,
-  removeSavedLetter,
-  SavedLetter,
-} from "@/lib/saved-letters";
 import { updateUser } from "@/lib/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type TabType = "letters" | "stories" | "saved";
+type TabType = "letters" | "stories";
 type FilterType = "all" | "sent" | "received";
 
 interface Letter {
@@ -51,7 +46,6 @@ const FILTERS: { value: FilterType; label: string }[] = [
 const TABS: { value: TabType; label: string }[] = [
   { value: "letters", label: "나의 편지" },
   { value: "stories", label: "나의 사연" },
-  { value: "saved", label: "보관한 편지" },
 ];
 
 // Figma: 512x546 패널 안 464x104 편지 카드
@@ -69,7 +63,6 @@ export default function MyPage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
-  const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -134,17 +127,11 @@ export default function MyPage() {
 
   // 편지/사연 목록 가져오기 Effect
   useEffect(() => {
-    if (session) {
-      if (activeTab === "letters") {
-        fetchLetters();
-      } else if (activeTab === "stories") {
-        fetchStories();
-      } else if (activeTab === "saved") {
-        setSavedLetters(getSavedLetters());
-      }
-    } else if (activeTab === "saved") {
-      // 보관한 편지는 로그인 없이도 조회 가능
-      setSavedLetters(getSavedLetters());
+    if (!session) return;
+    if (activeTab === "letters") {
+      fetchLetters();
+    } else {
+      fetchStories();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, session]);
@@ -172,7 +159,6 @@ export default function MyPage() {
   }
 
   const emptyMessage = () => {
-    if (activeTab === "saved") return "보관한 편지가 없습니다";
     if (activeTab === "stories") return "작성한 사연이 없습니다";
     if (filter === "sent") return "보낸 편지가 없습니다";
     if (filter === "received") return "받은 편지가 없습니다";
@@ -348,37 +334,6 @@ export default function MyPage() {
                         </Link>
                       );
                     })}
-                  </div>
-                ) : (
-                  <p className="text-center text-[#C4C4C4] py-12">{emptyMessage()}</p>
-                )
-              ) : activeTab === "saved" ? (
-                savedLetters.length > 0 ? (
-                  <div className="space-y-4">
-                    {savedLetters.map((saved) => (
-                      <div key={saved.letterId} className={cardClass}>
-                        <Link href={`/letter/${saved.letterId}`} className="block">
-                          <h3 className="text-xl font-medium text-[#424242]">{saved.title}</h3>
-                          <p className="mt-1 text-sm text-[#757575] line-clamp-1">
-                            {saved.contentPreview}
-                          </p>
-                        </Link>
-                        <div className="mt-1 flex items-center justify-between">
-                          <button
-                            onClick={() => {
-                              removeSavedLetter(saved.letterId);
-                              setSavedLetters(getSavedLetters());
-                            }}
-                            className="text-sm text-[#C4C4C4] hover:text-[#FF7F65] transition-colors"
-                          >
-                            보관 해제
-                          </button>
-                          <span className="text-sm text-[#757575]">
-                            {new Date(saved.savedAt).toLocaleDateString("ko-KR")} 보관
-                          </span>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 ) : (
                   <p className="text-center text-[#C4C4C4] py-12">{emptyMessage()}</p>
