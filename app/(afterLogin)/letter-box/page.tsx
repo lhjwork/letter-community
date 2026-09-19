@@ -7,6 +7,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { getMyLetters, getMyStories, type Letter, type Story, type Pagination } from "@/lib/api";
 import { HeroBanner } from "@/components/home";
+import MailCard from "@/components/shareds/MailCard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const CATEGORIES = ["카테고리", "가족", "사랑", "우정", "성장", "위로", "추억", "감사", "기타"];
 
 function MailboxContent() {
   const { data: session, status } = useSession();
@@ -160,89 +164,6 @@ function MailboxContent() {
     );
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}.${m}.${d}`;
-  };
-
-  // Masonry height pattern: 3 sizes for visual variety
-  const getCardHeight = (index: number) => {
-    const pattern = [280, 360, 280, 440, 360, 280, 440, 280, 360, 280, 360, 440];
-    return pattern[index % pattern.length];
-  };
-
-  // Generate horizontal line positions based on card height
-  const getLinePositions = (height: number) => {
-    const lines = [];
-    for (let y = 48; y < height - 20; y += 48) {
-      lines.push(y);
-    }
-    return lines;
-  };
-
-  // Calculate max text lines based on card height
-  const getMaxLines = (height: number) => {
-    if (height >= 440) return 10;
-    if (height >= 360) return 7;
-    return 4;
-  };
-
-  const renderMailboxCard = (item: { _id: string; title?: string; content?: string; authorName?: string; createdAt: string }, index: number) => {
-    const cardHeight = getCardHeight(index);
-    const lines = getLinePositions(cardHeight);
-    const maxLines = getMaxLines(cardHeight);
-
-    return (
-      <Link href={`/letter/${item._id}`} key={item._id} className="block w-full break-inside-avoid mb-4 sm:mb-5">
-        <div
-          className="bg-[#FEFEFE] border border-[#C4C4C4] rounded-xl w-full relative cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] overflow-hidden"
-          style={{ height: `${cardHeight}px` }}
-        >
-          {/* Horizontal lines */}
-          {lines.map((lineY) => (
-            <div
-              key={lineY}
-              className="absolute left-0 right-0 h-0.5 bg-[#EDEDED]"
-              style={{ top: `${lineY}px` }}
-            />
-          ))}
-
-          {/* Envelope icon - top left */}
-          <div className="absolute top-3.5 left-3">
-            <Image src="/icons/envelope-icon.png" alt="" width={28} height={24} className="w-7 h-6" />
-          </div>
-
-          {/* Date - top right */}
-          <div className="absolute top-4 right-3 sm:right-4">
-            <span className="text-[16px] sm:text-[18px] text-[#424242] font-['Pretendard']">
-              {formatDate(item.createdAt)}
-            </span>
-          </div>
-
-          {/* Title/Content preview */}
-          <div className="absolute top-14 left-4 right-4 sm:left-5 sm:right-5 bottom-14">
-            <p
-              className="text-[15px] sm:text-[16px] text-[#424242] leading-relaxed font-['Pretendard'] overflow-hidden"
-              style={{ display: "-webkit-box", WebkitLineClamp: maxLines, WebkitBoxOrient: "vertical" }}
-            >
-              {item.title || (item.content ? item.content.replace(/<[^>]*>/g, "").substring(0, 200) : "")}
-            </p>
-          </div>
-
-          {/* Author - bottom right */}
-          <div className="absolute bottom-4 right-3 sm:right-4">
-            <span className="text-[18px] sm:text-[20px] font-medium text-[#424242] font-['Pretendard']">
-              {item.authorName || "익명"}
-            </span>
-          </div>
-        </div>
-      </Link>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#FEFEFE]">
       {/* Banner */}
@@ -280,35 +201,36 @@ function MailboxContent() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
           {/* Category dropdown - only for stories tab */}
           {activeTab === "stories" && (
-            <div className="relative">
-              <select
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  setStoryPage(1);
-                }}
-                className="appearance-none h-[48px] sm:h-[64px] pl-4 sm:pl-5 pr-10 sm:pr-12 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl cursor-pointer focus:outline-none focus:border-[#FF7F65]"
+            <Select
+              value={category || "all"}
+              onValueChange={(v) => {
+                setCategory(v === "all" ? "" : v);
+                setStoryPage(1);
+              }}
+            >
+              <SelectTrigger
+                className="h-[48px] sm:h-[64px] min-w-[140px] sm:min-w-[160px] pl-4 sm:pl-5 pr-3 sm:pr-4 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl shadow-none data-[placeholder]:text-[#424242] data-[state=open]:border-[#FF7F65] focus-visible:border-[#FF7F65] focus-visible:ring-0 [&_svg]:size-5 [&_svg]:text-[#757575] [&_svg]:opacity-100"
                 style={{ fontFamily: "Pretendard, sans-serif" }}
               >
-                <option value="">카테고리</option>
-                <option value="가족">가족</option>
-                <option value="사랑">사랑</option>
-                <option value="우정">우정</option>
-                <option value="성장">성장</option>
-                <option value="위로">위로</option>
-                <option value="추억">추억</option>
-                <option value="감사">감사</option>
-                <option value="기타">기타</option>
-              </select>
-              <svg
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#757575] pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                sideOffset={6}
+                className="rounded-xl border-2 border-[#FFD1C7] bg-white shadow-[0_8px_24px_rgba(255,152,131,0.18)]"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+                {CATEGORIES.map((c) => (
+                  <SelectItem
+                    key={c}
+                    value={c === "카테고리" ? "all" : c}
+                    className="h-11 sm:h-12 pl-4 pr-10 rounded-lg text-base sm:text-lg text-[#424242] cursor-pointer focus:bg-[#FFF1EE] focus:text-[#FF7F65] data-[state=checked]:text-[#FF7F65] [&_svg]:text-[#FF7F65]"
+                    style={{ fontFamily: "Pretendard, sans-serif" }}
+                  >
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
 
           {/* Search field */}
@@ -364,7 +286,9 @@ function MailboxContent() {
               </div>
             ) : (
               <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-5">
-                {letters.map((letter, index) => renderMailboxCard(letter, index))}
+                {letters.map((letter, index) => (
+                  <MailCard key={letter._id} item={letter} index={index} />
+                ))}
               </div>
             )}
             {renderPagination()}
@@ -389,15 +313,9 @@ function MailboxContent() {
               </div>
             ) : (
               <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-5">
-                {stories.map((story, index) =>
-                  renderMailboxCard({
-                    _id: story._id,
-                    title: story.title,
-                    content: story.content,
-                    authorName: story.authorName,
-                    createdAt: story.createdAt,
-                  }, index)
-                )}
+                {stories.map((story, index) => (
+                  <MailCard key={story._id} item={story} index={index} />
+                ))}
               </div>
             )}
             {renderPagination()}

@@ -1,179 +1,173 @@
 "use client";
 
-import { Suspense, useCallback } from "react";
+import { Suspense, useCallback, useState, useEffect } from "react";
 import Link from "next/link";
 import { useInfiniteStories } from "@/hooks/useStories";
 import { useStoriesFilter } from "@/hooks/useStoriesFilter";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import {
-  CategoryFilter,
-  SearchBar,
-  SortSelect,
-  StoryCard,
-  EmptyState,
-} from "@/components/stories";
-// import { DailyPrompt } from "@/components/ai/DailyPrompt";
-import AdCarousel from "@/components/ads/AdCarousel";
+import { EmptyState } from "@/components/stories";
+import MailCard from "@/components/shareds/MailCard";
+import { HeroBanner } from "@/components/home";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { SortOption } from "@/lib/api";
 
-function StoriesContent() {
-  const { search, sort, category, updateFilter, resetFilter } =
-    useStoriesFilter();
-  const {
-    stories,
-    pagination,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useInfiniteStories({ search, sort, category, limit: 20 });
+const CATEGORIES = ["카테고리", "가족", "사랑", "우정", "성장", "위로", "추억", "감사", "기타"];
+const SORTS: { value: SortOption; label: string }[] = [
+  { value: "latest", label: "최신순" },
+  { value: "popular", label: "인기순" },
+];
 
-  // 다음 페이지 로드 함수
+const bannerSlides = [{ id: 1, image: "/images/mainbanner/banner-1.png", alt: "배너 1" }];
+
+const selectTriggerClass =
+  "h-[48px] sm:h-[64px] min-w-[140px] sm:min-w-[160px] pl-4 sm:pl-5 pr-3 sm:pr-4 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#424242] text-base sm:text-xl shadow-none data-[placeholder]:text-[#424242] data-[state=open]:border-[#FF7F65] focus-visible:border-[#FF7F65] focus-visible:ring-0 [&_svg]:size-5 [&_svg]:text-[#757575] [&_svg]:opacity-100";
+const selectContentClass =
+  "rounded-xl border-2 border-[#FFD1C7] bg-white shadow-[0_8px_24px_rgba(255,152,131,0.18)]";
+const selectItemClass =
+  "h-11 sm:h-12 pl-4 pr-10 rounded-lg text-base sm:text-lg text-[#424242] cursor-pointer focus:bg-[#FFF1EE] focus:text-[#FF7F65] data-[state=checked]:text-[#FF7F65] [&_svg]:text-[#FF7F65]";
+
+function StoriesContent() {
+  const { search, sort, category, updateFilter, resetFilter } = useStoriesFilter();
+  const { stories, pagination, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useInfiniteStories({ search, sort, category, limit: 20 });
+
+  // 검색어는 제출 시에만 URL에 반영
+  const [searchInput, setSearchInput] = useState(search);
+  useEffect(() => setSearchInput(search), [search]);
+
   const loadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Intersection Observer로 스크롤 감지
   const { ref: loadMoreRef } = useIntersectionObserver({
     onIntersect: loadMore,
     rootMargin: "200px",
   });
 
-  const total = pagination?.total || 0;
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 캐러셀 영역 (더미) */}
-      <section className="bg-white py-8 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <div className="bg-gray-100 rounded-lg h-48 md:h-64 flex items-center justify-center mb-6">
-            <p className="text-gray-400 text-lg">캐러셀 영역 (추후 구현)</p>
-          </div>
+    <div className="min-h-screen bg-[#FEFEFE]">
+      {/* Banner */}
+      <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
+        <HeroBanner bannerSlides={bannerSlides} />
+      </div>
 
-          {/* 상단 캐러셀 광고 */}
-          <AdCarousel
-            placement="banner"
-            limit={3}
-            aspectRatio="21:9"
-            autoPlay={true}
-            autoPlayInterval={6000}
-            showControls={true}
-            showIndicators={true}
-            className="mb-4"
-            showDebugInfo={process.env.NODE_ENV === "development"}
-          />
+      <main className="container mx-auto px-4 sm:px-8 lg:px-20 pb-16">
+        {/* Title */}
+        <div className="border-y border-[#C4C4C4] py-3 sm:py-4 mb-8 sm:mb-10">
+          <h1
+            className="text-2xl sm:text-4xl lg:text-[48px] text-[#757575]"
+            style={{ fontFamily: "NanumJangMiCe, cursive" }}
+          >
+            사연 목록
+          </h1>
         </div>
-      </section>
 
-      {/* 오늘의 감정 질문 - AI API 비활성화로 주석 처리
-      <section className="bg-white py-6 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <DailyPrompt />
-        </div>
-      </section>
-      */}
+        {/* Controls row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+          <Select
+            value={category || "all"}
+            onValueChange={(v) => updateFilter({ category: v === "all" ? "" : v })}
+          >
+            <SelectTrigger className={selectTriggerClass} style={{ fontFamily: "Pretendard, sans-serif" }}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper" sideOffset={6} className={selectContentClass}>
+              {CATEGORIES.map((c) => (
+                <SelectItem
+                  key={c}
+                  value={c === "카테고리" ? "all" : c}
+                  className={selectItemClass}
+                  style={{ fontFamily: "Pretendard, sans-serif" }}
+                >
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      {/* 검색 및 필터 섹션 */}
-      <section className="bg-white py-6 border-b sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          {/* 검색바 */}
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-4">
-            <div className="flex-1 max-w-md w-full">
-              <SearchBar
-                value={search}
-                onChange={(value) => updateFilter({ search: value })}
+          {/* Search field */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateFilter({ search: searchInput });
+            }}
+            className="flex-1 max-w-[360px]"
+          >
+            <div className="relative">
+              <svg
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C4C4C4]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="검색"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full h-[48px] sm:h-[64px] pl-12 pr-4 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl text-[#424242] placeholder-[#C4C4C4] focus:outline-none focus:border-[#FF7F65]"
+                style={{ fontFamily: "Pretendard, sans-serif" }}
               />
             </div>
+          </form>
 
-            {/* 사연 작성 버튼 */}
-            <Link
-              href="/write"
-              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
-              style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            >
-              사연 작성
-            </Link>
-          </div>
+          <Select value={sort} onValueChange={(v) => updateFilter({ sort: v })}>
+            <SelectTrigger className={selectTriggerClass} style={{ fontFamily: "Pretendard, sans-serif" }}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper" sideOffset={6} className={selectContentClass}>
+              {SORTS.map((s) => (
+                <SelectItem
+                  key={s.value}
+                  value={s.value}
+                  className={selectItemClass}
+                  style={{ fontFamily: "Pretendard, sans-serif" }}
+                >
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          {/* 카테고리 필터 버튼 */}
-          <CategoryFilter
-            selected={category}
-            onChange={(value) => updateFilter({ category: value })}
-          />
-
-          {/* 결과 수 & 정렬 */}
-          <div className="flex justify-between items-center mt-4">
-            <span className="text-gray-600">
-              총 <span className="font-semibold text-primary">{total}</span>개의
-              사연
-            </span>
-            <SortSelect
-              value={sort as SortOption}
-              onChange={(value) => updateFilter({ sort: value })}
-            />
-          </div>
+          <Link
+            href="/story-update"
+            className="h-[48px] sm:h-[64px] px-5 sm:px-6 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl font-medium text-[#424242] flex items-center justify-center hover:bg-[#F5F5F5] transition-colors whitespace-nowrap sm:ml-auto"
+            style={{ fontFamily: "Pretendard, sans-serif" }}
+          >
+            사연 작성
+          </Link>
         </div>
-      </section>
 
-      {/* Masonry 그리드 레이아웃 */}
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                <p className="text-gray-400">로딩 중...</p>
-              </div>
+        {/* Cards */}
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="w-10 h-10 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : stories.length === 0 ? (
+          <EmptyState onReset={resetFilter} />
+        ) : (
+          <>
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-5">
+              {stories.map((story, index) => (
+                <MailCard key={story._id} item={story} index={index} />
+              ))}
             </div>
-          ) : stories.length === 0 ? (
-            <EmptyState onReset={resetFilter} />
-          ) : (
-            <>
-              <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-                {stories.map((story, index) => (
-                  <div key={story._id} className="break-inside-avoid mb-4">
-                    <StoryCard story={story} />
 
-                    {/* 중간 캐러셀 광고 삽입 (20번째마다) */}
-                    {(index + 1) % 20 === 0 && (
-                      <div className="mb-4 col-span-full">
-                        <AdCarousel
-                          placement="banner"
-                          limit={2}
-                          aspectRatio="16:9"
-                          autoPlay={true}
-                          autoPlayInterval={7000}
-                          showControls={false}
-                          showIndicators={true}
-                          showDebugInfo={process.env.NODE_ENV === "development"}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* 인피니티 스크롤 트리거 */}
-              <div ref={loadMoreRef} className="py-8 flex justify-center">
-                {isFetchingNextPage ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    <span className="text-gray-400">로딩 중...</span>
-                  </div>
-                ) : hasNextPage ? (
-                  <span className="text-gray-400">스크롤하여 더 보기</span>
-                ) : (
-                  <span className="text-gray-400">
-                    모든 사연을 불러왔습니다 ✓
-                  </span>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </section>
+            {/* 인피니티 스크롤 트리거 */}
+            <div ref={loadMoreRef} className="py-8 flex justify-center">
+              {isFetchingNextPage ? (
+                <div className="w-8 h-8 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
+              ) : hasNextPage ? (
+                <span className="text-[#C4C4C4]">스크롤하여 더 보기</span>
+              ) : (
+                <span className="text-[#C4C4C4]">총 {pagination?.total ?? stories.length}개의 사연</span>
+              )}
+            </div>
+          </>
+        )}
+      </main>
     </div>
   );
 }
@@ -182,11 +176,8 @@ export default function StoriesPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-gray-400">로딩 중...</p>
-          </div>
+        <div className="min-h-screen bg-[#FEFEFE] flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
