@@ -10,6 +10,7 @@ import {
   SavedLetter,
 } from "@/lib/saved-letters";
 import { updateUser } from "@/lib/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type TabType = "letters" | "stories" | "saved";
 type FilterType = "all" | "sent" | "received";
@@ -41,33 +42,53 @@ interface Story {
   updatedAt: string;
 }
 
+const FILTERS: { value: FilterType; label: string }[] = [
+  { value: "all", label: "전체" },
+  { value: "sent", label: "보낸 편지" },
+  { value: "received", label: "받은 편지" },
+];
+
+const TABS: { value: TabType; label: string }[] = [
+  { value: "letters", label: "나의 편지" },
+  { value: "stories", label: "나의 사연" },
+  { value: "saved", label: "보관한 편지" },
+];
+
+// Figma: 512x546 패널 안 464x104 편지 카드
+const cardClass =
+  "block border-2 border-[#C4C4C4] rounded-xl px-5 py-4 hover:bg-[#F9F9F9] transition-colors";
+const panelClass = "bg-white rounded-lg border-2 border-[#EDEDED]";
+const headingClass = "text-2xl sm:text-4xl lg:text-[48px] leading-tight transition-colors";
+
 export default function MyPage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
-  const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
-
-  const handleSaveName = async () => {
-    const name = nameInput.trim();
-    if (!name || !session?.backendToken) return;
-    setSavingName(true);
-    try {
-      await updateUser(session.backendToken, { name });
-      await update({ name });
-      setEditingName(false);
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "닉네임 변경에 실패했습니다");
-    } finally {
-      setSavingName(false);
-    }
-  };
   const [activeTab, setActiveTab] = useState<TabType>("letters");
   const [filter, setFilter] = useState<FilterType>("all");
   const [letters, setLetters] = useState<Letter[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
   const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setNameInput(session?.user?.name || "");
+  }, [session?.user?.name]);
+
+  const handleSaveName = async () => {
+    const name = nameInput.trim();
+    if (!name || name === session?.user?.name || !session?.backendToken) return;
+    setSavingName(true);
+    try {
+      await updateUser(session.backendToken, { name });
+      await update({ name });
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "닉네임 변경에 실패했습니다");
+    } finally {
+      setSavingName(false);
+    }
+  };
 
   // 편지 목록 가져오기 함수
   const fetchLetters = async () => {
@@ -139,11 +160,8 @@ export default function MyPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">로딩 중...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#FEFEFE]">
+        <div className="w-12 h-12 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -153,383 +171,242 @@ export default function MyPage() {
     return null;
   }
 
+  const emptyMessage = () => {
+    if (activeTab === "saved") return "보관한 편지가 없습니다";
+    if (activeTab === "stories") return "작성한 사연이 없습니다";
+    if (filter === "sent") return "보낸 편지가 없습니다";
+    if (filter === "received") return "받은 편지가 없습니다";
+    return "작성한 편지가 없습니다";
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 메인 컨텐츠 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+    <div className="min-h-screen bg-[#FEFEFE]">
+      <main className="container mx-auto px-4 sm:px-8 lg:px-10 py-6 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[648fr_512fr] gap-6 lg:gap-[11px]">
           {/* 왼쪽: 내 프로필 */}
-          <div className="lg:col-span-1">
+          <section>
             <h2
-              className="text-2xl sm:text-4xl font-bold text-gray-600 mb-4 sm:mb-8"
+              className={`${headingClass} text-[#757575] mb-4 sm:mb-6`}
               style={{ fontFamily: "NanumJangMiCe, cursive" }}
             >
               내 프로필
             </h2>
 
-            <div className="bg-white rounded-lg border-2 border-gray-200 p-4 sm:p-8">
-              {/* 프로필 이미지 */}
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-gray-400 flex items-center justify-center">
-                    <span className="text-4xl sm:text-6xl">👤</span>
+            <div className={`${panelClass} p-5 sm:p-6`}>
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
+                {/* 프로필 이미지 */}
+                <div className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] shrink-0 mx-auto sm:mx-0">
+                  <div className="w-full h-full rounded-full bg-[#C4C4C4] flex items-center justify-center">
+                    <span className="text-5xl sm:text-6xl">👤</span>
                   </div>
-                  <button className="absolute bottom-0 right-0 w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
-                    <svg
-                      className="w-6 h-6 text-gray-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
+                  <button
+                    type="button"
+                    className="absolute bottom-0 right-0 w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] bg-white border-2 border-[#C4C4C4] rounded-full flex items-center justify-center text-[#757575] hover:bg-[#F9F9F9] transition-colors"
+                    aria-label="프로필 사진 변경"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
                 </div>
-              </div>
 
-              {/* 이메일 */}
-              <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-                <p className="text-gray-600 text-center">
-                  {session?.user?.email || "이메일 없음"}
-                </p>
-              </div>
+                {/* 이메일 / 닉네임 / 배송정보 */}
+                <div className="flex-1 flex flex-col gap-5">
+                  <div
+                    className="h-16 px-3 bg-[#F9F9F9] rounded-lg flex items-center text-xl text-[#757575] truncate"
+                    style={{ fontFamily: "Pretendard, sans-serif" }}
+                  >
+                    {session?.user?.email || "이메일 없음"}
+                  </div>
 
-              {/* 닉네임 수정 */}
-              <div className="mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between gap-2">
-                {editingName ? (
-                  <>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSaveName();
+                    }}
+                    className="h-16 px-6 border-2 border-[#FF9883] rounded-lg flex items-center gap-2"
+                  >
                     <input
                       type="text"
                       value={nameInput}
                       onChange={(e) => setNameInput(e.target.value)}
                       maxLength={20}
-                      className="flex-1 min-w-0 text-gray-600 border-b border-gray-400 outline-none bg-transparent"
-                      autoFocus
+                      placeholder="닉네임을 입력해주세요"
+                      className="flex-1 min-w-0 bg-transparent outline-none text-xl text-[#757575] placeholder-[#C4C4C4]"
+                      style={{ fontFamily: "Pretendard, sans-serif" }}
                     />
                     <button
-                      onClick={handleSaveName}
+                      type="submit"
                       disabled={savingName}
-                      className="text-[#FF9883] font-bold shrink-0 disabled:opacity-50"
+                      className="shrink-0 text-[#FF7F65] disabled:opacity-40"
+                      aria-label="닉네임 저장"
                     >
-                      {savingName ? "저장 중..." : "저장"}
-                    </button>
-                    <button
-                      onClick={() => setEditingName(false)}
-                      className="text-gray-400 shrink-0"
-                    >
-                      취소
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-gray-600">
-                      {session?.user?.name || "닉네임"}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setNameInput(session?.user?.name || "");
-                        setEditingName(true);
-                      }}
-                      className="text-gray-600 hover:text-gray-800"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </button>
-                  </>
-                )}
-              </div>
+                  </form>
 
-              {/* 배송정보 관리 */}
-              <Link
-                href="/letter-box/addresses"
-                className="mb-4 p-4 border-2 border-gray-400 rounded-lg flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-gray-600">배송정보 관리</span>
-                <svg
-                  className="w-5 h-5 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
+                  <Link
+                    href="/letter-box/addresses"
+                    className="h-16 px-6 border-2 border-[#C4C4C4] rounded-lg flex items-center justify-between text-xl text-[#757575] hover:bg-[#F9F9F9] transition-colors"
+                    style={{ fontFamily: "Pretendard, sans-serif" }}
+                  >
+                    배송정보 관리
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
 
               {/* 연동정보 */}
               <div className="mt-8">
-                <h3 className="text-lg font-medium text-gray-800 mb-4">
+                <h3
+                  className="text-xl font-medium text-[#424242] mb-6"
+                  style={{ fontFamily: "Pretendard, sans-serif" }}
+                >
                   연동정보
                 </h3>
-                <div className="p-6 bg-gray-100 rounded-lg">
-                  <p className="text-sm text-gray-600 text-center">
-                    연동된 계정이 없습니다
-                  </p>
+                <div className="h-[168px] bg-[#F9F9F9] rounded-lg flex items-center justify-center">
+                  <p className="text-[#757575]">연동된 계정이 없습니다</p>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 오른쪽: 나의 편지/사연 */}
-          <div className="lg:col-span-2">
-            {/* 탭과 필터 */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-8 gap-4">
-              {/* 탭 */}
-              <div className="flex gap-4 sm:gap-8 overflow-x-auto w-full sm:w-auto">
-                <button
-                  onClick={() => setActiveTab("letters")}
-                  className="relative shrink-0"
-                >
-                  <h2
-                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
-                      activeTab === "letters"
-                        ? "text-gray-600"
-                        : "text-gray-200"
+          {/* 오른쪽: 나의 편지 / 사연 */}
+          <section>
+            <div className="flex items-center justify-between gap-4 mb-4 sm:mb-6">
+              <div className="flex gap-4 sm:gap-6 overflow-x-auto">
+                {TABS.map((tab) => (
+                  <button
+                    key={tab.value}
+                    onClick={() => setActiveTab(tab.value)}
+                    className={`${headingClass} shrink-0 ${
+                      activeTab === tab.value
+                        ? "text-[#757575]"
+                        : "text-[#EDEDED] hover:text-[#C4C4C4]"
                     }`}
                     style={{ fontFamily: "NanumJangMiCe, cursive" }}
                   >
-                    나의 편지
-                  </h2>
-                  {activeTab === "letters" && (
-                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab("stories")}
-                  className="relative shrink-0"
-                >
-                  <h2
-                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
-                      activeTab === "stories"
-                        ? "text-gray-600"
-                        : "text-gray-200"
-                    }`}
-                    style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                  >
-                    나의 사연
-                  </h2>
-                  {activeTab === "stories" && (
-                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab("saved")}
-                  className="relative shrink-0"
-                >
-                  <h2
-                    className={`text-xl sm:text-3xl lg:text-4xl font-bold transition-colors ${
-                      activeTab === "saved" ? "text-gray-600" : "text-gray-200"
-                    }`}
-                    style={{ fontFamily: "NanumJangMiCe, cursive" }}
-                  >
-                    보관한 편지
-                  </h2>
-                  {activeTab === "saved" && (
-                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gray-600"></div>
-                  )}
-                </button>
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              {/* Select 필터 - 나의 편지 탭일 때만 표시 */}
               {activeTab === "letters" && (
-                <div className="relative">
-                  <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value as FilterType)}
-                    className="pl-4 pr-10 py-2 border-2 border-gray-400 rounded-lg text-gray-600 bg-white hover:bg-gray-50 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300 appearance-none"
+                <Select value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
+                  <SelectTrigger
+                    className="!h-12 w-[140px] shrink-0 px-4 border-2 border-[#C4C4C4] rounded-lg bg-white text-[#757575] text-xl shadow-none data-[state=open]:border-[#FF7F65] focus-visible:border-[#FF7F65] focus-visible:ring-0 [&_svg]:size-6 [&_svg]:text-[#757575] [&_svg]:opacity-100"
+                    style={{ fontFamily: "Pretendard, sans-serif" }}
                   >
-                    <option value="all">전체</option>
-                    <option value="sent">보낸 편지</option>
-                    <option value="received">받은 편지</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <svg
-                      className="h-5 w-5 text-gray-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    position="popper"
+                    sideOffset={6}
+                    className="rounded-lg border-2 border-[#C4C4C4] bg-[#FEFEFE] shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+                  >
+                    {FILTERS.map((f) => (
+                      <SelectItem
+                        key={f.value}
+                        value={f.value}
+                        className="h-12 pl-4 pr-10 rounded-lg text-xl text-[#757575] cursor-pointer focus:bg-[#FFF1EE] focus:text-[#FF7F65] data-[state=checked]:text-[#FF7F65] [&_svg]:text-[#FF7F65]"
+                        style={{ fontFamily: "Pretendard, sans-serif" }}
+                      >
+                        {f.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
 
-            {/* 콘텐츠 영역 */}
-            <div className="bg-white rounded-lg border-2 border-gray-200 p-6 min-h-[500px] max-h-[600px] overflow-y-auto">
-              {activeTab === "letters" ? (
-                <div>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <div className="w-8 h-8 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
-                    </div>
-                  ) : filteredLetters.length > 0 ? (
-                    <div className="space-y-4">
-                      {filteredLetters.map((letter) => {
-                        const letterId = letter._id || letter.id;
-                        return (
-                          <Link
-                            key={letterId}
-                            href={`/letter/${letterId}`}
-                            className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="flex flex-col gap-1">
-                              <h3 className="text-xl font-medium text-gray-800">
-                                {letter.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 line-clamp-1">
-                                {letter.content.replace(/<[^>]*>/g, "")}
-                              </p>
-                            </div>
-                            <div className="mt-1 text-right">
-                              <span className="text-sm text-gray-600">
-                                <span className="text-pink-400">From.</span>
-                                {filter === "sent"
-                                  ? letter.recipientName || "익명"
-                                  : letter.senderName || "익명"}
-                              </span>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-12">
-                      {filter === "all" && "작성한 편지가 없습니다"}
-                      {filter === "sent" && "보낸 편지가 없습니다"}
-                      {filter === "received" && "받은 편지가 없습니다"}
-                    </p>
-                  )}
+            <div className={`${panelClass} p-5 sm:p-6 h-[546px] overflow-y-auto`}>
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-8 h-8 border-4 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
                 </div>
+              ) : activeTab === "letters" ? (
+                filteredLetters.length > 0 ? (
+                  <div className="space-y-4">
+                    {filteredLetters.map((letter) => {
+                      const letterId = letter._id || letter.id;
+                      return (
+                        <Link key={letterId} href={`/letter/${letterId}`} className={cardClass}>
+                          <h3 className="text-xl font-medium text-[#424242]">{letter.title}</h3>
+                          <p className="mt-1 text-sm text-[#757575] line-clamp-1">
+                            {letter.content.replace(/<[^>]*>/g, "")}
+                          </p>
+                          <p className="mt-1 text-sm font-medium text-[#757575] text-right">
+                            <span className="text-[#FF7F65]">From.</span>
+                            {filter === "sent"
+                              ? letter.recipientName || "익명"
+                              : letter.senderName || "익명"}
+                          </p>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-center text-[#C4C4C4] py-12">{emptyMessage()}</p>
+                )
               ) : activeTab === "saved" ? (
-                <div>
-                  {savedLetters.length > 0 ? (
-                    <div className="space-y-4">
-                      {savedLetters.map((saved) => (
-                        <div
-                          key={saved.letterId}
-                          className="border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
-                        >
-                          <Link
-                            href={`/letter/${saved.letterId}`}
-                            className="block"
+                savedLetters.length > 0 ? (
+                  <div className="space-y-4">
+                    {savedLetters.map((saved) => (
+                      <div key={saved.letterId} className={cardClass}>
+                        <Link href={`/letter/${saved.letterId}`} className="block">
+                          <h3 className="text-xl font-medium text-[#424242]">{saved.title}</h3>
+                          <p className="mt-1 text-sm text-[#757575] line-clamp-1">
+                            {saved.contentPreview}
+                          </p>
+                        </Link>
+                        <div className="mt-1 flex items-center justify-between">
+                          <button
+                            onClick={() => {
+                              removeSavedLetter(saved.letterId);
+                              setSavedLetters(getSavedLetters());
+                            }}
+                            className="text-sm text-[#C4C4C4] hover:text-[#FF7F65] transition-colors"
                           >
-                            <div className="flex flex-col gap-1">
-                              <h3 className="text-xl font-medium text-gray-800">
-                                {saved.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 line-clamp-2">
-                                {saved.contentPreview}
-                              </p>
-                            </div>
-                            <div className="mt-2 text-right">
-                              <span className="text-sm text-gray-500">
-                                {new Date(saved.savedAt).toLocaleDateString(
-                                  "ko-KR",
-                                )}{" "}
-                                보관
-                              </span>
-                            </div>
-                          </Link>
-                          <div className="mt-2 flex justify-end">
-                            <button
-                              onClick={() => {
-                                removeSavedLetter(saved.letterId);
-                                setSavedLetters(getSavedLetters());
-                              }}
-                              className="text-sm text-red-400 hover:text-red-600 transition-colors"
-                            >
-                              보관 해제
-                            </button>
-                          </div>
+                            보관 해제
+                          </button>
+                          <span className="text-sm text-[#757575]">
+                            {new Date(saved.savedAt).toLocaleDateString("ko-KR")} 보관
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-12">
-                      보관한 편지가 없습니다
-                    </p>
-                  )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-[#C4C4C4] py-12">{emptyMessage()}</p>
+                )
+              ) : stories.length > 0 ? (
+                <div className="space-y-4">
+                  {stories.map((story) => {
+                    const storyId = story._id || story.id;
+                    return (
+                      <Link key={storyId} href={`/letter/${storyId}`} className={cardClass}>
+                        <h3 className="text-xl font-medium text-[#424242]">{story.title}</h3>
+                        <p className="mt-1 text-sm text-[#757575] line-clamp-1">
+                          {story.plainContent || story.content.replace(/<[^>]*>/g, "")}
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-[#757575] text-right">
+                          <span className="text-[#FF7F65]">{story.category}</span>
+                          {" · "}
+                          {new Date(story.createdAt).toLocaleDateString("ko-KR")}
+                        </p>
+                      </Link>
+                    );
+                  })}
                 </div>
               ) : (
-                <div>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <div className="w-8 h-8 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
-                    </div>
-                  ) : stories.length > 0 ? (
-                    <div className="space-y-4">
-                      {stories.map((story) => {
-                        const storyId = story._id || story.id;
-                        return (
-                          <Link
-                            key={storyId}
-                            href={`/letter/${storyId}`}
-                            className="block border-2 border-gray-400 rounded-xl p-5 hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs px-2 py-1 bg-pink-100 text-pink-600 rounded">
-                                  {story.category}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  조회 {story.viewCount} · 좋아요{" "}
-                                  {story.likeCount}
-                                </span>
-                              </div>
-                              <h3 className="text-xl font-medium text-gray-800">
-                                {story.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 line-clamp-2">
-                                {story.plainContent ||
-                                  story.content.replace(/<[^>]*>/g, "")}
-                              </p>
-                            </div>
-                            <div className="mt-2 text-right">
-                              <span className="text-sm text-gray-500">
-                                {new Date(story.createdAt).toLocaleDateString(
-                                  "ko-KR",
-                                )}
-                              </span>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-12">
-                      작성한 사연이 없습니다
-                    </p>
-                  )}
-                </div>
+                <p className="text-center text-[#C4C4C4] py-12">{emptyMessage()}</p>
               )}
             </div>
-          </div>
+          </section>
         </div>
       </main>
     </div>
