@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ShareModal from "@/components/ShareModal";
 import { WritingSuggestion } from "@/components/editor/WritingSuggestion";
+import { EmotionCharacter } from "@/components/character/EmotionCharacter";
 import WritingAmbience from "@/components/effects/WritingAmbience";
 import TypingRevealEffect from "@/components/effects/TypingRevealEffect";
 // import { DailyPrompt } from "@/components/ai/DailyPrompt";
@@ -565,6 +566,7 @@ function WritePageContent() {
                 <WritingAmbience editor={editor} />
                 <TypingRevealEffect editor={editor} />
                 <WritingSuggestion editor={editor} />
+                <EmotionCharacter editor={editor} />
               </div>
 
               {/* 편지 마무리 */}

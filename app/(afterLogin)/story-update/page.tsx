@@ -12,6 +12,7 @@ import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import SaveIndicator from "@/components/letter/SaveIndicator";
 import WritingAmbience from "@/components/effects/WritingAmbience";
 import TypingRevealEffect from "@/components/effects/TypingRevealEffect";
+import { EmotionCharacter } from "@/components/character/EmotionCharacter";
 import DraftSaveButton from "@/components/letter/DraftSaveButton";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -363,6 +364,7 @@ function StoryUpdateContent() {
                 <EditorContent editor={editor} />
                 <WritingAmbience editor={editor} />
                 <TypingRevealEffect editor={editor} />
+                <EmotionCharacter editor={editor} />
               </div>
 
               {/* 편지 마무리 */}
