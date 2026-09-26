@@ -48,6 +48,11 @@ export async function apiRequest<T>(
   });
 
   if (!response.ok) {
+    // 백엔드 토큰이 거부되면 헤더만 로그인 상태로 남는 일이 없도록 세션을 끊는다
+    if (response.status === 401 && token && typeof window !== "undefined") {
+      const { handleTokenExpiration } = await import("./auth-utils");
+      await handleTokenExpiration();
+    }
     const error = await response.json().catch(() => ({
       message: "Unknown error occurred",
     }));

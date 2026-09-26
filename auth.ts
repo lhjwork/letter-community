@@ -14,6 +14,18 @@ interface OAuthProfile {
   [key: string]: unknown;
 }
 
+// JWT payload의 exp(초)를 읽는다. 검증은 백엔드 몫이라 서명 확인 없이 디코드만 한다.
+function tokenExp(token: string): number {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+    return typeof payload.exp === "number" ? payload.exp : 0;
+  } catch {
+    return 0;
+  }
+}
+
+const REFRESH_BEFORE_SEC = 60 * 60; // 만료 1시간 전부터 재발급
+
 export const authConfig = {
   providers: [
     KakaoProvider({
@@ -96,6 +108,31 @@ export const authConfig = {
         } catch (error) {
           console.error("Error calling backend OAuth API:", error);
           return token;
+        }
+      }
+
+      // 백엔드 토큰 만료 임박 시 재발급. NextAuth 세션은 접속마다 연장되지만
+      // 백엔드 JWT는 로그인 시 한 번만 발급되어 어긋나는 문제를 여기서 막는다.
+      const backendToken = token.backendToken as string | undefined;
+      if (backendToken && token.userId && tokenExp(backendToken) - Date.now() / 1000 < REFRESH_BEFORE_SEC) {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/users/token/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
+            },
+            body: JSON.stringify({ userId: token.userId }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            return { ...token, backendToken: data.data.token };
+          }
+          console.error("Backend token refresh failed:", response.status);
+          // 재발급 불가(탈퇴 등)면 토큰을 비워 API가 401을 내고 클라이언트가 로그아웃하게 한다
+          return { ...token, backendToken: undefined };
+        } catch (error) {
+          console.error("Error refreshing backend token:", error);
         }
       }
       return token;
