@@ -281,24 +281,20 @@ export default function LetterDetailClient({
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 상단 행: 뒤로가기(작성자 편지 확인 화면에서는 미표시) + 작성자용 수정/삭제 */}
-        {(!(isAuthor && !isStory) || isAuthor) && (
+        {!(isAuthor && !isStory) && (
           <motion.div
             className="mb-8 flex items-center justify-between gap-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
           >
-            {!(isAuthor && !isStory) ? (
-              <Button
-                variant="outline"
-                onClick={() => router.back()}
-                className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
-              >
-                <span>← 뒤로가기</span>
-              </Button>
-            ) : (
-              <span />
-            )}
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+            >
+              <span>← 뒤로가기</span>
+            </Button>
             {isAuthor && (
               <div className="flex gap-2 sm:gap-3">
                 <Button
@@ -363,10 +359,31 @@ export default function LetterDetailClient({
             openLogin={openLogin}
           />
         ) : isAuthor ? (
-          <AuthorLetterView
-            letter={letter}
-            authorName={session?.user?.name || "Letter"}
-          />
+          <>
+            <AuthorLetterView
+              letter={letter}
+              authorName={session?.user?.name || "Letter"}
+            />
+            {/* 편지 작성자: 편지지 아래 오른쪽에 수정/삭제 */}
+            <div className="flex justify-end mt-6">
+              <div className="flex gap-2 sm:gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
+                  className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
+                >
+                  수정하기
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-[#757575] border-gray-400 hover:bg-gray-50 hover:text-[#757575] px-6 py-2 rounded-lg"
+                >
+                  삭제하기
+                </Button>
+              </div>
+            </div>
+          </>
         ) : (
         <EnvelopeAnimation onOpen={() => setEnvelopeOpened(true)}>
           {/* 사연 제목 필드 */}
