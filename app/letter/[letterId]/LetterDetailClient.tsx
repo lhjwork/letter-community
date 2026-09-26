@@ -339,6 +339,8 @@ export default function LetterDetailClient({
             session={session}
             router={router}
             openLogin={openLogin}
+            onEdit={() => router.push(`/story-update?id=${letter._id}`)}
+            onDelete={() => setShowDeleteConfirm(true)}
           />
         ) : isAuthor ? (
           <AuthorLetterView
@@ -617,7 +619,8 @@ export default function LetterDetailClient({
                 </Button>
               </div>
 
-              {/* 수정 / 삭제 */}
+              {/* 수정 / 삭제 — 사연은 공감하기 옆에 있으므로 편지만 여기 표시 */}
+              {!isStory && (
               <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-16">
                 <Button
                   variant="outline"
@@ -636,6 +639,7 @@ export default function LetterDetailClient({
                   삭제하기
                 </Button>
               </div>
+              )}
               <ConfirmDialog
                 open={showDeleteConfirm}
                 onOpenChange={setShowDeleteConfirm}
@@ -872,6 +876,8 @@ function StoryContent({
   session,
   router,
   openLogin,
+  onEdit,
+  onDelete,
 }: {
   letter: Letter;
   isAuthor: boolean;
@@ -880,6 +886,8 @@ function StoryContent({
   session: any;
   router: any;
   openLogin: (callbackUrl: string) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   const { isLiked, likeCount, isToggling, toggleLike, isLoggedIn } = useLike({
     letterId: letter._id,
@@ -992,6 +1000,26 @@ function StoryContent({
             >
               사연 답장하기
             </Button>
+          )}
+          {isAuthor && (
+            <>
+              <Button
+                variant="outline"
+                onClick={onEdit}
+                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] font-semibold text-base sm:text-lg lg:text-2xl leading-5"
+                style={{ fontFamily: "Pretendard" }}
+              >
+                수정하기
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onDelete}
+                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-gray-400 text-[#757575] hover:bg-gray-50 hover:text-[#757575] font-semibold text-base sm:text-lg lg:text-2xl leading-5"
+                style={{ fontFamily: "Pretendard" }}
+              >
+                삭제하기
+              </Button>
+            </>
           )}
         </div>
       </motion.div>
