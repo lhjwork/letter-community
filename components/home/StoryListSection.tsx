@@ -43,8 +43,8 @@ function StoryCard({ story }: StoryCardProps) {
         </div>
 
         {/* To. label */}
-        <div className="absolute top-14 left-[50px] sm:left-[60px]">
-          <span className="text-[20px] sm:text-[24px] font-semibold text-[#424242] font-['Pretendard']">
+        <div className="absolute top-[54px] left-[50px] sm:left-[60px] w-[56px] sm:w-[64px] h-[36px] bg-[#FF7F65] flex items-center justify-center">
+          <span className="text-[20px] sm:text-[24px] text-[#FEFEFE] font-['NanumJangMiCe']">
             To.
           </span>
         </div>
