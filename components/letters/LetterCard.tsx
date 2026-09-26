@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -35,7 +36,7 @@ export function LetterCard({ letter, onDelete }: LetterCardProps) {
       await deleteLetter(letter._id, token);
       onDelete?.(letter._id);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "편지 삭제에 실패했습니다.");
+      showAlert(err instanceof Error ? err.message : "편지 삭제에 실패했습니다.");
     } finally {
       setIsDeleting(false);
     }

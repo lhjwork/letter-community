@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ export default function DraftLoadModal({
       }
     } catch (error) {
       console.error("임시저장 삭제 실패:", error);
-      alert("삭제에 실패했습니다.");
+      showAlert("삭제에 실패했습니다.");
     }
   };
 

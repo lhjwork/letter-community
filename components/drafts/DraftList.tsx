@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { getDrafts, deleteDraft, publishDraft } from "@/lib/draft-api";
@@ -79,7 +80,7 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
     const token = session?.backendToken;
 
     if (!token) {
-      alert("로그인이 필요합니다.");
+      showAlert("로그인이 필요합니다.");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -94,12 +95,12 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
     } catch (error) {
       console.error("임시저장 삭제 실패:", error);
       if (error instanceof Error && error.message.includes("Authentication required")) {
-        alert("로그인이 필요합니다.");
+        showAlert("로그인이 필요합니다.");
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }
       } else {
-        alert("삭제 중 오류가 발생했습니다.");
+        showAlert("삭제 중 오류가 발생했습니다.");
       }
     }
   };
@@ -108,7 +109,7 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
     const token = session?.backendToken;
 
     if (!token) {
-      alert("로그인이 필요합니다.");
+      showAlert("로그인이 필요합니다.");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -120,19 +121,19 @@ export default function DraftList({ onEditDraft }: DraftListProps) {
     try {
       const response = await publishDraft(token, draftId);
       if (response.success) {
-        alert("편지가 성공적으로 발행되었습니다!");
+        showAlert("편지가 성공적으로 발행되었습니다!");
         window.open(response.data.url, "_blank");
         fetchDrafts(pagination.page);
       }
     } catch (error) {
       console.error("편지 발행 실패:", error);
       if (error instanceof Error && error.message.includes("Authentication required")) {
-        alert("로그인이 필요합니다.");
+        showAlert("로그인이 필요합니다.");
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }
       } else {
-        alert("발행 중 오류가 발생했습니다.");
+        showAlert("발행 중 오류가 발생했습니다.");
       }
     }
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
@@ -97,7 +98,7 @@ function StoryUpdateContent() {
     },
     onError: (error) => {
       console.error("저장 실패:", error);
-      alert(error);
+      showAlert(error);
     },
   });
 
@@ -133,12 +134,12 @@ function StoryUpdateContent() {
   const handleSubmit = async () => {
     // 내용 유효성 검사
     if (!content.trim()) {
-      alert("내용을 입력해주세요.");
+      showAlert("내용을 입력해주세요.");
       return;
     }
 
     if (!title.trim()) {
-      alert("제목을 입력해주세요.");
+      showAlert("제목을 입력해주세요.");
       return;
     }
 
@@ -176,7 +177,7 @@ function StoryUpdateContent() {
         token,
       );
 
-      alert(`사연이 "${selectedCategory}" 카테고리로 등록되었습니다! 💌`);
+      showAlert(`사연이 "${selectedCategory}" 카테고리로 등록되었습니다! 💌`);
 
       // 성공적으로 발행되면 임시저장 상태 초기화
       setHasUnsavedChanges(false);
@@ -189,7 +190,7 @@ function StoryUpdateContent() {
       }
     } catch (error) {
       console.error("등록 실패:", error);
-      alert(
+      showAlert(
         error instanceof Error
           ? error.message
           : "등록에 실패했습니다. 다시 시도해주세요.",

@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -599,7 +600,7 @@ export default function LetterDetailClient({
                   variant="outline"
                   onClick={() => {
                     navigator.clipboard.writeText(shareUrl);
-                    alert("링크가 복사되었습니다!");
+                    showAlert("링크가 복사되었습니다!");
                   }}
                   className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] cursor-pointer transition-colors font-semibold text-base sm:text-2xl leading-5"
                   style={{ fontFamily: "Pretendard" }}
@@ -1061,7 +1062,7 @@ function AddressForm({
     e.preventDefault();
 
     if (currentRequests >= maxRequests) {
-      alert(`1인당 최대 ${maxRequests}개까지만 신청할 수 있습니다.`);
+      showAlert(`1인당 최대 ${maxRequests}개까지만 신청할 수 있습니다.`);
       return;
     }
 
@@ -1071,14 +1072,14 @@ function AddressForm({
       !formData.zipCode ||
       !formData.address1
     ) {
-      alert("필수 항목을 모두 입력해주세요.");
+      showAlert("필수 항목을 모두 입력해주세요.");
       return;
     }
 
     const phoneNumbers = formData.phone.replace(/[^\d]/g, "");
     const phoneRegex = /^01[0-9][0-9]{3,4}[0-9]{4}$/;
     if (!phoneRegex.test(phoneNumbers)) {
-      alert("올바른 휴대폰 번호를 입력해주세요. (예: 010-1234-5678)");
+      showAlert("올바른 휴대폰 번호를 입력해주세요. (예: 010-1234-5678)");
       return;
     }
 
@@ -1115,11 +1116,11 @@ function AddressForm({
 
         // 추적 정보 표시
         if (result.data.trackingInfo) {
-          alert(
+          showAlert(
             `${result.message}\n\n추적 ID: ${result.data.trackingInfo.requestId}\n${result.data.trackingInfo.message}`,
           );
         } else {
-          alert(result.message);
+          showAlert(result.message);
         }
 
         onSuccess(result.data.requestId);
@@ -1128,7 +1129,7 @@ function AddressForm({
       }
     } catch (error) {
       console.error("실물 편지 신청 실패:", error);
-      alert(
+      showAlert(
         error instanceof Error
           ? error.message
           : "신청에 실패했습니다. 다시 시도해주세요.",

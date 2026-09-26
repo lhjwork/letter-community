@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Address } from "@/types/address";
@@ -55,10 +56,10 @@ export default function AddressSelectModal({ open, onOpenChange, onSelect }: Add
 
     try {
       await saveRecentToBook(session.backendToken, address._id, addressName || undefined);
-      alert("주소록에 저장되었습니다.");
+      showAlert("주소록에 저장되었습니다.");
       fetchAddresses();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "저장에 실패했습니다.");
+      showAlert(err instanceof Error ? err.message : "저장에 실패했습니다.");
     }
   };
 

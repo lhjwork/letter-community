@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -154,7 +155,7 @@ function WritePageContent() {
     },
     onError: (error) => {
       console.error("저장 실패:", error);
-      alert(error);
+      showAlert(error);
     },
   });
 
@@ -186,7 +187,7 @@ function WritePageContent() {
         }
       } catch (error) {
         console.error("임시저장 불러오기 실패:", error);
-        alert("임시저장을 불러올 수 없습니다.");
+        showAlert("임시저장을 불러올 수 없습니다.");
       } finally {
         setIsLoadingDraft(false);
       }
@@ -224,12 +225,12 @@ function WritePageContent() {
           setHasUnsavedChanges(true);
         } catch (error) {
           console.error("제목 생성 실패:", error);
-          alert("제목 생성에 실패했습니다. 다시 시도해주세요.");
+          showAlert("제목 생성에 실패했습니다. 다시 시도해주세요.");
         } finally {
           setIsGeneratingTitle(false);
         }
       } else {
-        alert("제목을 생성하기 위해서는 더 많은 내용을 작성해주세요.");
+        showAlert("제목을 생성하기 위해서는 더 많은 내용을 작성해주세요.");
       }
     }
   };
@@ -257,12 +258,12 @@ function WritePageContent() {
   const handleSubmit = async () => {
     // 내용 유효성 검사
     if (!content.trim()) {
-      alert("내용을 입력해주세요.");
+      showAlert("내용을 입력해주세요.");
       return;
     }
 
     if (!title.trim()) {
-      alert("제목을 입력해주세요.");
+      showAlert("제목을 입력해주세요.");
       return;
     }
 
@@ -303,7 +304,7 @@ function WritePageContent() {
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error("등록 실패:", error);
-      alert(
+      showAlert(
         error instanceof Error
           ? error.message
           : "등록에 실패했습니다. 다시 시도해주세요.",

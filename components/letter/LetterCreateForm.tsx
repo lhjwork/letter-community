@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { RecipientAddressInput } from "@/types/recipient";
@@ -66,7 +67,7 @@ export default function LetterCreateForm({ onSuccess, onCancel }: LetterCreateFo
       }
     } catch (error) {
       console.error("편지 생성 실패:", error);
-      alert("편지 생성에 실패했습니다. 다시 시도해주세요.");
+      showAlert("편지 생성에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }

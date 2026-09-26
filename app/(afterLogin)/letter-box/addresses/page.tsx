@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -73,7 +74,7 @@ export default function AddressesPage() {
       await deleteAddressApi(session.backendToken, id);
       setAddresses(addresses.filter((addr) => addr._id !== id));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "삭제에 실패했습니다.");
+      showAlert(err instanceof Error ? err.message : "삭제에 실패했습니다.");
     }
   };
 
@@ -84,7 +85,7 @@ export default function AddressesPage() {
       await setDefaultAddress(session.backendToken, id);
       fetchAddresses();
     } catch (err) {
-      alert(
+      showAlert(
         err instanceof Error ? err.message : "기본 배송지 설정에 실패했습니다.",
       );
     }
@@ -103,7 +104,7 @@ export default function AddressesPage() {
       setShowFormModal(false);
       fetchAddresses();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "저장에 실패했습니다.");
+      showAlert(err instanceof Error ? err.message : "저장에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,6 @@
 "use client";
 
+import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -93,12 +94,12 @@ export default function AuthorRequestsManager({ letterId, letterStats, authorSet
         if (result.success) {
           fetchRequests(); // 목록 새로고침
           setSelectedRequest(null);
-          alert(result.message);
+          showAlert(result.message);
         }
       }
     } catch (error) {
       console.error("승인/거절 처리 실패:", error);
-      alert("처리 중 오류가 발생했습니다.");
+      showAlert("처리 중 오류가 발생했습니다.");
     }
   };
 
