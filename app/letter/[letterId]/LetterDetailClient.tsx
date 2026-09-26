@@ -280,21 +280,43 @@ export default function LetterDetailClient({
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* 뒤로가기 버튼 - 작성자 편지 확인 화면에서는 미표시 */}
-        {!(isAuthor && !isStory) && (
+        {/* 상단 행: 뒤로가기(작성자 편지 확인 화면에서는 미표시) + 작성자용 수정/삭제 */}
+        {(!(isAuthor && !isStory) || isAuthor) && (
           <motion.div
-            className="mb-8"
+            className="mb-8 flex items-center justify-between gap-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Button
-              variant="outline"
-              onClick={() => router.back()}
-              className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
-            >
-              <span>← 뒤로가기</span>
-            </Button>
+            {!(isAuthor && !isStory) ? (
+              <Button
+                variant="outline"
+                onClick={() => router.back()}
+                className="flex items-center space-x-2 text-[#FF9883] border-[#FF9883] hover:bg-orange-50 px-6 py-2 rounded-lg"
+              >
+                <span>← 뒤로가기</span>
+              </Button>
+            ) : (
+              <span />
+            )}
+            {isAuthor && (
+              <div className="flex gap-2 sm:gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
+                  className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
+                >
+                  수정하기
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-[#757575] border-gray-400 hover:bg-gray-50 hover:text-[#757575] px-6 py-2 rounded-lg"
+                >
+                  삭제하기
+                </Button>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -339,8 +361,6 @@ export default function LetterDetailClient({
             session={session}
             router={router}
             openLogin={openLogin}
-            onEdit={() => router.push(`/story-update?id=${letter._id}`)}
-            onDelete={() => setShowDeleteConfirm(true)}
           />
         ) : isAuthor ? (
           <AuthorLetterView
@@ -619,27 +639,6 @@ export default function LetterDetailClient({
                 </Button>
               </div>
 
-              {/* 수정 / 삭제 — 사연은 공감하기 옆에 있으므로 편지만 여기 표시 */}
-              {!isStory && (
-              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-16">
-                <Button
-                  variant="outline"
-                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
-                  className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] text-base sm:text-2xl font-semibold leading-5"
-                  style={{ fontFamily: "Pretendard" }}
-                >
-                  수정하기
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-gray-400 text-[#757575] hover:bg-gray-50 hover:text-[#757575] text-base sm:text-2xl font-semibold leading-5"
-                  style={{ fontFamily: "Pretendard" }}
-                >
-                  삭제하기
-                </Button>
-              </div>
-              )}
               <ConfirmDialog
                 open={showDeleteConfirm}
                 onOpenChange={setShowDeleteConfirm}
@@ -876,8 +875,6 @@ function StoryContent({
   session,
   router,
   openLogin,
-  onEdit,
-  onDelete,
 }: {
   letter: Letter;
   isAuthor: boolean;
@@ -886,8 +883,6 @@ function StoryContent({
   session: any;
   router: any;
   openLogin: (callbackUrl: string) => void;
-  onEdit: () => void;
-  onDelete: () => void;
 }) {
   const { isLiked, likeCount, isToggling, toggleLike, isLoggedIn } = useLike({
     letterId: letter._id,
@@ -1000,26 +995,6 @@ function StoryContent({
             >
               사연 답장하기
             </Button>
-          )}
-          {isAuthor && (
-            <>
-              <Button
-                variant="outline"
-                onClick={onEdit}
-                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] font-semibold text-base sm:text-lg lg:text-2xl leading-5"
-                style={{ fontFamily: "Pretendard" }}
-              >
-                수정하기
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onDelete}
-                className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-gray-400 text-[#757575] hover:bg-gray-50 hover:text-[#757575] font-semibold text-base sm:text-lg lg:text-2xl leading-5"
-                style={{ fontFamily: "Pretendard" }}
-              >
-                삭제하기
-              </Button>
-            </>
           )}
         </div>
       </motion.div>
