@@ -217,7 +217,10 @@ export async function getStoryReplies(
 /**
  * 편지 상세 조회
  */
-export async function getLetter(letterId: string) {
+export async function getLetter(letterId: string): Promise<{
+  success: boolean;
+  data: { _id: string; title?: string; content?: string; category?: string; isPublic?: boolean; type?: string };
+}> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "GET",
   });
@@ -329,6 +332,28 @@ export async function getMyStories(
 
   return apiRequest<StoriesResponse>(endpoint, {
     method: "GET",
+    token,
+  });
+}
+
+/**
+ * 편지/사연 수정 (작성자 본인만)
+ */
+export async function updateLetter(
+  letterId: string,
+  data: {
+    title?: string;
+    content?: string;
+    category?: string;
+    isPublic?: boolean;
+    ogTitle?: string;
+    ogPreviewText?: string;
+  },
+  token: string,
+): Promise<{ success: boolean; data: { _id: string } }> {
+  return apiRequest(`/api/letters/${letterId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
     token,
   });
 }

@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
-import { createStory } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { createStory, getLetter, updateLetter } from "@/lib/api";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
@@ -55,6 +55,7 @@ function StoryUpdateContent() {
 
   const router = useRouter();
   const { data: session } = useSession();
+  const editId = useSearchParams().get("id"); // 있으면 기존 사연 수정 모드
 
   // Featured Stories 가져오기
   useEffect(() => {
@@ -86,6 +87,26 @@ function StoryUpdateContent() {
     placeholder: "어떤 이야기를 건네고 싶으신가요?",
     enableImages: false, // S3 무료 서비스 종료로 이미지 비활성화
   });
+
+  // 수정 모드: 기존 사연 불러오기
+  useEffect(() => {
+    if (!editId || !editor) return;
+    (async () => {
+      try {
+        const { data } = await getLetter(editId);
+        setTitle(data.title ?? "");
+        setContent(data.content ?? "");
+        editor.commands.setContent(data.content ?? "");
+        if (data.category) setSelectedCategory(data.category);
+        setIsPublic(data.isPublic !== false);
+        setHasUnsavedChanges(false);
+      } catch (error) {
+        console.error("사연 불러오기 실패:", error);
+        showAlert("사연을 불러올 수 없습니다.");
+        router.push("/letter-box");
+      }
+    })();
+  }, [editId, editor, router]);
 
   // 임시저장 훅
   const { saveState, manualSave } = useDraftManualSave({
@@ -156,6 +177,18 @@ function StoryUpdateContent() {
 
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+
+      if (editId) {
+        await updateLetter(
+          editId,
+          { title: title.trim(), content: htmlContent, category: selectedCategory, isPublic, ogTitle: title.trim(), ogPreviewText },
+          token as string,
+        );
+        setHasUnsavedChanges(false);
+        showAlert("사연이 수정되었습니다.");
+        router.push(`/letter/${editId}`);
+        return;
+      }
 
       const result = await createStory(
         {
@@ -485,7 +518,7 @@ function StoryUpdateContent() {
             disabled={isSubmitting}
             className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium bg-white border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
           >
-            {isSubmitting ? "작성 중..." : "작성 완료"}
+            {isSubmitting ? (editId ? "수정 중..." : "작성 중...") : editId ? "수정 완료" : "작성 완료"}
           </Button>
         </section>
       </main>

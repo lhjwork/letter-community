@@ -19,7 +19,8 @@ import LoginDialog from "@/components/shareds/LoginDialog";
 import { HeroBanner } from "@/components/home";
 import { useIsAuthor } from "@/hooks/useIsAuthor";
 import { useLike } from "@/hooks/useLike";
-import { getStoryReplies, type StoryReply } from "@/lib/api";
+import { getStoryReplies, deleteLetter, type StoryReply } from "@/lib/api";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EnvelopeAnimation from "@/components/effects/EnvelopeAnimation";
 import TypewriterText from "@/components/effects/TypewriterText";
 import HandwritingReveal from "@/components/effects/HandwritingReveal";
@@ -89,6 +90,13 @@ export default function LetterDetailClient({
 
   // 작성자 여부 확인 훅 사용
   const { isAuthor } = useIsAuthor(letter);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = async () => {
+    await deleteLetter(letter._id, session?.backendToken as string);
+    showAlert(isStory ? "사연이 삭제되었습니다." : "편지가 삭제되었습니다.");
+    router.push("/letter-box");
+  };
 
   // 정적 배너 데이터
   const bannerSlides = [
@@ -608,6 +616,35 @@ export default function LetterDetailClient({
                   링크 복사하기
                 </Button>
               </div>
+
+              {/* 수정 / 삭제 */}
+              <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-16">
+                <Button
+                  variant="outline"
+                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
+                  className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] text-base sm:text-2xl font-semibold leading-5"
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  수정하기
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-gray-400 text-[#757575] hover:bg-gray-50 hover:text-[#757575] text-base sm:text-2xl font-semibold leading-5"
+                  style={{ fontFamily: "Pretendard" }}
+                >
+                  삭제하기
+                </Button>
+              </div>
+              <ConfirmDialog
+                open={showDeleteConfirm}
+                onOpenChange={setShowDeleteConfirm}
+                title={isStory ? "사연을 삭제할까요?" : "편지를 삭제할까요?"}
+                description="삭제한 글은 목록에서 사라지며 다른 사람이 볼 수 없습니다."
+                confirmText="삭제"
+                variant="destructive"
+                onConfirm={handleDelete}
+              />
 
               {/* 네비게이션 버튼들 */}
               <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 mb-8 sm:mb-16">

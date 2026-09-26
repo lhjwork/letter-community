@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
-import { createLetter } from "@/lib/api";
+import { createLetter, getLetter, updateLetter } from "@/lib/api";
 import { generateTitle, canGenerateTitle } from "@/lib/ai-title-generator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -116,6 +116,7 @@ function WritePageContent() {
   const searchParams = useSearchParams();
   const draftId = searchParams.get("draftId");
   const replyTo = searchParams.get("replyTo"); // 사연 답장 모드
+  const editId = searchParams.get("id"); // 있으면 기존 편지 수정 모드
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(
     draftId || undefined,
   );
@@ -164,6 +165,25 @@ function WritePageContent() {
     when: hasUnsavedChanges && (content.length > 10 || title.length > 0),
     message: "작성 중인 편지가 저장되지 않았습니다. 정말 나가시겠습니까?",
   });
+
+  // 수정 모드: 기존 편지 불러오기
+  useEffect(() => {
+    if (!editId || !editor) return;
+    (async () => {
+      try {
+        const { data } = await getLetter(editId);
+        setTitle(data.title ?? "");
+        setContent(data.content ?? "");
+        editor.commands.setContent(data.content ?? "");
+        setIsPublic(data.isPublic !== false);
+        setHasUnsavedChanges(false);
+      } catch (error) {
+        console.error("편지 불러오기 실패:", error);
+        showAlert("편지를 불러올 수 없습니다.");
+        router.push("/letter-box");
+      }
+    })();
+  }, [editId, editor, router]);
 
   // 임시저장 불러오기
   useEffect(() => {
@@ -280,6 +300,18 @@ function WritePageContent() {
 
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
+
+      if (editId) {
+        await updateLetter(
+          editId,
+          { title: title.trim(), content: htmlContent, isPublic, ogTitle: title.trim(), ogPreviewText },
+          token as string,
+        );
+        setHasUnsavedChanges(false);
+        showAlert("편지가 수정되었습니다.");
+        router.push(`/letter/${editId}`);
+        return;
+      }
 
       // 일반 편지 생성
       const result = await createLetter(
@@ -766,7 +798,7 @@ function WritePageContent() {
               disabled={isSubmitting}
               className="px-4 sm:px-6 text-sm sm:text-base xl:text-2xl font-medium bg-white border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] min-w-[100px] sm:min-w-[120px] xl:min-w-[168px] h-10 sm:h-12 xl:h-[60px] rounded-lg"
             >
-              {isSubmitting ? "편지 생성 중..." : "작성 완료"}
+              {isSubmitting ? (editId ? "수정 중..." : "편지 생성 중...") : editId ? "수정 완료" : "작성 완료"}
             </Button>
           </motion.div>
         </motion.section>
