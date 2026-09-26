@@ -1,6 +1,7 @@
 "use client";
 
 import { showAlert } from "@/components/ui/AppAlert";
+import ProofreadModal, { requestProofread, applyCorrections, type Correction } from "@/components/letter/ProofreadModal";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -124,6 +125,7 @@ function WritePageContent() {
 
   // URL 공유 모달 상태
   const [showShareModal, setShowShareModal] = useState(false);
+  const [proofread, setProofread] = useState<Correction[] | null>(null);
   const [shareData, setShareData] = useState<{
     url: string;
     title: string;
@@ -275,6 +277,7 @@ function WritePageContent() {
     router.back();
   };
 
+  // 등록 직전 맞춤법 점검 → 제안이 있으면 모달, 없으면 바로 등록
   const handleSubmit = async () => {
     // 내용 유효성 검사
     if (!content.trim()) {
@@ -288,15 +291,34 @@ function WritePageContent() {
     }
 
     setIsSubmitting(true);
+    const corrections = await requestProofread(content);
+    if (corrections.length > 0) {
+      setIsSubmitting(false);
+      setProofread(corrections);
+      return;
+    }
+    await publish(content);
+  };
+
+  const handleProofreadConfirm = (selected: Correction[]) => {
+    const fixed = applyCorrections(content, selected);
+    setProofread(null);
+    setContent(fixed);
+    editor?.commands.setContent(fixed);
+    publish(fixed);
+  };
+
+  const publish = async (source: string) => {
+    setIsSubmitting(true);
 
     try {
       const token = session?.backendToken;
 
       // HTML 형식 그대로 사용
-      const htmlContent = content.trim();
+      const htmlContent = source.trim();
 
       // 미리보기용 일반 텍스트 (OG 이미지, 검색용)
-      const plainContent = content.replace(/<[^>]*>/g, "").trim();
+      const plainContent = source.replace(/<[^>]*>/g, "").trim();
 
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
@@ -805,6 +827,16 @@ function WritePageContent() {
       </main>
 
       {/* URL 공유 모달 */}
+      <ProofreadModal
+        open={!!proofread}
+        corrections={proofread ?? []}
+        onConfirm={handleProofreadConfirm}
+        onSkip={() => {
+          setProofread(null);
+          publish(content);
+        }}
+        onClose={() => setProofread(null)}
+      />
       <ShareModal
         isOpen={showShareModal && !!shareData}
         onClose={handleShareModalClose}
