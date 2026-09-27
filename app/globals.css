@@ -237,6 +237,11 @@ body {
   margin-top: 0;
 }
 
+/* 에디터에서 Enter로 비운 단락(<p></p>)이 뷰에서 0px로 접히지 않게 */
+.letter-content p:empty::before {
+  content: "\00a0";
+}
+
 .letter-content strong {
   font-weight: 700;
 }

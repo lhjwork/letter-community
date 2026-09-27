@@ -957,7 +957,7 @@ function StoryContent({
           <HandwritingReveal
             html={letter.content}
             className="letter-content story-lined text-base sm:text-xl flex-1"
-            style={{ ...textStyle, backgroundImage: "none" }}
+            style={{ color: textStyle.color, backgroundImage: "none" }}
           />
           {/* From. 닉네임 - 항상 마지막 줄 */}
           <div className="flex justify-end items-center gap-3 h-12">
@@ -968,7 +968,7 @@ function StoryContent({
               height={24}
               className="w-7 h-6"
             />
-            <span className="text-base sm:text-xl" style={textStyle}>
+            <span className="text-base sm:text-xl" style={{ color: textStyle.color }}>
               From. {letter.senderName || letter.authorName || "사연자"}
             </span>
           </div>
