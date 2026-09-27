@@ -238,7 +238,7 @@ export default function DiaryEditorPage() {
         {/* 꾸미기 도구 (신청 후에는 잠금) */}
         {!locked && (
           <div className="w-full lg:w-[320px] lg:sticky lg:top-6">
-            <DecoTools decos={decos} selectedId={selectedId} font={fontFamily} onSelect={setSelectedId} onChange={handleDecos} />
+            <DecoTools decos={decos} selectedId={selectedId} font={fontFamily} token={token} onSelect={setSelectedId} onChange={handleDecos} />
           </div>
         )}
       </div>

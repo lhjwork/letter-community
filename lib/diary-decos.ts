@@ -1,11 +1,11 @@
 /** 다이어리 데코 카탈로그. 전부 인라인 SVG/CSS — 파일 업로드·외부 리소스 없음 (인쇄에서도 벡터로 그대로) */
 
-export type DecoType = "sticker" | "tape" | "label";
+export type DecoType = "sticker" | "tape" | "label" | "letter";
 
 export interface DiaryDeco {
   id: string;
   type: DecoType;
-  src: string; // 스티커 id / 마테 패턴 id / (label은 "")
+  src: string; // 스티커 id / 마테 패턴 id / (label은 "") / 편지는 letterId
   x: number; // 종이 폭 기준 %
   y: number; // 종이 폭 기준 %
   w: number; // 종이 폭 기준 %

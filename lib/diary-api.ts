@@ -82,4 +82,6 @@ export const saveDiaryPage = (id: string, date: string, page: { content: string;
   apiRequest<Ok<{ date: string; savedAt: string }>>(`/api/diaries/${id}/pages/${date}`, { method: "PUT", body: JSON.stringify(page), token });
 export const requestDiaryPhysical = (id: string, data: { binding: DiaryBinding; copies: number; address: DiaryAddress }, token: string) =>
   apiRequest<Ok<DiaryPhysical>>(`/api/diaries/${id}/physical-request`, { method: "POST", body: JSON.stringify(data), token });
+/** 관리자 인쇄 링크(?t=)로 세션 없이 조회 */
+export const getDiaryPrintView = (id: string, t: string) => apiRequest<Ok<Diary>>(`/api/diaries/${id}/print-view?t=${encodeURIComponent(t)}`);
 export const deleteDiary = (id: string, token: string) => apiRequest<{ success: true }>(`/api/diaries/${id}`, { method: "DELETE", token });

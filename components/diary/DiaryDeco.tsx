@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { getMyLetters, type Letter } from "@/lib/api";
 import { DiaryDeco, MAX_DECOS, STICKERS, STICKER_COLORS, TAPES, newDecoId, randomPlacement } from "@/lib/diary-decos";
 
 /* ───────────── 데코 한 개 그리기 (편집·인쇄 공용) ───────────── */
@@ -25,6 +26,15 @@ function DecoView({ deco, font }: { deco: DiaryDeco; font: string }) {
       />
     );
   }
+  if (deco.type === "letter") {
+    return (
+      <div className="w-full h-full relative overflow-hidden rounded-[3px] border-2 border-[#FF9883] bg-[#FFFDFB] flex items-end justify-center" style={{ fontFamily: font }}>
+        {/* 봉투 덮개 */}
+        <div className="absolute inset-x-0 top-0 h-[42%] bg-[#FF9883] opacity-90" style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }} />
+        <span className="relative px-2 pb-[6%] text-[0.9em] leading-tight text-center text-[#2B3446] line-clamp-2">{deco.text || "편지"}</span>
+      </div>
+    );
+  }
   return (
     <div className="w-full px-2 py-0.5 leading-snug text-center whitespace-pre-wrap break-keep" style={{ fontFamily: font, backgroundColor: deco.color ?? "#F9C9C0", color: "#2B3446", fontSize: "1em" }}>
       {deco.text || "라벨"}
@@ -33,7 +43,7 @@ function DecoView({ deco, font }: { deco: DiaryDeco; font: string }) {
 }
 
 /** 폭(%)에 대한 높이 비율. 스티커 1:1, 마테 1:0.22, 라벨은 내용 높이 */
-const aspect = (d: DiaryDeco) => (d.type === "sticker" ? 1 : d.type === "tape" ? 0.22 : undefined);
+const aspect = (d: DiaryDeco) => (d.type === "sticker" ? 1 : d.type === "tape" ? 0.22 : d.type === "letter" ? 0.66 : undefined);
 
 /* ───────────── 종이 위 레이어 ───────────── */
 
@@ -112,20 +122,29 @@ interface ToolsProps {
   decos: DiaryDeco[];
   selectedId: string | null;
   font: string;
+  token?: string;
   onSelect: (id: string | null) => void;
   onChange: (decos: DiaryDeco[]) => void;
 }
 
-type Tab = "sticker" | "tape" | "label";
+type Tab = "sticker" | "tape" | "label" | "letter";
 const TABS: { id: Tab; label: string }[] = [
   { id: "sticker", label: "스티커" },
   { id: "tape", label: "마테" },
   { id: "label", label: "라벨" },
+  { id: "letter", label: "편지" },
 ];
 
-export function DecoTools({ decos, selectedId, font, onSelect, onChange }: ToolsProps) {
+export function DecoTools({ decos, selectedId, font, token, onSelect, onChange }: ToolsProps) {
   const [tab, setTab] = useState<Tab>("sticker");
   const [color, setColor] = useState<string>(STICKER_COLORS[0]);
+  const [letters, setLetters] = useState<Letter[] | null>(null);
+  useEffect(() => {
+    if (tab !== "letter" || letters || !token) return;
+    getMyLetters(token, { limit: 30 })
+      .then((r) => setLetters(r.data))
+      .catch(() => setLetters([]));
+  }, [tab, letters, token]);
   const sel = decos.find((d) => d.id === selectedId) ?? null;
   const full = decos.length >= MAX_DECOS;
 
@@ -190,6 +209,21 @@ export function DecoTools({ decos, selectedId, font, onSelect, onChange }: Tools
             + 라벨 추가
           </button>
         )}
+        {tab === "letter" && (
+          <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto">
+            {letters === null ? (
+              <p className="text-xs text-[#9E9E9E]">편지를 불러오는 중...</p>
+            ) : letters.length === 0 ? (
+              <p className="text-xs text-[#9E9E9E]">아직 쓴 편지가 없어요. 편지를 쓰면 여기서 붙일 수 있어요.</p>
+            ) : (
+              letters.map((l) => (
+                <button key={l._id} disabled={full} onClick={() => add({ type: "letter", src: l._id, w: 26, text: l.title })} className="text-left px-3 py-1.5 rounded-md border border-[#E5E5E5] hover:border-[#FF9883] disabled:opacity-40 truncate">
+                  ✉ {l.title}
+                </button>
+              ))
+            )}
+          </div>
+        )}
         {full && <p className="mt-2 text-xs text-[#9E9E9E]">한 페이지에는 {MAX_DECOS}개까지 붙일 수 있어요.</p>}
       </div>
 
@@ -197,7 +231,7 @@ export function DecoTools({ decos, selectedId, font, onSelect, onChange }: Tools
       {sel && (
         <div className="border-t border-[#E5E5E5] p-3 flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="font-medium">선택한 {sel.type === "sticker" ? "스티커" : sel.type === "tape" ? "마테" : "라벨"}</span>
+            <span className="font-medium">선택한 {sel.type === "sticker" ? "스티커" : sel.type === "tape" ? "마테" : sel.type === "letter" ? "편지" : "라벨"}</span>
             <button onClick={() => onSelect(null)} className="text-[#9E9E9E] hover:text-[#424242]">선택 해제</button>
           </div>
           {sel.type === "label" && (

@@ -1,33 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DOMPurify from "isomorphic-dompurify";
 import { DecoLayer } from "@/components/diary/DiaryDeco";
-import { getDiary, DIARY_FONTS, type Diary } from "@/lib/diary-api";
+import { getDiary, getDiaryPrintView, DIARY_FONTS, type Diary } from "@/lib/diary-api";
 
 const hasText = (html: string) => !!html.replace(/<[^>]*>/g, "").trim();
 
 /**
  * 인쇄용 뷰: 표지 + 쓴 페이지를 A5 한 장씩. 헤더·푸터 없음.
  * 관리자가 Chrome에서 "PDF로 저장"(배경 그래픽 켬) → 인쇄 업체 전달. 사용자 미리보기로도 쓴다.
+ * 관리자는 ?t=<인쇄 토큰>으로 소유자 세션 없이 연다.
  */
 export default function DiaryPrintPage() {
   const { diaryId } = useParams<{ diaryId: string }>();
+  const printToken = useSearchParams().get("t");
   const { data: session, status } = useSession();
   const token = session?.backendToken;
   const [diary, setDiary] = useState<Diary | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) return;
-    getDiary(diaryId, token)
-      .then((r) => setDiary(r.data))
-      .catch(() => setError("다이어리를 불러올 수 없습니다."));
-  }, [diaryId, token]);
+    const req = printToken ? getDiaryPrintView(diaryId, printToken) : token ? getDiary(diaryId, token) : null;
+    if (!req) return;
+    req.then((r) => setDiary(r.data)).catch((e: unknown) => setError(e instanceof Error ? e.message : "다이어리를 불러올 수 없습니다."));
+  }, [diaryId, token, printToken]);
 
-  if (status === "unauthenticated") return <p className="p-8">로그인이 필요합니다.</p>;
+  if (!printToken && status === "unauthenticated") return <p className="p-8">로그인이 필요합니다.</p>;
   if (error) return <p className="p-8">{error}</p>;
   if (!diary) return <p className="p-8 text-[#757575]">불러오는 중...</p>;
 
