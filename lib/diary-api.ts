@@ -25,6 +25,39 @@ export interface DiaryPage {
   content: string;
   decos: DiaryDeco[];
 }
+export const DIARY_BINDINGS = [
+  { id: "spring", label: "스프링", desc: "펼침이 좋아요" },
+  { id: "perfect", label: "무선", desc: "책 같은 느낌" },
+] as const;
+export type DiaryBinding = (typeof DIARY_BINDINGS)[number]["id"];
+export type DiaryPhysicalStatus = "none" | "requested" | "approved" | "printing" | "sent" | "delivered" | "rejected";
+export const DIARY_PHYSICAL_LABEL: Record<DiaryPhysicalStatus, string> = {
+  none: "미신청",
+  requested: "신청 접수",
+  approved: "승인됨",
+  printing: "인쇄 중",
+  sent: "발송됨",
+  delivered: "배송 완료",
+  rejected: "반려",
+};
+export interface DiaryAddress {
+  name: string;
+  phone: string;
+  zipCode: string;
+  address1: string;
+  address2?: string;
+  memo?: string;
+}
+export interface DiaryPhysical {
+  status: DiaryPhysicalStatus;
+  binding: DiaryBinding;
+  copies: number;
+  address?: DiaryAddress;
+  requestedAt?: string;
+  updatedAt?: string;
+  notes?: string;
+}
+
 export interface Diary {
   _id: string;
   title: string;
@@ -33,6 +66,7 @@ export interface Diary {
   font: DiaryFont;
   pages: DiaryPage[];
   status: "writing" | "closed";
+  physical: DiaryPhysical;
   updatedAt: string;
 }
 
@@ -46,4 +80,6 @@ export const updateDiary = (id: string, data: Partial<Pick<Diary, "title" | "pap
   apiRequest<Ok<Diary>>(`/api/diaries/${id}`, { method: "PATCH", body: JSON.stringify(data), token });
 export const saveDiaryPage = (id: string, date: string, page: { content: string; decos: DiaryDeco[] }, token: string) =>
   apiRequest<Ok<{ date: string; savedAt: string }>>(`/api/diaries/${id}/pages/${date}`, { method: "PUT", body: JSON.stringify(page), token });
+export const requestDiaryPhysical = (id: string, data: { binding: DiaryBinding; copies: number; address: DiaryAddress }, token: string) =>
+  apiRequest<Ok<DiaryPhysical>>(`/api/diaries/${id}/physical-request`, { method: "POST", body: JSON.stringify(data), token });
 export const deleteDiary = (id: string, token: string) => apiRequest<{ success: true }>(`/api/diaries/${id}`, { method: "DELETE", token });

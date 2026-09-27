@@ -798,3 +798,75 @@ body {
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* 에디터에서 Enter로 비운 단락이 인쇄/읽기 뷰에서 접히지 않게 */
+.diary-paper .tiptap p:empty::before {
+  content: "\00a0";
+}
+
+/* 인쇄 뷰: A5 실치수. 화면 640px 기준 값(행간 32px, 글자 20px)을 148mm(≈559px) 비율로 축소 */
+.diary-print {
+  background: #e9e7e2;
+  min-height: 100vh;
+  padding: 24px 0 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.diary-print__toolbar {
+  width: 148mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #424242;
+}
+.diary-print .diary-paper {
+  width: 148mm;
+  height: 210mm;
+  aspect-ratio: auto;
+  overflow: hidden;
+  border-radius: 0;
+  font-size: 17.5px;
+  --diary-line: 28px;
+  padding: 49px 24px 21px;
+  background-position: 0 49px;
+}
+.diary-print__cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #2b3446;
+}
+.diary-print__cover h1 {
+  font-size: 40px;
+  margin: 0;
+}
+.diary-print__cover p {
+  font-size: 20px;
+  color: #757575;
+  margin: 0;
+}
+@page {
+  size: A5;
+  margin: 0;
+}
+@media print {
+  .diary-print {
+    background: none;
+    padding: 0;
+    gap: 0;
+    min-height: auto;
+    display: block;
+  }
+  .diary-print .diary-paper {
+    border: none;
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+    margin: 0;
+  }
+}

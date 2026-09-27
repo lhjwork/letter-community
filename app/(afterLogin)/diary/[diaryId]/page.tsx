@@ -8,7 +8,8 @@ import Link from "next/link";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { showAlert } from "@/components/ui/AppAlert";
 import { DecoLayer, DecoTools } from "@/components/diary/DiaryDeco";
-import { getDiary, saveDiaryPage, updateDiary, DIARY_FONTS, DIARY_PAPERS, type Diary } from "@/lib/diary-api";
+import PhysicalRequestForm from "@/components/diary/PhysicalRequestForm";
+import { getDiary, saveDiaryPage, updateDiary, DIARY_FONTS, DIARY_PAPERS, DIARY_PHYSICAL_LABEL, type Diary } from "@/lib/diary-api";
 import type { DiaryDeco } from "@/lib/diary-decos";
 
 const hand = { fontFamily: "NanumJangMiCe, cursive" };
@@ -37,6 +38,7 @@ export default function DiaryEditorPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<"saved" | "dirty" | "saving">("saved");
   const [writtenDays, setWrittenDays] = useState<Set<string>>(new Set());
+  const [showRequest, setShowRequest] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pagesRef = useRef<Record<string, PageData>>({}); // 날짜별 최신 상태 (효과·핸들러에서만 읽음)
 
@@ -146,8 +148,14 @@ export default function DiaryEditorPage() {
     setDay(Math.min(Math.max(next, 1), lastDay));
   };
 
+  // 실물 신청 후에는 인쇄 원본이 바뀌면 안 되므로 편집 잠금
+  const locked = !!diary && diary.physical.status !== "none" && diary.physical.status !== "rejected";
+  useEffect(() => {
+    editor?.setEditable(!locked);
+  }, [editor, locked]);
+
   const changeSetting = async (patch: Partial<Pick<Diary, "paper" | "font">>) => {
-    if (!diary || !token) return;
+    if (!diary || !token || locked) return;
     setDiary({ ...diary, ...patch });
     try {
       await updateDiary(diaryId, patch, token);
@@ -199,7 +207,7 @@ export default function DiaryEditorPage() {
         <div className="flex items-center gap-2">
           <span className="text-[#757575]">종이</span>
           {DIARY_PAPERS.map((p) => (
-            <button key={p.id} onClick={() => changeSetting({ paper: p.id })} className={`px-3 py-1 rounded-full border ${diary.paper === p.id ? "border-[#FF9883] text-[#FF7F65]" : "border-[#C4C4C4]"}`}>
+            <button key={p.id} disabled={locked} onClick={() => changeSetting({ paper: p.id })} className={`px-3 py-1 rounded-full border ${diary.paper === p.id ? "border-[#FF9883] text-[#FF7F65]" : "border-[#C4C4C4]"}`}>
               {p.label}
             </button>
           ))}
@@ -207,7 +215,7 @@ export default function DiaryEditorPage() {
         <div className="flex items-center gap-2">
           <span className="text-[#757575]">글씨체</span>
           {DIARY_FONTS.map((f) => (
-            <button key={f.id} onClick={() => changeSetting({ font: f.id })} className={`px-3 py-1 rounded-full border text-base ${diary.font === f.id ? "border-[#FF9883] text-[#FF7F65]" : "border-[#C4C4C4]"}`} style={{ fontFamily: f.family }}>
+            <button key={f.id} disabled={locked} onClick={() => changeSetting({ font: f.id })} className={`px-3 py-1 rounded-full border text-base ${diary.font === f.id ? "border-[#FF9883] text-[#FF7F65]" : "border-[#C4C4C4]"}`} style={{ fontFamily: f.family }}>
               {f.label}
             </button>
           ))}
@@ -224,13 +232,61 @@ export default function DiaryEditorPage() {
         >
           <span className="diary-paper__date">{date.replace(/-/g, ". ")}.</span>
           <EditorContent editor={editor} />
-          <DecoLayer decos={decos} font={fontFamily} selectedId={selectedId} onSelect={setSelectedId} onChange={handleDecos} />
+          <DecoLayer decos={decos} font={fontFamily} selectedId={selectedId} onSelect={setSelectedId} onChange={handleDecos} readOnly={locked} />
         </div>
 
-        {/* 꾸미기 도구 */}
-        <div className="w-full lg:w-[320px] lg:sticky lg:top-6">
-          <DecoTools decos={decos} selectedId={selectedId} font={fontFamily} onSelect={setSelectedId} onChange={handleDecos} />
-        </div>
+        {/* 꾸미기 도구 (신청 후에는 잠금) */}
+        {!locked && (
+          <div className="w-full lg:w-[320px] lg:sticky lg:top-6">
+            <DecoTools decos={decos} selectedId={selectedId} font={fontFamily} onSelect={setSelectedId} onChange={handleDecos} />
+          </div>
+        )}
+      </div>
+
+      {/* 종이 다이어리로 받기 */}
+      <div className="mt-10 max-w-[640px] mx-auto lg:mx-0">
+        {locked ? (
+          <div className="rounded-lg border border-[#C4C4C4] bg-white p-5 text-[#424242]">
+            <p className="text-2xl mb-1" style={hand}>종이 다이어리 · {DIARY_PHYSICAL_LABEL[diary.physical.status]}</p>
+            <p className="text-sm text-[#757575]">
+              {diary.physical.requestedAt && `${new Date(diary.physical.requestedAt).toLocaleDateString("ko-KR")} 신청 · `}
+              {diary.physical.binding === "spring" ? "스프링" : "무선"} 제본 {diary.physical.copies}권 · 신청 후에는 내용을 고칠 수 없어요.
+            </p>
+            {diary.physical.notes && <p className="mt-2 text-sm text-[#FF7F65]">관리자 메모: {diary.physical.notes}</p>}
+            <Link href={`/diary/${diaryId}/print`} target="_blank" className="inline-block mt-3 text-sm text-[#FF7F65] underline">인쇄본 미리보기</Link>
+          </div>
+        ) : showRequest && token ? (
+          <PhysicalRequestForm
+            diaryId={diaryId}
+            token={token}
+            writtenCount={writtenDays.size}
+            onCancel={() => setShowRequest(false)}
+            onDone={(physical) => {
+              setDiary({ ...diary, physical, status: "closed" });
+              setShowRequest(false);
+              showAlert("신청되었습니다. 승인되면 알려드릴게요.");
+            }}
+          />
+        ) : (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => {
+                if (timerRef.current && date) {
+                  clearTimeout(timerRef.current);
+                  timerRef.current = null;
+                  flush(date);
+                }
+                setShowRequest(true);
+              }}
+              disabled={writtenDays.size === 0}
+              className="px-5 py-2 rounded-lg bg-[#FF9883] text-white hover:bg-[#ff8a70] disabled:opacity-50"
+            >
+              종이 다이어리로 받기
+            </button>
+            <Link href={`/diary/${diaryId}/print`} target="_blank" className="text-sm text-[#757575] underline">인쇄본 미리보기</Link>
+            {diary.physical.status === "rejected" && diary.physical.notes && <span className="text-sm text-[#E8735C]">반려: {diary.physical.notes}</span>}
+          </div>
+        )}
       </div>
     </div>
   );
