@@ -791,3 +791,10 @@ body {
 .diary-paper .tiptap p.is-editor-empty:first-child::before {
   font-family: var(--diary-font);
 }
+
+/* 데코 선택 표시 (인쇄 뷰에서는 readOnly라 나오지 않음) */
+.diary-deco--selected {
+  outline: 2px dashed #ff9883;
+  outline-offset: 3px;
+  border-radius: 2px;
+}

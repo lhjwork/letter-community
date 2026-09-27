@@ -1,4 +1,5 @@
 import { apiRequest } from "./api";
+import type { DiaryDeco } from "./diary-decos";
 
 export const DIARY_PAPERS = [
   { id: "lined", label: "줄" },
@@ -22,6 +23,7 @@ export type DiaryFont = (typeof DIARY_FONTS)[number]["id"];
 export interface DiaryPage {
   date: string;
   content: string;
+  decos: DiaryDeco[];
 }
 export interface Diary {
   _id: string;
@@ -42,6 +44,6 @@ export const createDiary = (data: { title: string; month: string; paper: DiaryPa
   apiRequest<Ok<Diary>>("/api/diaries", { method: "POST", body: JSON.stringify(data), token });
 export const updateDiary = (id: string, data: Partial<Pick<Diary, "title" | "paper" | "font">>, token: string) =>
   apiRequest<Ok<Diary>>(`/api/diaries/${id}`, { method: "PATCH", body: JSON.stringify(data), token });
-export const saveDiaryPage = (id: string, date: string, content: string, token: string) =>
-  apiRequest<Ok<{ date: string; savedAt: string }>>(`/api/diaries/${id}/pages/${date}`, { method: "PUT", body: JSON.stringify({ content }), token });
+export const saveDiaryPage = (id: string, date: string, page: { content: string; decos: DiaryDeco[] }, token: string) =>
+  apiRequest<Ok<{ date: string; savedAt: string }>>(`/api/diaries/${id}/pages/${date}`, { method: "PUT", body: JSON.stringify(page), token });
 export const deleteDiary = (id: string, token: string) => apiRequest<{ success: true }>(`/api/diaries/${id}`, { method: "DELETE", token });
