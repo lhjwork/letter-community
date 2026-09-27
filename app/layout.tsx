@@ -25,6 +25,8 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumJangMiCe.css" rel="stylesheet" />
+        {/* 다이어리 손글씨 폰트 (OFL) */}
+        <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Gaegu&family=Hi+Melody&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased overflow-x-hidden">
         <SessionProvider>

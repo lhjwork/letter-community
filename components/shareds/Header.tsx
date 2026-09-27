@@ -150,6 +150,16 @@ export default function Header() {
                 우편함
               </button>
             )}
+
+            {status === "authenticated" && (
+              <Link
+                href="/diary"
+                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
+                style={{ fontFamily: "NanumJangMiCe, cursive" }}
+              >
+                다이어리
+              </Link>
+            )}
           </nav>
 
           {/* 오른쪽 로그인/사용자 메뉴 */}

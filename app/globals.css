@@ -740,3 +740,54 @@ body {
   line-height: 48px;
   margin: 0;
 }
+
+/* 다이어리 - A5 종이 한 장. 데코 좌표(Phase 1)는 이 상자의 폭 % 기준 */
+.diary-paper {
+  position: relative;
+  aspect-ratio: 1 / 1.414;
+  background-color: #fefefe;
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 56px 28px 24px;
+  overflow-y: auto;
+  --diary-line: 32px;
+  background-attachment: local;
+}
+.diary-paper[data-paper="lined"] {
+  background-image: repeating-linear-gradient(transparent 0, transparent calc(var(--diary-line) - 1px), #e4e1da calc(var(--diary-line) - 1px), #e4e1da var(--diary-line));
+  background-position: 0 56px;
+}
+.diary-paper[data-paper="grid"] {
+  background-image: linear-gradient(#ebe8e2 1px, transparent 1px), linear-gradient(90deg, #ebe8e2 1px, transparent 1px);
+  background-size: var(--diary-line) var(--diary-line);
+  background-position: 0 56px;
+}
+.diary-paper[data-paper="dot"] {
+  background-image: radial-gradient(#d6d3cc 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.diary-paper[data-paper="cream"] {
+  background-color: #fbf6ec;
+  border-color: #e3d9c4;
+}
+.diary-paper__date {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  font-family: var(--diary-font);
+  font-size: 18px;
+  color: #757575;
+}
+/* useLetterEditor가 인라인으로 박는 폰트·행간을 다이어리 값으로 덮는다 */
+.diary-paper .tiptap {
+  min-height: 100%;
+}
+.diary-paper .tiptap :is(p, h1, h2, h3, li) {
+  font-family: var(--diary-font);
+  line-height: var(--diary-line);
+  margin: 0;
+}
+.diary-paper .tiptap p.is-editor-empty:first-child::before {
+  font-family: var(--diary-font);
+}
