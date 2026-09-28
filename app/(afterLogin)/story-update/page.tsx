@@ -127,7 +127,7 @@ function StoryUpdateContent() {
 
   // 페이지 이탈 경고
   useBeforeUnload({
-    when: hasUnsavedChanges && (content.length > 10 || title.length > 0),
+    when: hasUnsavedChanges && content.length > 10,
     message: "작성 중인 사연이 저장되지 않았습니다. 정말 나가시겠습니까?",
   });
 
@@ -144,11 +144,6 @@ function StoryUpdateContent() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [manualSave]);
 
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    setHasUnsavedChanges(true);
-  };
-
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setHasUnsavedChanges(true);
@@ -157,13 +152,8 @@ function StoryUpdateContent() {
   // 등록 직전 맞춤법 점검 → 제안이 있으면 모달, 없으면 바로 등록
   const handleSubmit = async () => {
     // 내용 유효성 검사
-    if (!content.trim()) {
+    if (!content.replace(/<[^>]*>/g, "").trim()) {
       showAlert("내용을 입력해주세요.");
-      return;
-    }
-
-    if (!title.trim()) {
-      showAlert("제목을 입력해주세요.");
       return;
     }
 
@@ -200,10 +190,12 @@ function StoryUpdateContent() {
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
+      // MVP에서는 제목 입력이 없어 본문 앞 30자를 제목으로 보냄 (서버는 제목 필수)
+      const storyTitle = title.trim() || plainContent.slice(0, 30);
       if (editId) {
         await updateLetter(
           editId,
-          { title: title.trim(), content: htmlContent, category: selectedCategory, isPublic, ogTitle: title.trim(), ogPreviewText },
+          { title: storyTitle, content: htmlContent, category: selectedCategory, isPublic, ogTitle: storyTitle, ogPreviewText },
           token as string,
         );
         setHasUnsavedChanges(false);
@@ -214,10 +206,10 @@ function StoryUpdateContent() {
 
       const result = await createStory(
         {
-          title: title.trim(),
+          title: storyTitle,
           content: htmlContent,
           authorName: session?.user?.name || "익명",
-          ogTitle: title.trim(),
+          ogTitle: storyTitle,
           ogPreviewText,
           category: selectedCategory,
           isPublic,
@@ -324,31 +316,6 @@ function StoryUpdateContent() {
               {selectedCategoryInfo.description}
             </p>
           )}
-        </section>
-
-        {/* 제목 입력 */}
-        <section className="mb-6 sm:mb-12">
-          <h2
-            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
-            style={{ fontFamily: "NanumJangMiCe, cursive" }}
-          >
-            편지의 제목을 정해주세요
-          </h2>
-
-          <div className="bg-white border border-gray-400 rounded-lg px-5 sm:px-7 h-10 sm:h-12 xl:h-16 flex items-center">
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="내용을 입력해주세요"
-              className="w-full text-sm sm:text-base xl:text-xl text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent"
-            />
-          </div>
-
-          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-4">
-            제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
-            제안해드려요.
-          </p>
         </section>
 
         {/* 내용 작성 */}

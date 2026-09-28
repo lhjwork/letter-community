@@ -9,7 +9,6 @@ import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { EditorContent } from "@tiptap/react";
 import { createLetter, getLetter, updateLetter } from "@/lib/api";
-import { generateTitle, canGenerateTitle } from "@/lib/ai-title-generator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import ShareModal from "@/components/ShareModal";
@@ -32,8 +31,6 @@ function WritePageContent() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
-  const [aiGeneratedTitle, setAiGeneratedTitle] = useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
 
@@ -233,39 +230,6 @@ function WritePageContent() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [manualSave]);
 
-  // AI 제목 생성 함수 (버튼 클릭 시 호출)
-  const generateAITitle = async () => {
-    if (content) {
-      const plainContent = content.replace(/<[^>]*>/g, "").trim();
-
-      if (canGenerateTitle(plainContent)) {
-        setIsGeneratingTitle(true);
-        try {
-          const generatedTitle = await generateTitle(plainContent);
-          setAiGeneratedTitle(generatedTitle);
-          setTitle(generatedTitle);
-          setHasUnsavedChanges(true);
-        } catch (error) {
-          console.error("제목 생성 실패:", error);
-          showAlert("제목 생성에 실패했습니다. 다시 시도해주세요.");
-        } finally {
-          setIsGeneratingTitle(false);
-        }
-      } else {
-        showAlert("제목을 생성하기 위해서는 더 많은 내용을 작성해주세요.");
-      }
-    }
-  };
-
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    setHasUnsavedChanges(true);
-  };
-
-  const regenerateTitle = async () => {
-    await generateAITitle();
-  };
-
   const handleCancel = () => {
     if (
       hasUnsavedChanges &&
@@ -280,13 +244,8 @@ function WritePageContent() {
   // 등록 직전 맞춤법 점검 → 제안이 있으면 모달, 없으면 바로 등록
   const handleSubmit = async () => {
     // 내용 유효성 검사
-    if (!content.trim()) {
+    if (!content.replace(/<[^>]*>/g, "").trim()) {
       showAlert("내용을 입력해주세요.");
-      return;
-    }
-
-    if (!title.trim()) {
-      showAlert("제목을 입력해주세요.");
       return;
     }
 
@@ -323,10 +282,12 @@ function WritePageContent() {
       const ogPreviewText =
         plainContent.slice(0, 60) + (plainContent.length > 60 ? "..." : "");
 
+      // MVP에서는 제목 입력이 없어 본문 앞 30자를 제목으로 보냄 (서버는 제목 필수)
+      const letterTitle = title.trim() || plainContent.slice(0, 30);
       if (editId) {
         await updateLetter(
           editId,
-          { title: title.trim(), content: htmlContent, isPublic, ogTitle: title.trim(), ogPreviewText },
+          { title: letterTitle, content: htmlContent, isPublic, ogTitle: letterTitle, ogPreviewText },
           token as string,
         );
         setHasUnsavedChanges(false);
@@ -338,10 +299,10 @@ function WritePageContent() {
       // 일반 편지 생성
       const result = await createLetter(
         {
-          title: title.trim(),
+          title: letterTitle,
           content: htmlContent,
           type: "friend",
-          ogTitle: title.trim(),
+          ogTitle: letterTitle,
           ogPreviewText,
           isPublic,
           replyToId: replyTo || undefined,
@@ -438,44 +399,6 @@ function WritePageContent() {
           </Button>
         </motion.div>
 
-        {/* 제목 입력 */}
-        <motion.section
-          className="mb-6 sm:mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" as const }}
-        >
-          <motion.h2
-            className="text-2xl sm:text-3xl xl:text-5xl font-bold text-gray-700 mb-4 sm:mb-8"
-            style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            편지의 제목을 정해주세요
-          </motion.h2>
-
-          <motion.div
-            className="bg-white border border-gray-400 rounded-lg px-5 sm:px-7 h-10 sm:h-12 xl:h-16 flex items-center"
-            whileFocus={{ borderColor: "#FF9883", boxShadow: "0 0 0 2px rgba(255, 152, 131, 0.2)" }}
-            whileHover={{ borderColor: "#FF9883" }}
-            transition={{ duration: 0.2 }}
-          >
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="내용을 입력해주세요"
-              className="w-full text-sm sm:text-base xl:text-xl text-gray-700 placeholder-gray-400 border-none outline-none bg-transparent"
-            />
-          </motion.div>
-
-          <p className="text-gray-600 text-sm sm:text-base xl:text-xl mt-2 sm:mt-6">
-            제목이 떠오르지 않아도 괜찮아요. 레터가 내용을 바탕으로 제목을
-            제안해드려요.
-          </p>
-        </motion.section>
-
         {/* 내용 작성 */}
         <motion.section
           className="mb-6 sm:mb-12"
@@ -552,57 +475,6 @@ function WritePageContent() {
                 </div>
                 <div className="text-left text-base text-gray-700 mb-4">
                   To Someone Special
-                </div>
-
-                {/* AI 제목 생성 관련 버튼들 */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    {isGeneratingTitle && (
-                      <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                    )}
-
-                    <button
-                      onClick={generateAITitle}
-                      disabled={
-                        isGeneratingTitle ||
-                        !content.replace(/<[^>]*>/g, "").trim()
-                      }
-                      className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={"AI로 제목 생성"}
-                    >
-                      {isGeneratingTitle ? "생성 중..." : "🤖 AI 제목 생성"}
-                    </button>
-
-                    {aiGeneratedTitle && !isGeneratingTitle && (
-                      <button
-                        onClick={regenerateTitle}
-                        className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded hover:bg-green-200 transition-colors"
-                        title={"제목 다시 생성"}
-                      >
-                        🔄 재생성
-                      </button>
-                    )}
-                  </div>
-
-                  {/* AI 제목 생성 상태 표시 */}
-                  <div className="text-xs text-gray-500">
-                    {isGeneratingTitle ? (
-                      <span className="flex items-center gap-1">
-                        <span className="animate-pulse">🤖</span>
-                        AI가 제목을 생성하고 있습니다...
-                      </span>
-                    ) : aiGeneratedTitle ? (
-                      <span className="text-green-600">
-                        ✨ AI가 생성한 제목입니다. 마음에 들지 않으면 직접
-                        수정하세요.
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">
-                        편지 내용을 작성한 후 &quot;AI 제목 생성&quot; 버튼을
-                        클릭하세요.
-                      </span>
-                    )}
-                  </div>
                 </div>
               </div>
 

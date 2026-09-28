@@ -199,7 +199,7 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-[#FEFEFE]">
       <main className="container mx-auto px-4 sm:px-8 lg:px-10 py-6 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[648fr_512fr] gap-6 lg:gap-[11px]">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,648fr)_minmax(460px,512fr)] gap-6 xl:gap-[11px]">
           {/* 왼쪽: 내 프로필 */}
           <section>
             <h2
@@ -210,95 +210,77 @@ export default function MyPage() {
             </h2>
 
             <div className={`${panelClass} p-5 sm:p-6`}>
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
-                {/* 프로필 이미지 */}
-                <div className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] shrink-0 mx-auto sm:mx-0">
-                  <div className="w-full h-full rounded-full bg-[#C4C4C4] flex items-center justify-center">
-                    <span className="text-5xl sm:text-6xl">👤</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="absolute bottom-0 right-0 w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] bg-white border-2 border-[#C4C4C4] rounded-full flex items-center justify-center text-[#757575] hover:bg-[#F9F9F9] transition-colors"
-                    aria-label="프로필 사진 변경"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
+              {/* 이메일 / 닉네임 / 배송정보 */}
+              <div className="flex flex-col gap-5">
+                <div
+                  className="h-16 px-3 bg-[#F9F9F9] rounded-lg flex items-center text-xl text-[#757575] truncate"
+                  style={{ fontFamily: "Pretendard, sans-serif" }}
+                >
+                  {session?.user?.email || "이메일 없음"}
                 </div>
 
-                {/* 이메일 / 닉네임 / 배송정보 */}
-                <div className="flex-1 flex flex-col gap-5">
-                  <div
-                    className="h-16 px-3 bg-[#F9F9F9] rounded-lg flex items-center text-xl text-[#757575] truncate"
-                    style={{ fontFamily: "Pretendard, sans-serif" }}
+                <div>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSaveName();
+                    }}
+                    className={`h-16 px-6 border-2 rounded-lg flex items-center gap-2 ${
+                      nameLocked ? "border-[#C4C4C4] bg-[#F9F9F9]" : "border-[#FF9883]"
+                    }`}
                   >
-                    {session?.user?.email || "이메일 없음"}
-                  </div>
-
-                  <div>
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSaveName();
+                    <input
+                      type="text"
+                      value={nameInput}
+                      onChange={(e) => {
+                        setNameInput(e.target.value);
+                        setNameMessage(null);
                       }}
-                      className={`h-16 px-6 border-2 rounded-lg flex items-center gap-2 ${
-                        nameLocked ? "border-[#C4C4C4] bg-[#F9F9F9]" : "border-[#FF9883]"
-                      }`}
-                    >
-                      <input
-                        type="text"
-                        value={nameInput}
-                        onChange={(e) => {
-                          setNameInput(e.target.value);
-                          setNameMessage(null);
-                        }}
-                        maxLength={20}
-                        disabled={nameLocked || savingName}
-                        placeholder="닉네임을 입력해주세요"
-                        className="flex-1 min-w-0 bg-transparent outline-none text-xl text-[#757575] placeholder-[#C4C4C4] disabled:cursor-not-allowed"
-                        style={{ fontFamily: "Pretendard, sans-serif" }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={nameLocked || savingName}
-                        className="shrink-0 text-[#FF7F65] disabled:text-[#C4C4C4]"
-                        aria-label="닉네임 저장"
-                      >
-                        {savingName ? (
-                          <span className="block w-6 h-6 border-2 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </button>
-                    </form>
-                    <p
-                      className={`mt-2 px-1 text-sm ${
-                        nameMessage ? (nameMessage.ok ? "text-[#FF7F65]" : "text-[#E5484D]") : "text-[#C4C4C4]"
-                      }`}
+                      maxLength={20}
+                      disabled={nameLocked || savingName}
+                      placeholder="닉네임을 입력해주세요"
+                      className="flex-1 min-w-0 bg-transparent outline-none text-xl text-[#757575] placeholder-[#C4C4C4] disabled:cursor-not-allowed"
                       style={{ fontFamily: "Pretendard, sans-serif" }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={nameLocked || savingName}
+                      className="shrink-0 text-[#FF7F65] disabled:text-[#C4C4C4]"
+                      aria-label="닉네임 저장"
                     >
-                      {nameMessage
-                        ? nameMessage.text
-                        : nameLocked
-                          ? `닉네임은 한 달에 한 번만 변경할 수 있어요 (${nextNameChangeAt!.toLocaleDateString("ko-KR")}부터 가능)`
-                          : "닉네임은 한 달에 한 번만 변경할 수 있어요. 변경하려면 체크를 눌러주세요"}
-                    </p>
-                  </div>
-
-                  <Link
-                    href="/letter-box/addresses"
-                    className="h-16 px-6 border-2 border-[#C4C4C4] rounded-lg flex items-center justify-between text-xl text-[#757575] hover:bg-[#F9F9F9] transition-colors"
+                      {savingName ? (
+                        <span className="block w-6 h-6 border-2 border-[#FF7F65] border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  </form>
+                  <p
+                    className={`mt-2 px-1 text-sm ${
+                      nameMessage ? (nameMessage.ok ? "text-[#FF7F65]" : "text-[#E5484D]") : "text-[#C4C4C4]"
+                    }`}
                     style={{ fontFamily: "Pretendard, sans-serif" }}
                   >
-                    배송정보 관리
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+                    {nameMessage
+                      ? nameMessage.text
+                      : nameLocked
+                        ? `닉네임은 한 달에 한 번만 변경할 수 있어요 (${nextNameChangeAt!.toLocaleDateString("ko-KR")}부터 가능)`
+                        : "닉네임은 한 달에 한 번만 변경할 수 있어요. 변경하려면 체크를 눌러주세요"}
+                  </p>
                 </div>
+
+                <Link
+                  href="/letter-box/addresses"
+                  className="h-16 px-6 border-2 border-[#C4C4C4] rounded-lg flex items-center justify-between text-xl text-[#757575] hover:bg-[#F9F9F9] transition-colors"
+                  style={{ fontFamily: "Pretendard, sans-serif" }}
+                >
+                  배송정보 관리
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
               </div>
 
               {/* 연동정보 */}
