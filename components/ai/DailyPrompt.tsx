@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -54,6 +55,7 @@ export function DailyPrompt() {
   }, []);
 
   const handleWriteClick = () => {
+    track("daily_prompt_write_click", { logged_in: !!session });
     if (session) {
       router.push("/write");
     } else {

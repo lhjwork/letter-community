@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
@@ -81,6 +82,7 @@ export default function LetterDetailClient({
   };
 
   const handleWriteClick = () => {
+    track("write_cta_click", { from: "letter_detail", logged_in: !!session });
     if (session) {
       router.push("/write");
     } else {
@@ -94,6 +96,7 @@ export default function LetterDetailClient({
 
   const handleDelete = async () => {
     await deleteLetter(letter._id, session?.backendToken as string);
+    track("letter_delete", { letter_type: letter.type, letter_id: letter._id });
     showAlert(isStory ? "사연이 삭제되었습니다." : "편지가 삭제되었습니다.");
     router.push("/letter-box");
   };
@@ -242,6 +245,12 @@ export default function LetterDetailClient({
   const isStory = letter.type === "story";
   const [envelopeOpened, setEnvelopeOpened] = useState(isStory); // 사연은 바로 열림
 
+  useEffect(() => {
+    track("letter_view", { letter_type: letter.type, letter_id: letter._id, is_author: isAuthor });
+    // isAuthor는 세션 로딩 후 바뀔 수 있어 의존성에서 제외 (최초 1회만 기록)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [letter._id]);
+
   // 스크롤 연동 그림자 + 플로팅 버튼
   const letterPaperRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -385,7 +394,12 @@ export default function LetterDetailClient({
             </div>
           </>
         ) : (
-        <EnvelopeAnimation onOpen={() => setEnvelopeOpened(true)}>
+        <EnvelopeAnimation
+          onOpen={() => {
+            setEnvelopeOpened(true);
+            track("envelope_open", { letter_id: letter._id });
+          }}
+        >
           {/* 사연 제목 필드 */}
           {letter.ogTitle && (
             <motion.div
@@ -560,6 +574,7 @@ export default function LetterDetailClient({
             <div className="flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full">
               <LikeButton
                 letterId={letter._id}
+                letterType={letter.type}
                 initialLikeCount={letter.likeCount || 0}
                 size="lg"
                 showCount
@@ -647,6 +662,7 @@ export default function LetterDetailClient({
                   variant="outline"
                   onClick={() => {
                     navigator.clipboard.writeText(shareUrl);
+                    track("share", { method: "copy_link", content_type: letter.type, item_id: letter._id });
                     showAlert("링크가 복사되었습니다!");
                   }}
                   className="w-full sm:w-56 h-12 sm:h-16 bg-white rounded-lg border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] cursor-pointer transition-colors font-semibold text-base sm:text-2xl leading-5"
@@ -903,6 +919,7 @@ function StoryContent({
 }) {
   const { isLiked, likeCount, isToggling, toggleLike, isLoggedIn } = useLike({
     letterId: letter._id,
+    letterType: "story",
     initialLikeCount: letter.likeCount || 0,
   });
   const [replies, setReplies] = useState<StoryReply[]>([]);
@@ -1165,6 +1182,7 @@ function AddressForm({
       }
 
       if (result.success) {
+        track("physical_request", { letter_id: letterId, anonymous: false });
         // 새로운 RequestId 기반 저장
         savePhysicalRequestId(letterId, result.data.requestId);
 

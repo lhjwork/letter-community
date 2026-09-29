@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useState } from "react";
 import { requestPhysicalLetterAnonymous, validateRecipientAddress } from "@/lib/recipient-api";
 import { getOrCreateSessionId } from "@/lib/session-id";
@@ -83,6 +84,7 @@ export default function AnonymousPhysicalRequestForm({ letterId, letterTitle, on
       });
 
       if (response.success) {
+        track("physical_request", { letter_id: letterId, anonymous: true, is_duplicate: response.data.isDuplicate });
         setIsDuplicate(response.data.isDuplicate);
 
         if (response.data.isDuplicate) {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { track } from "@/lib/analytics/ga";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
@@ -24,6 +25,10 @@ export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: Logi
 
   const allAgreed = agreeTerms && agreePrivacy;
 
+  useEffect(() => {
+    if (isOpen) track("login_dialog_open", { from: callbackUrl });
+  }, [isOpen, callbackUrl]);
+
   const handleAgreeAll = (checked: boolean) => {
     setAgreeTerms(checked);
     setAgreePrivacy(checked);
@@ -31,6 +36,7 @@ export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: Logi
 
   const handleLogin = async (provider: "kakao" | "naver" | "instagram") => {
     if (!allAgreed) return;
+    track("login_start", { method: provider });
     try {
       await signIn(provider, { callbackUrl });
     } catch (error) {

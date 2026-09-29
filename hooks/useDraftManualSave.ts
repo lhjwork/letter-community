@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics/ga";
 import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { saveDraft } from "@/lib/draft-api";
@@ -58,6 +59,7 @@ export function useDraftManualSave({ content, title, type, category, draftId, on
       });
 
       if (response.success) {
+        track("draft_save", { letter_type: type ?? "unknown", is_new: !draftId });
         setSaveState({
           status: "saved",
           lastSavedAt: new Date(),

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
 import ProofreadModal, { requestProofread, applyCorrections, type Correction } from "@/components/letter/ProofreadModal";
 import { useState, useEffect } from "react";
@@ -199,6 +200,7 @@ function StoryUpdateContent() {
           token as string,
         );
         setHasUnsavedChanges(false);
+        track("letter_update", { letter_type: "story", letter_id: editId });
         showAlert("사연이 수정되었습니다.");
         router.push(`/letter/${editId}`);
         return;
@@ -224,6 +226,12 @@ function StoryUpdateContent() {
         token,
       );
 
+      track("story_create", {
+        letter_type: "story",
+        category: selectedCategory,
+        is_public: isPublic,
+        content_length: plainContent.length,
+      });
       showAlert(`사연이 "${selectedCategory}" 카테고리로 등록되었습니다! 💌`);
 
       // 성공적으로 발행되면 임시저장 상태 초기화

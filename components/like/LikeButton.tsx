@@ -3,10 +3,12 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLike } from "@/hooks/useLike";
+import type { LetterType } from "@/lib/analytics/ga";
 import LoginDialog from "@/components/shareds/LoginDialog";
 
 interface LikeButtonProps {
   letterId: string;
+  letterType?: LetterType;
   initialLikeCount?: number;
   initialIsLiked?: boolean;
   size?: "sm" | "md" | "lg";
@@ -24,12 +26,13 @@ interface Particle {
 
 const PARTICLE_COLORS = ["#FF6B6B", "#FF8E8E", "#FFB4B4", "#FF4757", "#FF6348"];
 
-export default function LikeButton({ letterId, initialLikeCount = 0, initialIsLiked = false, size = "md", showCount = true }: LikeButtonProps) {
+export default function LikeButton({ letterId, letterType, initialLikeCount = 0, initialIsLiked = false, size = "md", showCount = true }: LikeButtonProps) {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [justLiked, setJustLiked] = useState(false);
   const { isLiked, likeCount, isToggling, toggleLike, isLoggedIn } = useLike({
     letterId,
+    letterType,
     initialLikeCount,
     initialIsLiked,
   });

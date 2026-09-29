@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
 import ProofreadModal, { requestProofread, applyCorrections, type Correction } from "@/components/letter/ProofreadModal";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -291,6 +292,7 @@ function WritePageContent() {
           token as string,
         );
         setHasUnsavedChanges(false);
+        track("letter_update", { letter_type: "friend", letter_id: editId });
         showAlert("편지가 수정되었습니다.");
         router.push(`/letter/${editId}`);
         return;
@@ -309,6 +311,13 @@ function WritePageContent() {
         },
         token,
       );
+
+      track("letter_create", {
+        letter_type: "friend",
+        is_reply: !!replyTo,
+        is_public: isPublic,
+        content_length: plainContent.length,
+      });
 
       // 공유 모달 표시
       setShareData({

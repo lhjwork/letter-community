@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
@@ -15,6 +16,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const openLoginDialog = (callbackUrl = "/") => {
+    if (callbackUrl !== "/") track("write_cta_click", { from: "header", logged_in: false });
     setLoginCallbackUrl(callbackUrl);
     setIsLoginDialogOpen(true);
   };

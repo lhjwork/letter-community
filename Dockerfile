@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
+# NEXT_PUBLIC_* 값은 빌드 시 번들에 인라인되므로 --build-arg 로 넘겨야 한다.
+ARG NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
 RUN pnpm run build
 
 FROM node:22-alpine

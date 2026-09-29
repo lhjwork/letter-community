@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useState } from "react";
 import Image from "next/image";
 import type { Correction } from "@/lib/ai/proofread-types";
@@ -17,7 +18,9 @@ export async function requestProofread(content: string): Promise<Correction[]> {
     });
     if (!res.ok) return [];
     const data = await res.json();
-    return Array.isArray(data.corrections) ? data.corrections : [];
+    const corrections: Correction[] = Array.isArray(data.corrections) ? data.corrections : [];
+    if (corrections.length > 0) track("proofread_shown", { correction_count: corrections.length });
+    return corrections;
   } catch {
     return [];
   }
@@ -88,7 +91,10 @@ export default function ProofreadModal({ open, corrections, onConfirm, onSkip, o
           </button>
           <button
             type="button"
-            onClick={() => onConfirm(selected)}
+            onClick={() => {
+              track("proofread_confirm", { correction_count: corrections.length, selected_count: selected.length });
+              onConfirm(selected);
+            }}
             className="h-12 rounded-lg bg-[#FF9883] text-white text-base font-medium hover:bg-[#FF7F65] transition-colors"
           >
             {selected.length ? `${selected.length}곳 고쳐서 등록` : "그대로 등록"}

@@ -205,6 +205,9 @@ NEXTAUTH_URL=http://localhost:3001
 BACKEND_URL=http://localhost:5001
 NEXT_PUBLIC_BACKEND_URL=http://localhost:5001
 
+# Google Analytics 4 (비우면 GA 비활성화, 설정법: docs/analytics.md)
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+
 # OAuth 설정
 NAVER_CLIENT_ID=your-naver-client-id
 NAVER_CLIENT_SECRET=your-naver-client-secret

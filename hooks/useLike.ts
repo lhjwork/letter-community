@@ -3,14 +3,16 @@
 import { useState, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { addLike, removeLike, checkLikeStatus } from "@/lib/api";
+import { track, type LetterType } from "@/lib/analytics/ga";
 
 interface UseLikeOptions {
   letterId: string;
+  letterType?: LetterType;
   initialLikeCount?: number;
   initialIsLiked?: boolean;
 }
 
-export const useLike = ({ letterId, initialLikeCount = 0, initialIsLiked = false }: UseLikeOptions) => {
+export const useLike = ({ letterId, letterType, initialLikeCount = 0, initialIsLiked = false }: UseLikeOptions) => {
   const { data: session } = useSession();
   const token = (session as any)?.backendToken;
 
@@ -57,6 +59,7 @@ export const useLike = ({ letterId, initialLikeCount = 0, initialIsLiked = false
       } else {
         await addLike(letterId, token);
       }
+      track("like", { letter_id: letterId, letter_type: letterType, action: previousIsLiked ? "remove" : "add" });
       return true;
     } catch (error) {
       // 에러 시 롤백
@@ -67,7 +70,7 @@ export const useLike = ({ letterId, initialLikeCount = 0, initialIsLiked = false
     } finally {
       setIsToggling(false);
     }
-  }, [letterId, token, isLiked, likeCount, isToggling]);
+  }, [letterId, letterType, token, isLiked, likeCount, isToggling]);
 
   return {
     isLiked,

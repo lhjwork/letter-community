@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useState, useRef, useEffect, FormEvent } from "react";
 
 interface Message {
@@ -32,6 +33,7 @@ export function EmotionChat() {
     };
 
     const newMessages = [...messages, userMessage];
+    track("ai_chat_message", { message_index: newMessages.filter((m) => m.role === "user").length });
     setMessages(newMessages);
     setInput("");
     setIsLoading(true);
@@ -95,7 +97,10 @@ export function EmotionChat() {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setIsOpen(true);
+          track("ai_chat_open", {});
+        }}
         className="fixed bottom-6 right-6 w-12 h-12 bg-gray-800 dark:bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-all hover:scale-105 flex items-center justify-center z-50"
         aria-label="감정 대화 열기"
       >

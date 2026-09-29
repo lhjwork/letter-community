@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import type { SortOption } from "@/lib/api";
@@ -26,6 +27,12 @@ export const useStoriesFilter = () => {
 
       // 필터 변경 시 페이지를 1로 리셋
       params.delete("page");
+
+      track("story_filter", {
+        search: params.get("search") || "",
+        category: params.get("category") || "",
+        sort: params.get("sort") || "latest",
+      });
 
       router.push(`/stories?${params.toString()}`);
     },

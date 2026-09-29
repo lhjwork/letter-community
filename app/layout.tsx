@@ -3,6 +3,7 @@ import "./globals.css";
 import SessionProvider from "@/components/SessionProvider";
 import { AlertHost } from "@/components/ui/AppAlert";
 import { EmotionChat } from "@/components/ai/EmotionChat";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -28,6 +29,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased overflow-x-hidden">
         <SessionProvider>
+          <GoogleAnalytics />
           <div className="mx-auto max-w-[1920px] overflow-x-hidden">{children}</div>
           <AlertHost />
           <EmotionChat />

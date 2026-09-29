@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/ga";
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,6 +45,7 @@ export default function ShareModal({ isOpen, onClose, letterUrl, letterTitle }: 
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
+    track("share", { method: "copy_link", content_type: "friend" });
     try {
       await navigator.clipboard.writeText(letterUrl);
       setCopied(true);
@@ -68,6 +70,7 @@ export default function ShareModal({ isOpen, onClose, letterUrl, letterTitle }: 
 
   const shareToKakao = () => {
     if (typeof window !== "undefined" && window.Kakao) {
+      track("share", { method: "kakao", content_type: "friend" });
       window.Kakao.Share.sendDefault({
         objectType: "feed",
         content: {
