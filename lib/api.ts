@@ -129,15 +129,11 @@ export async function createStory(
     authorName: string;
     ogTitle?: string;
     ogPreviewText?: string;
-    category?: string; // AI 분류 카테고리
-    isPublic?: boolean; // 공개 여부
-    aiMetadata?: {
-      confidence: number;
-      reason: string;
-      tags: string[];
-      classifiedAt: string;
-      model: string;
-    };
+    category?: string;
+    contentType?: "text" | "html";
+    envelope?: "seongsu" | "myeongdong";
+    isAnonymous?: boolean;
+    recipientName?: string;
   },
   token?: string,
 ): Promise<{ data: { _id: string } }> {
@@ -162,18 +158,14 @@ export async function createLetter(
     type: "friend" | "story";
     ogTitle?: string;
     ogPreviewText?: string;
-    isPublic?: boolean; // 공개 여부
     authorName?: string; // 사연용
-    category?: string; // 사연용 AI 분류 카테고리
+    category?: string;
+    contentType?: "text" | "html";
+    envelope?: "seongsu" | "myeongdong";
+    isAnonymous?: boolean;
+    recipientName?: string;
     recipientAddresses?: RecipientAddressInput[]; // 수신자 주소 목록
     replyToId?: string; // 사연 답장인 경우 원본 사연 ID
-    aiMetadata?: {
-      confidence: number;
-      reason: string;
-      tags: string[];
-      classifiedAt: string;
-      model: string;
-    };
   },
   token?: string,
 ): Promise<{
@@ -219,7 +211,18 @@ export async function getStoryReplies(
  */
 export async function getLetter(letterId: string): Promise<{
   success: boolean;
-  data: { _id: string; title?: string; content?: string; category?: string; isPublic?: boolean; type?: string };
+  data: {
+    _id: string;
+    title?: string;
+    content?: string;
+    contentType?: "text" | "html";
+    category?: string;
+    envelope?: "seongsu" | "myeongdong";
+    isAnonymous?: boolean;
+    recipientName?: string;
+    isPublic?: boolean;
+    type?: string;
+  };
 }> {
   return apiRequest(`/api/letters/${letterId}`, {
     method: "GET",
@@ -345,6 +348,10 @@ export async function updateLetter(
     title?: string;
     content?: string;
     category?: string;
+    contentType?: "text" | "html";
+    envelope?: "seongsu" | "myeongdong";
+    isAnonymous?: boolean;
+    recipientName?: string;
     isPublic?: boolean;
     ogTitle?: string;
     ogPreviewText?: string;

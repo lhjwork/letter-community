@@ -8,6 +8,7 @@ interface Letter {
   _id: string;
   type: "story" | "friend";
   content: string;
+  contentType?: "text" | "html";
   ogTitle?: string;
   ogPreviewText: string;
   status: string;
@@ -41,6 +42,14 @@ interface Letter {
   };
 }
 
+function textToHtml(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+}
+
 async function getLetter(letterId: string): Promise<Letter | null> {
   try {
     const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`, {
@@ -54,9 +63,8 @@ async function getLetter(letterId: string): Promise<Letter | null> {
     // 새로운 필드들에 대한 기본값 설정 (백엔드 호환성)
     return {
       ...data,
-      // senderId를 우선적으로 사용하고, 없으면 다른 필드들 확인
-      authorId:
-        data.senderId || data.authorId || data.senderUserId || "unknown",
+      // textarea 로 쓴 편지(contentType text)는 읽기 화면의 HTML 렌더러에 맞게 줄바꿈만 <br> 로
+      content: data.contentType === "text" ? textToHtml(data.content ?? "") : data.content,
       physicalLetterStats: data.physicalLetterStats || {
         totalRequests: 0,
         pendingRequests: 0,

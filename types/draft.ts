@@ -6,8 +6,12 @@ export interface DraftLetter {
   title: string;
   autoTitle: string;
   content: string;
+  contentType?: "text" | "html";
   type: "friend" | "story";
   category: string;
+  envelope?: "seongsu" | "myeongdong";
+  isAnonymous?: boolean;
+  recipientName?: string;
   wordCount: number;
   saveCount: number;
   lastSavedAt: string;
@@ -49,8 +53,12 @@ export interface DraftSaveRequest {
   draftId?: string;
   title?: string;
   content: string;
+  contentType?: "text" | "html";
   type?: "friend" | "story";
   category?: string;
+  envelope?: "seongsu" | "myeongdong";
+  isAnonymous?: boolean;
+  recipientName?: string;
   recipientAddresses?: RecipientAddressInput[];
 }
 

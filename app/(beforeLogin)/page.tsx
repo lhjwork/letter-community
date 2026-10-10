@@ -45,7 +45,7 @@ function Hero() {
           <br className="mobile-down:hidden" /> 사연을 남기면 답장이 오고, 편지를 쓰면 링크 하나로 전해져요.
         </p>
         <div className="mt-1 flex flex-wrap gap-3 mobile-down:order-5 mobile-down:mt-0 mobile-down:flex-col mobile-down:gap-2.5">
-          <AuthLink href="/story-update" className="btn btn-brick min-h-[52px] px-7 text-[26px] mobile-down:min-h-14 mobile-down:text-[28px]">
+          <AuthLink href="/write?kind=story" className="btn btn-brick min-h-[52px] px-7 text-[26px] mobile-down:min-h-14 mobile-down:text-[28px]">
             사연 남기기
           </AuthLink>
           <AuthLink href="/write" className="btn btn-blue min-h-[52px] px-6 text-[26px] mobile-down:min-h-[52px]">
@@ -119,7 +119,7 @@ function LetterPaper({ kind }: { kind: "story" | "friend" }) {
           </li>
         ))}
       </ol>
-      <AuthLink href={story ? "/story-update" : "/write"} className={`btn my-3.5 min-h-11 px-5 text-[22px] mobile-down:hidden ${story ? "btn-brick" : "btn-blue"}`}>
+      <AuthLink href={story ? "/write?kind=story" : "/write"} className={`btn my-3.5 min-h-11 px-5 text-[22px] mobile-down:hidden ${story ? "btn-brick" : "btn-blue"}`}>
         {story ? "사연 남기기" : "편지 쓰기"}
       </AuthLink>
     </div>

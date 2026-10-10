@@ -1,5 +1,5 @@
 import { DraftLetter, DraftListResponse, DraftSaveRequest, DraftPublishRequest } from "@/types/draft";
-import { handleTokenExpiration, checkAuthError } from "./auth-utils";
+import { checkAuthError } from "./auth-utils";
 
 // API Base URL 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";

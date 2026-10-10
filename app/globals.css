@@ -277,6 +277,41 @@ body {
   font-size: 15px;
   color: var(--ink);
 }
+/* 봉투 스와치 (v8-Write .swatch) */
+.swatch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+.swatch .pv {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+}
+.swatch input:checked + .pv { border: 2px solid var(--ink); box-shadow: 0 0 0 3px var(--cream) inset; }
+.swatch input:focus-visible + .pv { outline: 2px solid var(--airblue); outline-offset: 2px; }
+.swatch .nm { font-family: var(--font-pen), "Nanum Pen Script", cursive; font-size: 18px; color: var(--ink-2); }
+/* 쓰기 화면 2단 배치. 데스크톱: 편지지 | (종류, 옵션, 버튼). 모바일: 종류 → 편지지 → 옵션 → 버튼(sticky) */
+.write-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 720px) minmax(300px, 1fr);
+  grid-template-areas: "paper kind" "paper side" "paper act";
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  align-items: start;
+  column-gap: 40px;
+  row-gap: 28px;
+}
+@media (max-width: 767px) {
+  .write-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "kind" "paper" "side" "act"; row-gap: 24px; }
+}
 /* 모바일 사이드 메뉴 항목 (M-Menu .m-nav) */
 .m-nav a, .m-nav button {
   display: flex;
@@ -288,80 +323,6 @@ body {
   border-bottom: 1px solid var(--rule);
   color: var(--ink);
 }
-}
-
-/* Tiptap 에디터 스타일 */
-.tiptap {
-  outline: none;
-}
-
-.tiptap p.is-editor-empty:first-child::before {
-  color: #9ca3af;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-
-.tiptap p {
-  margin: 0;
-  line-height: 28px;
-}
-
-.tiptap strong {
-  font-weight: 700;
-}
-
-.tiptap em {
-  font-style: italic;
-}
-
-.tiptap ul,
-.tiptap ol {
-  padding-left: 1.5rem;
-  margin: 0.5rem 0;
-}
-
-.tiptap ul {
-  list-style-type: disc;
-}
-
-.tiptap ol {
-  list-style-type: decimal;
-}
-
-.tiptap li {
-  line-height: 28px;
-}
-
-.tiptap blockquote {
-  border-left: 3px solid #e5e7eb;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #6b7280;
-}
-
-.tiptap code {
-  background-color: #f3f4f6;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-  font-family: monospace;
-  font-size: 0.875em;
-}
-
-.tiptap pre {
-  background-color: #1f2937;
-  color: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  margin: 1rem 0;
-}
-
-.tiptap pre code {
-  background-color: transparent;
-  padding: 0;
-  color: inherit;
 }
 
 /* 편지 내용 표시 스타일 */

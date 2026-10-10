@@ -16,6 +16,8 @@ const CSP = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // isomorphic-dompurify → jsdom 을 서버 번들에 넣으면 dev(webpack)에서 default-stylesheet.css ENOENT 로 500. 외부 패키지로 둔다
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
   poweredByHeader: false,
   // reactCompiler: true, // Disabled due to HMR infinite loop issues
 

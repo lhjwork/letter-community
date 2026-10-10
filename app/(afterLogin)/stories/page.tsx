@@ -132,7 +132,7 @@ function StoriesContent() {
           </Select>
 
           <Link
-            href="/story-update"
+            href="/write?kind=story"
             className="h-[48px] sm:h-[64px] px-5 sm:px-6 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl font-medium text-[#424242] flex items-center justify-center hover:bg-[#F5F5F5] transition-colors whitespace-nowrap sm:ml-auto"
             style={{ fontFamily: "Pretendard, sans-serif" }}
           >

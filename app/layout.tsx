@@ -5,7 +5,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { AlertHost } from "@/components/ui/AppAlert";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
-const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap" });
+const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap", preload: false });
 const pen = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], variable: "--font-pen", display: "swap", preload: false });
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton", display: "swap", preload: false });
 

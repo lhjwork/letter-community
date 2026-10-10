@@ -7,15 +7,19 @@ import { handleApiError } from "@/lib/auth-utils";
 
 interface UseDraftManualSaveProps {
   content: string;
+  contentType?: "text" | "html";
   title?: string;
   type?: "friend" | "story";
   category?: string;
+  envelope?: "seongsu" | "myeongdong";
+  isAnonymous?: boolean;
+  recipientName?: string;
   draftId?: string;
   onSave?: (draftId: string) => void;
   onError?: (error: string) => void;
 }
 
-export function useDraftManualSave({ content, title, type, category, draftId, onSave, onError }: UseDraftManualSaveProps) {
+export function useDraftManualSave({ content, contentType, title, type, category, envelope, isAnonymous, recipientName, draftId, onSave, onError }: UseDraftManualSaveProps) {
   const { data: session } = useSession();
   const [saveState, setSaveState] = useState<DraftSaveState>({
     status: "idle",
@@ -54,8 +58,12 @@ export function useDraftManualSave({ content, title, type, category, draftId, on
         draftId,
         title,
         content,
+        contentType,
         type,
         category,
+        envelope,
+        isAnonymous,
+        recipientName,
       });
 
       if (response.success) {
@@ -83,7 +91,7 @@ export function useDraftManualSave({ content, title, type, category, draftId, on
         onError?.(errorMessage);
       }
     }
-  }, [getToken, content, title, type, category, draftId, onSave, onError]);
+  }, [getToken, content, contentType, title, type, category, envelope, isAnonymous, recipientName, draftId, onSave, onError]);
 
   return {
     saveState,

@@ -164,16 +164,6 @@ export const scaleUp: Variants = {
   },
 };
 
-// Card flip (for DailyPrompt)
-export const cardFlip: Variants = {
-  front: { rotateY: 0, opacity: 1 },
-  back: {
-    rotateY: 180,
-    opacity: 0,
-    transition: { duration: 0.6, ease: "easeInOut" },
-  },
-};
-
 // Floating element (infinite)
 export const floatingAnimation = {
   y: [0, -12, -6, -18, 0],

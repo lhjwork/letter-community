@@ -98,11 +98,11 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
         </div>
 
         {loggedIn ? (
-          <Link href="/story-update" onClick={onClose} className="btn btn-brick min-h-14 text-[26px]">
+          <Link href="/write?kind=story" onClick={onClose} className="btn btn-brick min-h-14 text-[26px]">
             사연 남기기
           </Link>
         ) : (
-          <button type="button" onClick={needLogin("/story-update")} className="btn btn-brick min-h-14 text-[26px]">
+          <button type="button" onClick={needLogin("/write?kind=story")} className="btn btn-brick min-h-14 text-[26px]">
             사연 남기기
           </button>
         )}

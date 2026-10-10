@@ -31,7 +31,7 @@ import {
   cleanupOldRequests,
   savePhysicalRequestId,
 } from "@/lib/letter-requests";
-import { fadeInUp, staggerContainer, staggerItem, springs } from "@/lib/animations/config";
+import { staggerContainer, staggerItem, springs } from "@/lib/animations/config";
 
 interface Letter {
   _id: string;
@@ -39,8 +39,7 @@ interface Letter {
   content: string;
   ogTitle?: string;
   status: string;
-  authorId: string;
-  senderId?: string; // 백엔드에서 실제로 사용하는 필드
+  isAuthor?: boolean; // 서버가 viewer 기준으로 계산
   senderName?: string; // 작성자 닉네임
   authorName?: string;
   physicalLetterStats: {
@@ -308,7 +307,7 @@ export default function LetterDetailClient({
               <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
+                  onClick={() => router.push(`/write?kind=${isStory ? "story" : "friend"}&id=${letter._id}`)}
                   className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
                 >
                   수정하기
@@ -378,7 +377,7 @@ export default function LetterDetailClient({
               <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => router.push(`${isStory ? "/story-update" : "/write"}?id=${letter._id}`)}
+                  onClick={() => router.push(`/write?kind=${isStory ? "story" : "friend"}&id=${letter._id}`)}
                   className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
                 >
                   수정하기

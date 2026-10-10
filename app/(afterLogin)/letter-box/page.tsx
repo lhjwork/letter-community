@@ -118,7 +118,7 @@ function MailboxContent() {
 
     // Calculate visible page range
     let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
+    const endPage = Math.min(totalPages, startPage + 4);
     if (endPage - startPage < 4) {
       startPage = Math.max(1, endPage - 4);
     }
@@ -257,7 +257,7 @@ function MailboxContent() {
 
           {/* Action button */}
           <Link
-            href={activeTab === "letters" ? "/write" : "/story-update"}
+            href={activeTab === "letters" ? "/write" : "/write?kind=story"}
             className="h-[48px] sm:h-[64px] px-5 sm:px-6 border-2 border-[#C4C4C4] rounded-lg text-base sm:text-xl font-medium text-[#424242] flex items-center justify-center hover:bg-[#F5F5F5] transition-colors whitespace-nowrap"
             style={{ fontFamily: "Pretendard, sans-serif" }}
           >
@@ -305,7 +305,7 @@ function MailboxContent() {
                   아직 작성한 사연이 없습니다
                 </p>
                 <Link
-                  href="/story-update"
+                  href="/write?kind=story"
                   className="inline-block px-6 py-3 bg-[#FF7F65] text-white text-lg font-semibold rounded-lg hover:bg-[#ff6b50] transition-colors"
                 >
                   첫 사연 작성하기
