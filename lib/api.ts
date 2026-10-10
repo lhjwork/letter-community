@@ -378,10 +378,13 @@ export interface Story {
   title?: string;
   content?: string;
   authorName?: string;
+  recipientName?: string;
   category?: string;
   status?: string;
   viewCount?: number;
   likeCount?: number;
+  /** 숨김·삭제 제외 답장 수 (featured 응답에만 실림) */
+  replyCount?: number;
   createdAt: string;
   updatedAt?: string;
 }

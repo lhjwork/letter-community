@@ -11,7 +11,20 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "NanumJangMiCe", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-myeongjo), "Nanum Myeongjo", serif;
+  --font-pen: var(--font-pen), "Nanum Pen Script", cursive;
+  --font-anton: var(--font-anton), "Anton", sans-serif;
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-hint: var(--ink-hint);
+  --color-brick: var(--brick);
+  --color-brick-band: var(--brick-band);
+  --color-airblue: var(--airblue);
+  --color-approve: var(--approve);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,10 +61,26 @@
 }
 
 body {
-  font-family: "NanumJangMiCe", Arial, Helvetica, sans-serif;
+  font-family: var(--font-myeongjo), "Nanum Myeongjo", serif;
+  background: var(--cream);
+  color: var(--ink);
 }
 
 :root {
+  /* v8 토큰 (docs/design/PRINCIPLES.md 3절) */
+  --cream: #f3eee4;
+  --paper: #fffdf8;
+  --rule: #d8cdbb;
+  --ink: #2b2b2b;
+  --ink-2: #5a524a;
+  --ink-3: #6b6157;
+  --ink-hint: #8a7f72;
+  --brick: #b44a33;
+  --brick-band: #c8553d;
+  --airblue: #3e6e8e;
+  --approve: #2f5d4a;
+  --paper-shadow: 0 10px 0 -4px #e3dacb, 0 20px 0 -8px #eae2d3;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -145,6 +174,120 @@ body {
       font-size: 16px !important;
     }
   }
+}
+
+/* ===== v8 공용 클래스 (보드 <style> 블록 그대로). Tailwind 유틸이 덮어쓸 수 있게 components 레이어 ===== */
+@layer components {
+.airmail {
+  background-image: repeating-linear-gradient(135deg, var(--airblue) 0 18px, #ffffff 18px 36px, var(--brick-band) 36px 54px, #ffffff 54px 72px);
+}
+.ruled {
+  background-image: repeating-linear-gradient(transparent 0 35px, var(--rule) 35px 36px);
+  background-position: 0 -8px;
+}
+.stampbox {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 3px solid currentColor;
+  border-radius: 3px;
+  font-family: var(--font-pen), "Nanum Pen Script", cursive;
+  font-size: 24px;
+  line-height: 1;
+  transform: rotate(-2deg);
+  letter-spacing: 0.02em;
+}
+.paper {
+  position: relative;
+  background-color: var(--paper);
+  border: 1px solid var(--rule);
+  box-shadow: var(--paper-shadow);
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 26px 24px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.post {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px double var(--airblue);
+  border-radius: 50%;
+  font-family: var(--font-anton), "Anton", sans-serif;
+  line-height: 1.2;
+  color: var(--airblue);
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 3px;
+  font-family: var(--font-pen), "Nanum Pen Script", cursive;
+  font-size: 24px;
+  line-height: 1;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink);
+}
+.btn-brick { background: var(--brick); color: #ffffff; border-color: var(--brick); }
+.btn-blue { color: var(--airblue); border-color: var(--airblue); }
+.btn-blue-fill { background: var(--airblue); color: #ffffff; border-color: var(--airblue); }
+.btn-ink { color: var(--ink); border-color: var(--ink); }
+.btn-green { background: var(--approve); color: #ffffff; border-color: var(--approve); }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  font-family: var(--font-pen), "Nanum Pen Script", cursive;
+  font-size: 20px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.chip-on { border-color: var(--ink); color: var(--ink); background: var(--cream); }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  color: #ffffff;
+  font-family: var(--font-anton), "Anton", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.field {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1.5px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  font-family: var(--font-myeongjo), "Nanum Myeongjo", serif;
+  font-size: 15px;
+  color: var(--ink);
+}
+/* 모바일 사이드 메뉴 항목 (M-Menu .m-nav) */
+.m-nav a, .m-nav button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  font-family: var(--font-pen), "Nanum Pen Script", cursive;
+  font-size: 28px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+}
 }
 
 /* Tiptap 에디터 스타일 */
@@ -739,134 +882,4 @@ body {
 .story-lined h3 {
   line-height: 48px;
   margin: 0;
-}
-
-/* 다이어리 - A5 종이 한 장. 데코 좌표(Phase 1)는 이 상자의 폭 % 기준 */
-.diary-paper {
-  position: relative;
-  aspect-ratio: 1 / 1.414;
-  background-color: #fefefe;
-  border: 1px solid #c4c4c4;
-  border-radius: 4px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  padding: 56px 28px 24px;
-  overflow-y: auto;
-  --diary-line: 32px;
-  background-attachment: local;
-}
-.diary-paper[data-paper="lined"] {
-  background-image: repeating-linear-gradient(transparent 0, transparent calc(var(--diary-line) - 1px), #e4e1da calc(var(--diary-line) - 1px), #e4e1da var(--diary-line));
-  background-position: 0 56px;
-}
-.diary-paper[data-paper="grid"] {
-  background-image: linear-gradient(#ebe8e2 1px, transparent 1px), linear-gradient(90deg, #ebe8e2 1px, transparent 1px);
-  background-size: var(--diary-line) var(--diary-line);
-  background-position: 0 56px;
-}
-.diary-paper[data-paper="dot"] {
-  background-image: radial-gradient(#d6d3cc 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
-}
-.diary-paper[data-paper="cream"] {
-  background-color: #fbf6ec;
-  border-color: #e3d9c4;
-}
-.diary-paper__date {
-  position: absolute;
-  top: 18px;
-  right: 24px;
-  font-family: var(--diary-font);
-  font-size: 18px;
-  color: #757575;
-}
-/* useLetterEditor가 인라인으로 박는 폰트·행간을 다이어리 값으로 덮는다 */
-.diary-paper .tiptap {
-  min-height: 100%;
-}
-.diary-paper .tiptap :is(p, h1, h2, h3, li) {
-  font-family: var(--diary-font);
-  line-height: var(--diary-line);
-  margin: 0;
-}
-.diary-paper .tiptap p.is-editor-empty:first-child::before {
-  font-family: var(--diary-font);
-}
-
-/* 데코 선택 표시 (인쇄 뷰에서는 readOnly라 나오지 않음) */
-.diary-deco--selected {
-  outline: 2px dashed #ff9883;
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-
-/* 에디터에서 Enter로 비운 단락이 인쇄/읽기 뷰에서 접히지 않게 */
-.diary-paper .tiptap p:empty::before {
-  content: "\00a0";
-}
-
-/* 인쇄 뷰: A5 실치수. 화면 640px 기준 값(행간 32px, 글자 20px)을 148mm(≈559px) 비율로 축소 */
-.diary-print {
-  background: #e9e7e2;
-  min-height: 100vh;
-  padding: 24px 0 48px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-.diary-print__toolbar {
-  width: 148mm;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  color: #424242;
-}
-.diary-print .diary-paper {
-  width: 148mm;
-  height: 210mm;
-  aspect-ratio: auto;
-  overflow: hidden;
-  border-radius: 0;
-  font-size: 17.5px;
-  --diary-line: 28px;
-  padding: 49px 24px 21px;
-  background-position: 0 49px;
-}
-.diary-print__cover {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  color: #2b3446;
-}
-.diary-print__cover h1 {
-  font-size: 40px;
-  margin: 0;
-}
-.diary-print__cover p {
-  font-size: 20px;
-  color: #757575;
-  margin: 0;
-}
-@page {
-  size: A5;
-  margin: 0;
-}
-@media print {
-  .diary-print {
-    background: none;
-    padding: 0;
-    gap: 0;
-    min-height: auto;
-    display: block;
-  }
-  .diary-print .diary-paper {
-    border: none;
-    box-shadow: none;
-    page-break-after: always;
-    break-after: page;
-    margin: 0;
-  }
 }

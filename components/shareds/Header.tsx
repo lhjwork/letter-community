@@ -3,245 +3,112 @@
 import { track } from "@/lib/analytics/ga";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import LoginDialog from "./LoginDialog";
 import MobileSideMenu from "./MobileSideMenu";
 
+export const NAV = [
+  { href: "/write", label: "편지 쓰기" },
+  { href: "/stories", label: "사연" },
+  { href: "/letter-box", label: "우편함" },
+] as const;
+
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+export function todayLabel(d = new Date()) {
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${DAYS[d.getDay()]}`;
+}
+
 export default function Header() {
   const { data: session, status } = useSession();
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const [loginCallbackUrl, setLoginCallbackUrl] = useState("/");
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const loggedIn = status === "authenticated";
+  const [loginCallbackUrl, setLoginCallbackUrl] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const openLoginDialog = (callbackUrl = "/") => {
-    if (callbackUrl !== "/") track("write_cta_click", { from: "header", logged_in: false });
+    if (callbackUrl === "/write") track("write_cta_click", { from: "header", logged_in: false });
     setLoginCallbackUrl(callbackUrl);
-    setIsLoginDialogOpen(true);
   };
 
-  const handleLoginClick = () => {
-    if (status === "authenticated") {
-      setIsUserMenuOpen(!isUserMenuOpen);
-    } else {
-      openLoginDialog("/");
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-    setIsUserMenuOpen(false);
-  };
+  // 로그인 전에는 보호 라우트 대신 로그인 모달. 보드 글자 크기·폰트는 그대로
+  const navItem = (href: string, label: string, className: string) =>
+    loggedIn || href === "/stories" ? (
+      <Link key={href} href={href} className={className}>
+        {label}
+      </Link>
+    ) : (
+      <button key={href} type="button" onClick={() => openLoginDialog(href)} className={`${className} cursor-pointer bg-transparent`}>
+        {label}
+      </button>
+    );
 
   return (
     <>
-      {/* 모바일 헤더 - md 미만에서만 표시 */}
-      <header className="md:hidden w-full h-11 flex items-center justify-between px-[17px] border-b border-[#EDEDED] bg-white">
-        {/* 로고 */}
-        <Link
-          href={status === "authenticated" ? "/home" : "/"}
-          className="flex items-center gap-0"
-        >
-          <Image
-            src="/icons/letter-logo.svg"
-            alt="Letter Logo"
-            width={44}
-            height={30}
-            className="w-[44px] h-[30px]"
-            priority
-          />
-          <span
-            className="text-[19px] text-[#4C261E]"
-            style={{ fontFamily: "NanumJangMiCe, cursive" }}
-          >
-            Letter
-          </span>
+      {/* 데스크톱 헤더 */}
+      <header className="mx-auto flex w-full max-w-[1180px] flex-wrap items-center justify-between gap-4 px-6 pb-[18px] pt-[22px] mobile-down:hidden">
+        <Link href={loggedIn ? "/home" : "/"} aria-label="레터 홈" className="flex items-center gap-2">
+          <Image src="/v8/logo.png" alt="" width={66} height={44} className="h-11 w-[66px] object-contain" priority />
+          <span className="font-pen text-[34px] leading-none text-ink">Letter</span>
         </Link>
-
-        {/* 햄버거 메뉴 버튼 */}
-        <button
-          onClick={() => setIsMobileMenuOpen(true)}
-          className="w-6 h-6 cursor-pointer"
-        >
-          <Image
-            src="/icons/mobile/menu-hamburger.svg"
-            alt="메뉴"
-            width={24}
-            height={24}
-          />
-        </button>
-      </header>
-
-      {/* 데스크톱 헤더 - md 이상에서만 표시 */}
-      <header className="hidden md:block w-full mt-4 sm:mt-6 xxl:mt-[26px] px-3 sm:px-6 md:px-8 xxl:px-[40px] py-3 sm:py-4 xxl:py-[20px] pb-4 sm:pb-6 xxl:pb-[20px] rounded-[24px] border border-[#C4C4C4]">
-        <div className="flex items-center justify-between gap-2 md:gap-4">
-          {/* 왼쪽 로고 */}
-          <Link
-            href={status === "authenticated" ? "/home" : "/"}
-            className="flex items-center gap-0 shrink-0"
-          >
-            <Image
-              src="/icons/letter-logo.svg"
-              alt="Letter Logo"
-              width={88}
-              height={60}
-              className="md:w-[70px] md:h-[48px] xxl:w-[88px] xxl:h-[60px]"
-              priority
-            />
-            <span
-              className="md:text-[30px] xxl:text-[38px] text-[#4C261E] whitespace-nowrap"
-              style={{ fontFamily: "NanumJangMiCe, cursive" }}
-            >
-              Letter
-            </span>
-          </Link>
-
-          {/* 중간 네비게이션 */}
-          <nav className="flex items-center gap-4 md:gap-6 xxl:gap-[120px] flex-1 justify-center">
-            {status === "authenticated" ? (
-              <Link
-                href="/write"
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                편지 쓰기
-              </Link>
-            ) : (
-              <button
-                onClick={() => openLoginDialog("/write")}
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                편지 쓰기
-              </button>
-            )}
-
-            {status === "authenticated" ? (
-              <Link
-                href="/story-update"
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                사연 작성
-              </Link>
-            ) : (
-              <button
-                onClick={() => openLoginDialog("/story-update")}
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                사연 작성
-              </button>
-            )}
-
-            {status === "authenticated" ? (
-              <Link
-                href="/letter-box"
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                우편함
-              </Link>
-            ) : (
-              <button
-                onClick={() => openLoginDialog("/letter-box")}
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap cursor-pointer"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                우편함
-              </button>
-            )}
-
-            {status === "authenticated" && (
-              <Link
-                href="/diary"
-                className="text-base md:text-xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                다이어리
-              </Link>
-            )}
-          </nav>
-
-          {/* 오른쪽 로그인/사용자 메뉴 */}
-          <div className="relative flex items-center gap-1 sm:gap-2 shrink-0">
+        <nav aria-label="주 메뉴" className="flex flex-wrap gap-[34px] font-pen text-[22px]">
+          {NAV.map((n) => navItem(n.href, n.label, "inline-flex min-h-11 items-center text-ink hover:text-brick"))}
+        </nav>
+        <div className="flex items-center gap-[18px]">
+          <span className="font-pen text-lg text-ink-3" suppressHydrationWarning>
+            {todayLabel()}
+          </span>
+          {loggedIn ? (
+            <Link href="/my-page" className="inline-flex min-h-11 items-center border-b-[1.5px] border-ink font-pen text-xl text-ink hover:text-brick">
+              {session?.user?.name ?? "마이페이지"}
+            </Link>
+          ) : (
             <button
-              onClick={handleLoginClick}
-              className="flex items-center gap-1 sm:gap-2 cursor-pointer"
+              type="button"
+              onClick={() => openLoginDialog("/")}
+              className="inline-flex min-h-11 cursor-pointer items-center border-b-[1.5px] border-ink bg-transparent font-pen text-xl text-ink hover:text-brick"
             >
-              <span
-                className="text-lg sm:text-xl md:text-2xl xxl:text-[32px] text-[#757575] hover:text-black transition-colors whitespace-nowrap"
-                style={{ fontFamily: "NanumJangMiCe, cursive" }}
-              >
-                {status === "authenticated" && session?.user?.name
-                  ? session.user.name
-                  : "로그인"}
-              </span>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="text-[#757575]"
-              >
-                <path
-                  d="M6 9L12 15L18 9"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              로그인
             </button>
-
-            {/* 사용자 메뉴 드롭다운 */}
-            {isUserMenuOpen && status === "authenticated" && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-sm text-gray-600">
-                    {session?.user?.email || ""}
-                  </p>
-                </div>
-                <Link
-                  href="/home"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => setIsUserMenuOpen(false)}
-                >
-                  홈
-                </Link>
-                <Link
-                  href="/my-page"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => setIsUserMenuOpen(false)}
-                >
-                  마이페이지
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
-                >
-                  로그아웃
-                </button>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </header>
 
-      {/* 모바일 사이드 메뉴 */}
-      <MobileSideMenu
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        onLoginClick={() => openLoginDialog("/")}
-      />
+      {/* 모바일 헤더 */}
+      <header className="hidden w-full items-center justify-between gap-3 px-4 pb-2.5 pt-3 mobile-down:flex">
+        <Link href={loggedIn ? "/home" : "/"} aria-label="레터 홈" className="flex items-center gap-1.5">
+          <Image src="/v8/logo.png" alt="" width={54} height={36} className="h-9 w-[54px] object-contain" priority />
+          <span className="font-pen text-[30px] leading-none text-ink">Letter</span>
+        </Link>
+        <div className="flex items-center gap-1">
+          {loggedIn ? (
+            <Link href="/letter-box" aria-label="우편함" className="inline-flex h-11 w-11 items-center justify-center">
+              <MailIcon />
+            </Link>
+          ) : (
+            <button type="button" aria-label="우편함" onClick={() => openLoginDialog("/letter-box")} className="inline-flex h-11 w-11 items-center justify-center">
+              <MailIcon />
+            </button>
+          )}
+          <button type="button" aria-label="메뉴" onClick={() => setIsMobileMenuOpen(true)} className="inline-flex h-11 w-11 items-center justify-center">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="text-ink">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
+      </header>
 
-      {/* 로그인 다이얼로그 */}
-      <LoginDialog
-        isOpen={isLoginDialogOpen}
-        onClose={() => setIsLoginDialogOpen(false)}
-        callbackUrl={loginCallbackUrl}
-      />
+      <MobileSideMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} onLoginClick={(href) => openLoginDialog(href)} />
+
+      <LoginDialog isOpen={loginCallbackUrl !== null} onClose={() => setLoginCallbackUrl(null)} callbackUrl={loginCallbackUrl ?? "/"} />
     </>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true" className="text-ink">
+      <rect x="3" y="5" width="18" height="14" rx="1" />
+      <path d="M3 7l9 6 9-6" />
+    </svg>
   );
 }
