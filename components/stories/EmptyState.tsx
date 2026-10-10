@@ -1,18 +1,6 @@
-"use client";
-
-interface EmptyStateProps {
-  onReset: () => void;
-}
-
-export default function EmptyState({ onReset }: EmptyStateProps) {
+/** 사연 목록 결과 없음. v8 문구, Pen 24 */
+export default function EmptyState({ filtered = false }: { filtered?: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="text-6xl mb-4">📭</div>
-      <h3 className="text-xl font-semibold text-gray-700 mb-2">검색 결과가 없습니다</h3>
-      <p className="text-gray-500 mb-6">다른 검색어나 카테고리로 다시 시도해보세요</p>
-      <button onClick={onReset} className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-        필터 초기화
-      </button>
-    </div>
+    <p className="m-0 py-24 text-center font-pen text-2xl text-ink-3 mobile-down:py-16">{filtered ? "이 조건에 맞는 사연이 없어요." : "아직 사연이 없어요."}</p>
   );
 }

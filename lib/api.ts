@@ -390,8 +390,10 @@ export interface Story {
   status?: string;
   viewCount?: number;
   likeCount?: number;
-  /** 숨김·삭제 제외 답장 수 (featured 응답에만 실림) */
+  /** 숨김·삭제 제외 답장 수 (featured·목록 응답에 실림) */
   replyCount?: number;
+  /** 목록 응답: plainContent 앞 80자. content 는 실리지 않는다 */
+  preview?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -409,15 +411,6 @@ export interface StoriesResponse {
   success: boolean;
   data: Story[];
   pagination: Pagination;
-}
-
-export interface CategoryStats {
-  total: number;
-  categories: {
-    category: string;
-    count: number;
-    percentage: string;
-  }[];
 }
 
 export type SortOption = "latest" | "oldest" | "popular";
@@ -444,18 +437,6 @@ export async function getStories(
   if (params?.category) queryParams.append("category", params.category);
 
   return apiRequest(`/api/letters/stories?${queryParams.toString()}`, {
-    method: "GET",
-  });
-}
-
-/**
- * 카테고리 통계 조회
- */
-export async function getCategoryStats(): Promise<{
-  success: boolean;
-  data: CategoryStats;
-}> {
-  return apiRequest("/api/letters/categories/stats", {
     method: "GET",
   });
 }

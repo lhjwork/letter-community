@@ -33,7 +33,7 @@ export default function RootLayout({
         {/* 편지지·봉투 SVG(components/stationery)가 폰트명 문자열로 쓴다 */}
         <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
       </head>
-      <body className="antialiased overflow-x-hidden">
+      <body className="antialiased">
         <SessionProvider>
           <GoogleAnalytics />
           {children}

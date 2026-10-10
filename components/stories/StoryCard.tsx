@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { LikeButton } from "@/components/like";
 import type { Story } from "@/lib/api";
 
 interface StoryCardProps {

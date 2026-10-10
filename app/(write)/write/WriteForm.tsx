@@ -365,11 +365,11 @@ export default function WriteForm() {
 
       {/* 마음 · 봉투 · 익명 */}
       <div className="flex flex-col gap-7 [grid-area:side] mobile-down:gap-6">
-        <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+        <fieldset className="m-0 flex min-w-0 flex-col gap-3 border-0 p-0">
           <legend className={LEGEND}>어떤 마음인가요</legend>
           <div className="flex flex-wrap gap-2 mobile-down:flex-nowrap mobile-down:overflow-x-auto mobile-down:pb-1.5 mobile-down:[scrollbar-width:thin]">
             {CATEGORIES.map((c) => (
-              <label key={c} className={`chip cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-airblue ${category === c ? "chip-on" : ""}`}>
+              <label key={c} className={`chip relative cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-airblue ${category === c ? "chip-on" : ""}`}>
                 <input type="radio" name="category" value={c} checked={category === c} onChange={() => setCategory(c)} className="sr-only" />
                 {c}
               </label>

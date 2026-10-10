@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthLink from "@/components/shareds/AuthLink";
 import { getFeaturedStories, type Story } from "@/lib/api";
+import { seoulParts } from "@/lib/seoulDate";
 
 // 빌드 컨테이너에서는 backend에 접근 불가 → 프리렌더 금지. 데이터 캐시는 getFeaturedStories의 fetch revalidate가 담당
 export const dynamic = "force-dynamic";
@@ -127,14 +128,6 @@ function LetterPaper({ kind }: { kind: "story" | "friend" }) {
 }
 
 const TILTS = ["-rotate-[0.6deg]", "rotate-[0.7deg]", "rotate-[0.4deg]", "-rotate-[0.8deg]"];
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
-function seoulParts(iso: string) {
-  const d = new Date(new Date(iso).toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-  return { key: `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`, dd: String(d.getDate()).padStart(2, "0"), mm: String(d.getMonth() + 1).padStart(2, "0"), mon: MONTHS[d.getMonth()], wd: WEEKDAYS[d.getDay()] };
-}
-
 function preview(s: Story) {
   return (s.content ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 60);
 }
