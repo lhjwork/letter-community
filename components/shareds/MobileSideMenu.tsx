@@ -178,6 +178,24 @@ export default function MobileSideMenu({
                 </span>
               </button>
             )}
+
+            {status === "authenticated" && (
+              <Link
+                href="/diary"
+                onClick={handleMenuClick}
+                className="flex items-center gap-2"
+              >
+                <Image
+                  src="/icons/mobile/forum.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                />
+                <span className="text-[#757575] text-base font-medium">
+                  다이어리
+                </span>
+              </Link>
+            )}
           </nav>
         </div>
 

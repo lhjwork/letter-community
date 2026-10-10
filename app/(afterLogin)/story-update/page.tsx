@@ -2,7 +2,6 @@
 
 import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
-import ProofreadModal, { requestProofread, applyCorrections, type Correction } from "@/components/letter/ProofreadModal";
 import { useState, useEffect } from "react";
 import { useLetterEditor } from "@/components/editor/useLetterEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
@@ -45,7 +44,6 @@ function StoryUpdateContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [featuredStories, setFeaturedStories] = useState<Story[]>([]);
-  const [proofread, setProofread] = useState<Correction[] | null>(null);
 
   // 정적 배너 데이터 (fs 모듈 사용 불가로 인한 임시 해결)
   const bannerSlides = [
@@ -150,7 +148,6 @@ function StoryUpdateContent() {
     setHasUnsavedChanges(true);
   };
 
-  // 등록 직전 맞춤법 점검 → 제안이 있으면 모달, 없으면 바로 등록
   const handleSubmit = async () => {
     // 내용 유효성 검사
     if (!content.replace(/<[^>]*>/g, "").trim()) {
@@ -158,22 +155,12 @@ function StoryUpdateContent() {
       return;
     }
 
-    setIsSubmitting(true);
-    const corrections = await requestProofread(content);
-    if (corrections.length > 0) {
-      setIsSubmitting(false);
-      setProofread(corrections);
+    if (!title.trim()) {
+      showAlert("제목을 입력해주세요.");
       return;
     }
-    await publish(content);
-  };
 
-  const handleProofreadConfirm = (selected: Correction[]) => {
-    const fixed = applyCorrections(content, selected);
-    setProofread(null);
-    setContent(fixed);
-    editor?.commands.setContent(fixed);
-    publish(fixed);
+    await publish(content);
   };
 
   const publish = async (source: string) => {
@@ -518,16 +505,6 @@ function StoryUpdateContent() {
             {isSubmitting ? (editId ? "수정 중..." : "작성 중...") : editId ? "수정 완료" : "작성 완료"}
           </Button>
         </section>
-      <ProofreadModal
-        open={!!proofread}
-        corrections={proofread ?? []}
-        onConfirm={handleProofreadConfirm}
-        onSkip={() => {
-          setProofread(null);
-          publish(content);
-        }}
-        onClose={() => setProofread(null)}
-      />
       </main>
     </div>
   );

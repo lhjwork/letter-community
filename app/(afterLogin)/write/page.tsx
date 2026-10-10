@@ -2,7 +2,6 @@
 
 import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
-import ProofreadModal, { requestProofread, applyCorrections, type Correction } from "@/components/letter/ProofreadModal";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -123,7 +122,6 @@ function WritePageContent() {
 
   // URL 공유 모달 상태
   const [showShareModal, setShowShareModal] = useState(false);
-  const [proofread, setProofread] = useState<Correction[] | null>(null);
   const [shareData, setShareData] = useState<{
     url: string;
     title: string;
@@ -242,7 +240,6 @@ function WritePageContent() {
     router.back();
   };
 
-  // 등록 직전 맞춤법 점검 → 제안이 있으면 모달, 없으면 바로 등록
   const handleSubmit = async () => {
     // 내용 유효성 검사
     if (!content.replace(/<[^>]*>/g, "").trim()) {
@@ -250,22 +247,12 @@ function WritePageContent() {
       return;
     }
 
-    setIsSubmitting(true);
-    const corrections = await requestProofread(content);
-    if (corrections.length > 0) {
-      setIsSubmitting(false);
-      setProofread(corrections);
+    if (!title.trim()) {
+      showAlert("제목을 입력해주세요.");
       return;
     }
-    await publish(content);
-  };
 
-  const handleProofreadConfirm = (selected: Correction[]) => {
-    const fixed = applyCorrections(content, selected);
-    setProofread(null);
-    setContent(fixed);
-    editor?.commands.setContent(fixed);
-    publish(fixed);
+    await publish(content);
   };
 
   const publish = async (source: string) => {
@@ -708,16 +695,6 @@ function WritePageContent() {
       </main>
 
       {/* URL 공유 모달 */}
-      <ProofreadModal
-        open={!!proofread}
-        corrections={proofread ?? []}
-        onConfirm={handleProofreadConfirm}
-        onSkip={() => {
-          setProofread(null);
-          publish(content);
-        }}
-        onClose={() => setProofread(null)}
-      />
       <ShareModal
         isOpen={showShareModal && !!shareData}
         onClose={handleShareModalClose}
