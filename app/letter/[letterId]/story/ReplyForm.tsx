@@ -46,7 +46,7 @@ export default function ReplyForm({ storyId, storyTitle, to }: Props) {
   };
 
   return (
-    <form onSubmit={submit} className="paper ruled flex max-w-[860px] rotate-[0.3deg] flex-col px-12 py-[72px] mobile-down:px-5 mobile-down:py-9">
+    <form onSubmit={submit} className="paper ruled mx-auto flex w-full max-w-[860px] rotate-[0.3deg] flex-col px-12 py-[72px] mobile-down:px-5 mobile-down:py-9">
       <span className="stampbox absolute -top-4 left-7 bg-paper text-airblue mobile-down:left-4 mobile-down:text-[22px]">답장 쓰기</span>
       <p className="m-0 font-pen text-[26px] leading-9 text-brick mobile-down:text-2xl">To. {to}</p>
       <label htmlFor="reply-body" className="sr-only">
