@@ -11,11 +11,9 @@ import { PHYSICAL_STATUS } from "./status";
 type Req = {
   requestId: string;
   name: string;
-  phone?: string;
-  fullAddress: string;
+  region: string; // 구 단위까지(서울 성동구)
   status: string;
   requestedAt: string;
-  memo?: string;
 };
 
 /** 작성자용 실물 편지 신청 목록 + 승인/거절 (v8-Modals-2 "신청 거절") */
@@ -67,7 +65,7 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
       <div className="airmail absolute inset-x-0 top-0 h-2" aria-hidden="true" />
       <h2 className="m-0 border-b-2 border-ink pb-3 font-pen text-[40px] font-normal leading-9 mobile-down:pb-2.5 mobile-down:text-[30px]">실물 편지 신청 {items.length}건</h2>
       {items.length === 0 ? (
-        <p className="m-0 py-9 text-center font-pen text-2xl text-ink-2">아직 신청이 없어요. 링크를 보내면 받는 분이 여기서 신청할 수 있어요.</p>
+        <p className="m-0 py-9 text-center font-pen text-2xl text-ink-2">아직 신청이 없어요.</p>
       ) : (
         <ul className="m-0 list-none p-0">
           {items.map((r) => {
@@ -83,11 +81,7 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
                     </span>
                     <span className={`badge ${r.status === "rejected" ? "bg-ink-3" : pending ? "bg-brick" : "bg-approve"}`}>{PHYSICAL_STATUS[r.status] ?? r.status}</span>
                   </span>
-                  <span className="text-sm text-ink-2">
-                    {r.fullAddress}
-                    {r.phone ? ` · ${r.phone}` : ""}
-                  </span>
-                  {r.memo && <span className="text-sm text-ink-3">{r.memo}</span>}
+                  <span className="text-sm text-ink-2">{r.region}</span>
                 </div>
                 {pending && (
                   <span className="flex gap-2.5">
@@ -106,10 +100,10 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
       )}
 
       <Dialog open={reject !== null} onOpenChange={(o) => !o && setReject(null)}>
-        <DialogContent showCloseButton={false} className="paper max-w-[460px] gap-3.5 rounded-none border-rule bg-paper px-8 pb-8 pt-9 shadow-[var(--paper-shadow)]">
+        <DialogContent showCloseButton={false} className="paper max-w-[460px] gap-4 rounded-none border-rule bg-paper px-9 pb-8 pt-10 shadow-[var(--paper-shadow)]">
           <div className="airmail absolute inset-x-0 top-0 h-1.5" aria-hidden="true" />
           <span className="stampbox absolute -top-4 left-6 bg-paper text-ink">신청 거절</span>
-          <DialogClose aria-label="닫기" className="absolute right-1 top-1 inline-flex h-11 w-11 items-center justify-center font-pen text-[22px] text-ink-3">
+          <DialogClose aria-label="닫기" className="absolute right-3.5 top-3.5 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3">
             ✕
           </DialogClose>
           <DialogTitle className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3]">이 실물 편지 신청을 거절할까요</DialogTitle>
@@ -119,7 +113,7 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
                 {reject.name} · {seoulParts(reject.requestedAt).mm}.{seoulParts(reject.requestedAt).dd} 신청
               </strong>
               <span className="text-[13px] text-ink-2">
-                {letterTitle} → {reject.fullAddress}
+                {letterTitle} → {reject.region}
               </span>
             </div>
           )}

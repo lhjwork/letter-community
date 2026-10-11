@@ -60,7 +60,7 @@ export default function FriendDetail({ letter }: { letter: FriendLetter }) {
 
       {canRequest && (
         <section id="request" className={`${WRAP} scroll-mt-6 pb-24 mobile-down:pb-12`}>
-          <div className="relative flex flex-wrap items-start gap-10 border border-rule bg-paper p-12 mobile-down:flex-col mobile-down:gap-3.5 mobile-down:px-5 mobile-down:pb-7 mobile-down:pt-9">
+          <div className="relative flex flex-wrap items-start gap-10 border border-rule bg-paper p-12 mobile-down:flex-col mobile-down:items-stretch mobile-down:gap-3.5 mobile-down:px-5 mobile-down:pb-7 mobile-down:pt-9">
             <div className="airmail absolute inset-x-0 top-0 h-2" aria-hidden="true" />
             <div className="airmail absolute inset-x-0 bottom-0 h-2 mobile-down:hidden" aria-hidden="true" />
             <div className="flex flex-[1_1_380px] flex-col gap-3.5 mobile-down:flex-none">

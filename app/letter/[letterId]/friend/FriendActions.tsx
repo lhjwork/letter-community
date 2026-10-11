@@ -11,7 +11,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { CopyLinkButton } from "../story/StoryActions";
 import JumpLink from "@/components/ui/JumpLink";
 
-const ROW = "mt-10 flex w-full max-w-[760px] flex-wrap items-center justify-center gap-3 mobile-down:mt-8 mobile-down:flex-col mobile-down:gap-2.5";
+const ROW = "mt-10 flex w-full max-w-[760px] flex-wrap justify-center gap-3 mobile-down:mt-8 mobile-down:flex-col mobile-down:gap-2.5";
 const SUB = "btn btn-ink mobile-down:flex-1 mobile-down:px-3 mobile-down:text-[22px]";
 
 function useViewTrack(letterId: string, isAuthor: boolean) {

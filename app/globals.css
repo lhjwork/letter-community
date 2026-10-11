@@ -179,6 +179,12 @@ body {
       font-size: var(--mobile-fs, 16px) !important;
     }
   }
+
+  /* placeholder 대비(preflight 기본은 글자색 50% ≈ 3.1:1). 형식 안내가 placeholder 에만 있는 칸이 있어 ink-3(4.5:1 이상)로 */
+  ::placeholder {
+    color: var(--ink-3);
+    opacity: 1;
+  }
 }
 
 /* ===== v8 공용 클래스 (보드 <style> 블록 그대로). Tailwind 유틸이 덮어쓸 수 있게 components 레이어 ===== */

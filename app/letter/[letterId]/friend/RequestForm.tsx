@@ -59,6 +59,11 @@ export default function RequestForm({ letterId }: { letterId: string }) {
 
   return (
     <form onSubmit={submit} className="flex flex-[1_1_380px] flex-col gap-3.5 mobile-down:mt-1 mobile-down:flex-none mobile-down:gap-3">
+      {prev && (
+        <a href={`/letter/${letterId}/request/${prev}`} className="inline-flex min-h-11 items-center self-start font-pen text-xl text-ink-2 hover:text-brick">
+          <span className="border-b-[1.5px] border-current">이미 신청한 편지의 진행 보기</span>
+        </a>
+      )}
       <label className={LABEL}>
         <span className={LABEL_TXT}>받으실 분의 이름</span>
         <input type="text" name="name" value={f.name} onChange={set("name")} maxLength={50} autoComplete="name" required className="field" placeholder="받으실 분의 이름" />
@@ -100,11 +105,6 @@ export default function RequestForm({ letterId }: { letterId: string }) {
       <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-brick mt-1.5 min-h-14 text-[26px] mobile-down:mt-1">
         {busy ? "신청하는 중" : "실물 편지 신청"}
       </button>
-      {prev && (
-        <a href={`/letter/${letterId}/request/${prev}`} className="inline-flex min-h-11 items-center self-center font-pen text-xl text-ink-2 hover:text-brick">
-          <span className="border-b-[1.5px] border-current">이미 신청한 편지의 진행 보기</span>
-        </a>
-      )}
     </form>
   );
 }
