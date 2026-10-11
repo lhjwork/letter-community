@@ -4,7 +4,6 @@ import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -17,10 +16,8 @@ import RecipientAddressModal from "@/components/recipient/RecipientAddressModal"
 import RecipientSelectModal from "@/components/recipient/RecipientSelectModal";
 import { Button } from "@/components/ui/button";
 import LoginDialog from "@/components/shareds/LoginDialog";
-import { HeroBanner } from "@/components/home";
 import { useIsAuthor } from "@/hooks/useIsAuthor";
-import { useLike } from "@/hooks/useLike";
-import { getStoryReplies, deleteLetter, type StoryReply } from "@/lib/api";
+import { deleteLetter } from "@/lib/api";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EnvelopeAnimation from "@/components/effects/EnvelopeAnimation";
 import TypewriterText from "@/components/effects/TypewriterText";
@@ -35,7 +32,7 @@ import { staggerContainer, staggerItem, springs } from "@/lib/animations/config"
 
 interface Letter {
   _id: string;
-  type: "story" | "friend";
+  type: "friend"; // 사연(story)은 page.tsx 가 story/StoryDetail 로 보낸다
   content: string;
   ogTitle?: string;
   status: string;
@@ -74,11 +71,7 @@ export default function LetterDetailClient({
   const router = useRouter();
   const { data: session } = useSession();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [loginCallbackUrl, setLoginCallbackUrl] = useState("/write");
-  const openLogin = (callbackUrl: string) => {
-    setLoginCallbackUrl(callbackUrl);
-    setShowLoginDialog(true);
-  };
+  const loginCallbackUrl = "/write";
 
   const handleWriteClick = () => {
     track("write_cta_click", { from: "letter_detail", logged_in: !!session });
@@ -96,18 +89,9 @@ export default function LetterDetailClient({
   const handleDelete = async () => {
     await deleteLetter(letter._id, session?.backendToken as string);
     track("letter_delete", { letter_type: letter.type, letter_id: letter._id });
-    showAlert(isStory ? "사연이 삭제되었습니다." : "편지가 삭제되었습니다.");
+    showAlert("편지가 삭제되었습니다.");
     router.push("/letter-box");
   };
-
-  // 정적 배너 데이터
-  const bannerSlides = [
-    {
-      id: 1,
-      image: "/images/mainbanner/banner-1.png",
-      alt: "배너 1",
-    },
-  ];
 
   const letterId = letter._id;
 
@@ -241,8 +225,7 @@ export default function LetterDetailClient({
     ).length;
   }, [userRequests]);
 
-  const isStory = letter.type === "story";
-  const [envelopeOpened, setEnvelopeOpened] = useState(isStory); // 사연은 바로 열림
+  const [envelopeOpened, setEnvelopeOpened] = useState(false);
 
   useEffect(() => {
     track("letter_view", { letter_type: letter.type, letter_id: letter._id, is_author: isAuthor });
@@ -279,17 +262,10 @@ export default function LetterDetailClient({
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FEFEFE" }}>
-      {/* 베너 */}
-      {bannerSlides.length > 0 && (
-        <div className="container mx-auto px-4 sm:px-8 lg:px-20 py-6 sm:py-12">
-          <HeroBanner bannerSlides={bannerSlides} />
-        </div>
-      )}
-
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* 상단 행: 뒤로가기(작성자 편지 확인 화면에서는 미표시) + 작성자용 수정/삭제 */}
-        {!(isAuthor && !isStory) && (
+        {!isAuthor && (
           <motion.div
             className="mb-8 flex items-center justify-between gap-3"
             initial={{ opacity: 0, x: -20 }}
@@ -307,7 +283,7 @@ export default function LetterDetailClient({
               <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => router.push(`/write?kind=${isStory ? "story" : "friend"}&id=${letter._id}`)}
+                  onClick={() => router.push(`/write?kind=friend&id=${letter._id}`)}
                   className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
                 >
                   수정하기
@@ -340,9 +316,7 @@ export default function LetterDetailClient({
                 lineHeight: "1.15",
               }}
             >
-              {isStory ? (
-                "당신에게 전해진 사연"
-              ) : envelopeOpened ? (
+              {envelopeOpened ? (
                 "To. 당신에게 도착한 편지"
               ) : (
                 <TypewriterText
@@ -356,17 +330,7 @@ export default function LetterDetailClient({
         )}
 
         {/* 사연: 바로 표시 / 작성자 편지: 확인 화면 / 수신자 편지: 봉투 애니메이션 */}
-        {isStory ? (
-          <StoryContent
-            letter={letter}
-            isAuthor={isAuthor}
-            letterPaperRef={letterPaperRef}
-            paperShadow={paperShadow}
-            session={session}
-            router={router}
-            openLogin={openLogin}
-          />
-        ) : isAuthor ? (
+        {isAuthor ? (
           <>
             <AuthorLetterView
               letter={letter}
@@ -377,7 +341,7 @@ export default function LetterDetailClient({
               <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => router.push(`/write?kind=${isStory ? "story" : "friend"}&id=${letter._id}`)}
+                  onClick={() => router.push(`/write?kind=friend&id=${letter._id}`)}
                   className="text-[#FF9883] border-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883] px-6 py-2 rounded-lg"
                 >
                   수정하기
@@ -643,7 +607,7 @@ export default function LetterDetailClient({
                   lineHeight: "normal",
                 }}
               >
-                {isStory ? "링크를 통해 사연을 공유해주세요" : "링크를 통해 편지를 공유해주세요"}
+                링크를 통해 편지를 공유해주세요
               </h2>
 
               {/* 링크 복사 영역 */}
@@ -674,7 +638,7 @@ export default function LetterDetailClient({
               <ConfirmDialog
                 open={showDeleteConfirm}
                 onOpenChange={setShowDeleteConfirm}
-                title={isStory ? "사연을 삭제할까요?" : "편지를 삭제할까요?"}
+                title="편지를 삭제할까요?"
                 description="삭제한 글은 목록에서 사라지며 다른 사람이 볼 수 없습니다."
                 confirmText="삭제"
                 variant="destructive"
@@ -766,7 +730,7 @@ export default function LetterDetailClient({
                 className="w-12 h-12 rounded-full bg-[#FF7F65] text-white shadow-lg flex items-center justify-center text-lg"
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
-                title={isStory ? "나도 사연 남기기" : "편지 답장"}
+                title="편지 답장"
               >
                 ✎
               </motion.button>
@@ -898,207 +862,6 @@ function AuthorLetterView({
   );
 }
 
-/* 사연 전용 콘텐츠 - 피그마 "사연 상세" 디자인 */
-function StoryContent({
-  letter,
-  isAuthor,
-  letterPaperRef,
-  paperShadow,
-  session,
-  router,
-  openLogin,
-}: {
-  letter: Letter;
-  isAuthor: boolean;
-  letterPaperRef: React.RefObject<HTMLDivElement | null>;
-  paperShadow: any;
-  session: any;
-  router: any;
-  openLogin: (callbackUrl: string) => void;
-}) {
-  const { isLiked, likeCount, isToggling, toggleLike, isLoggedIn } = useLike({
-    letterId: letter._id,
-    letterType: "story",
-    initialLikeCount: letter.likeCount || 0,
-  });
-  const [replies, setReplies] = useState<StoryReply[]>([]);
-  useEffect(() => {
-    getStoryReplies(letter._id)
-      .then((r) => setReplies(r.data))
-      .catch(() => setReplies([]));
-  }, [letter._id]);
-
-  const replyUrl = `/write?replyTo=${letter._id}`;
-  const handleLike = () => {
-    if (!isLoggedIn) return openLogin(`/letter/${letter._id}`);
-    toggleLike();
-  };
-  const handleReply = () => {
-    if (!session) return openLogin(replyUrl);
-    router.push(replyUrl);
-  };
-
-  const textStyle = { fontFamily: "Pretendard, sans-serif", color: "#424242" };
-
-  return (
-    <>
-      {/* 사연 제목 필드 */}
-      {letter.ogTitle && (
-        <motion.div
-          className="mb-5 rounded-lg border px-5 sm:px-7 h-12 sm:h-[60px] flex items-center"
-          style={{ backgroundColor: "#FEFEFE", borderColor: "#C4C4C4" }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <span
-            className="text-[#424242] text-base sm:text-xl truncate"
-            style={{ fontFamily: "Pretendard, sans-serif", fontWeight: 500 }}
-          >
-            {letter.ogTitle}
-          </span>
-        </motion.div>
-      )}
-
-      {/* 사연 작성 카드 - 48px 배경선 */}
-      <motion.div
-        ref={letterPaperRef}
-        className="rounded-lg border overflow-hidden mb-6 sm:mb-10"
-        style={{ backgroundColor: "#FEFEFE", borderColor: "#C4C4C4", boxShadow: paperShadow }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...springs.gentle, delay: 0.1 }}
-      >
-        <div className="story-lined px-5 sm:px-7 min-h-[240px] sm:min-h-[386px] flex flex-col">
-          <HandwritingReveal
-            html={letter.content}
-            className="letter-content story-lined text-base sm:text-xl flex-1"
-            style={{ color: textStyle.color, backgroundImage: "none" }}
-          />
-          {/* From. 닉네임 - 항상 마지막 줄 */}
-          <div className="flex justify-end items-center gap-3 h-12">
-            <Image
-              src="/icons/letter-heart-icon.svg"
-              alt="편지 아이콘"
-              width={28}
-              height={24}
-              className="w-7 h-6"
-            />
-            <span className="text-base sm:text-xl" style={{ color: textStyle.color }}>
-              From. {letter.senderName || letter.authorName || "사연자"}
-            </span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 메타 정보 + 액션 버튼 */}
-      <motion.div
-        className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 mb-12 sm:mb-20"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div
-          className="flex flex-wrap gap-x-8 sm:gap-x-12 gap-y-2 text-sm sm:text-lg pt-2"
-          style={textStyle}
-        >
-          <span>공감 수 : {String(likeCount).padStart(2, "0")}</span>
-          <span>date. {formatDotDate(letter.createdAt)}</span>
-          <span>도착한 답장 {replies.length}통</span>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <Button
-            onClick={handleLike}
-            disabled={isToggling}
-            aria-pressed={isLiked}
-            className={`w-full sm:w-44 lg:w-56 h-12 sm:h-16 rounded-lg font-semibold text-base sm:text-lg lg:text-2xl leading-5 transition-colors ${
-              isLiked
-                ? "bg-white border-2 border-[#FF7F65] text-[#FF7F65] hover:bg-orange-50"
-                : "bg-[#FF7F65] text-white hover:bg-[#ff6b4d]"
-            }`}
-            style={{ fontFamily: "Pretendard" }}
-          >
-            {isLiked ? "공감 완료" : "공감하기"}
-          </Button>
-          {!isAuthor && (
-            <Button
-              onClick={handleReply}
-              className="w-full sm:w-44 lg:w-56 h-12 sm:h-16 bg-[#FF7F65] text-white rounded-lg hover:bg-[#ff6b4d] transition-colors font-semibold text-base sm:text-lg lg:text-2xl leading-5"
-              style={{ fontFamily: "Pretendard" }}
-            >
-              사연 답장하기
-            </Button>
-          )}
-        </div>
-      </motion.div>
-
-      {/* 도착한 답장 */}
-      <section className="mb-12 sm:mb-20">
-        <div className="flex items-center gap-6 sm:gap-10 mb-8 sm:mb-14">
-          <div className="flex-1 h-px bg-[#C4C4C4]" />
-          <h3
-            className="text-lg sm:text-2xl font-medium whitespace-nowrap"
-            style={textStyle}
-          >
-            도착한 답장
-          </h3>
-          <div className="flex-1 h-px bg-[#C4C4C4]" />
-        </div>
-
-        {replies.length === 0 ? (
-          <p className="text-center text-sm sm:text-base text-[#757575] py-8">
-            아직 도착한 답장이 없어요
-          </p>
-        ) : (
-          <motion.ul
-            className="flex flex-col gap-5 sm:gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {replies.map((reply) => (
-              <motion.li key={reply._id} variants={staggerItem}>
-                <Link
-                  href={`/letter/${reply._id}`}
-                  className="block rounded-xl border border-[#D1D1D1] bg-white px-5 sm:px-7 py-5 hover:border-[#FF9883] transition-colors"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <Image
-                      src="/icons/letter-heart-icon.svg"
-                      alt=""
-                      width={28}
-                      height={24}
-                      className="w-7 h-6"
-                    />
-                    <span className="text-base sm:text-xl font-medium" style={textStyle}>
-                      {reply.authorName}
-                    </span>
-                  </div>
-                  <p className="text-base sm:text-xl font-medium mb-4 truncate" style={textStyle}>
-                    {reply.title}
-                  </p>
-                  <p className="text-base sm:text-xl font-medium truncate" style={textStyle}>
-                    {reply.ogPreviewText || reply.plainContent}
-                  </p>
-                  <p className="text-right text-sm sm:text-xl font-medium mt-4" style={textStyle}>
-                    {formatDotDate(reply.createdAt)}
-                  </p>
-                </Link>
-              </motion.li>
-            ))}
-          </motion.ul>
-        )}
-      </section>
-    </>
-  );
-}
-
-/** 2026. 09. 06 형식 */
-function formatDotDate(date: string) {
-  const d = new Date(date);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${pad(d.getMonth() + 1)}. ${pad(d.getDate())}`;
-}
 
 function AddressForm({
   letterId,

@@ -176,7 +176,7 @@ body {
   /* 모바일에서 input 줌 방지 */
   @media (max-width: 767px) {
     input, select, textarea {
-      font-size: 16px !important;
+      font-size: var(--mobile-fs, 16px) !important;
     }
   }
 }

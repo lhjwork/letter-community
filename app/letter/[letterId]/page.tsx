@@ -1,14 +1,24 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
+import { getComments, getStoryReplies, type StoryReply } from "@/lib/api";
 import LetterDetailClient from "./LetterDetailClient";
+import { NARROW } from "./narrow";
+import StoryDetail from "./story/StoryDetail";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 interface Letter {
   _id: string;
   type: "story" | "friend";
+  title?: string;
   content: string;
   contentType?: "text" | "html";
+  senderName?: string;
+  recipientName?: string;
+  category?: string;
+  isAuthor?: boolean;
+  commentCount?: number;
   ogTitle?: string;
   ogPreviewText: string;
   status: string;
@@ -63,8 +73,8 @@ async function getLetter(letterId: string): Promise<Letter | null> {
     // 새로운 필드들에 대한 기본값 설정 (백엔드 호환성)
     return {
       ...data,
-      // textarea 로 쓴 편지(contentType text)는 읽기 화면의 HTML 렌더러에 맞게 줄바꿈만 <br> 로
-      content: data.contentType === "text" ? textToHtml(data.content ?? "") : data.content,
+      // textarea 로 쓴 편지(contentType text)는 기존 읽기 화면(마음 편지)의 HTML 렌더러에 맞게 줄바꿈만 <br> 로. 사연 상세는 원문을 쓴다
+      content: data.type === "story" || data.contentType !== "text" ? data.content : textToHtml(data.content ?? ""),
       physicalLetterStats: data.physicalLetterStats || {
         totalRequests: 0,
         pendingRequests: 0,
@@ -111,7 +121,7 @@ export async function generateMetadata({
     .join(" ")
     .slice(0, 120);
   const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og?text=${encodeURIComponent(previewText)}`;
-  const title = letter.ogTitle || "당신에게 도착한 편지";
+  const title = (letter.type === "story" && letter.title) || letter.ogTitle || "당신에게 도착한 편지";
   const description = letter.ogPreviewText || "특별한 편지가 도착했습니다.";
 
   return {
@@ -151,5 +161,19 @@ export default async function LetterDetailPage({
     notFound();
   }
 
-  return <LetterDetailClient letter={letter} />;
+  if (letter.type === "story") {
+    const session = await auth();
+    const token = session?.backendToken;
+    const [replies, comments] = await Promise.all([
+      getStoryReplies(letterId).then((r) => r.data).catch((): StoryReply[] => []),
+      getComments(letterId, 1, token).then((r) => r.data).catch(() => ({ items: [], total: letter.commentCount ?? 0, hasNextPage: false })),
+    ]);
+    return <StoryDetail story={letter} replies={replies} comments={comments} />;
+  }
+
+  return (
+    <div className={NARROW}>
+      <LetterDetailClient letter={{ ...letter, type: "friend" }} />
+    </div>
+  );
 }

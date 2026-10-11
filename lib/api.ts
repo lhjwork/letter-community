@@ -190,7 +190,13 @@ export interface StoryReply {
   title: string;
   ogPreviewText?: string;
   plainContent?: string;
+  /** 익명 답장은 "익명" */
   authorName: string;
+  isAnonymous?: boolean;
+  /** 작성자가 레터(관리자) 계정 */
+  isAdminReply: boolean;
+  /** 관리자가 채택해 사연자에게 전해지는 답장 */
+  isAdopted: boolean;
   createdAt: string;
 }
 
@@ -204,6 +210,36 @@ export async function getStoryReplies(
     method: "GET",
     cache: "no-store",
   });
+}
+
+// === 사연 댓글 ===
+export const COMMENT_MAX = 100;
+export const COMMENT_PAGE = 5;
+
+export interface StoryComment {
+  _id: string;
+  nickname: string;
+  content: string;
+  createdAt: string;
+  isMine: boolean;
+}
+
+export interface CommentsResponse {
+  success: boolean;
+  data: { items: StoryComment[]; total: number; hasNextPage: boolean };
+}
+
+/** 댓글 목록 (오래된 순, 기본 5개). 토큰이 있으면 isMine 이 계산된다 */
+export async function getComments(letterId: string, page = 1, token?: string): Promise<CommentsResponse> {
+  return apiRequest(`/api/letters/${letterId}/comments?page=${page}&limit=${COMMENT_PAGE}`, { method: "GET", cache: "no-store", token });
+}
+
+export async function createComment(letterId: string, content: string, token: string): Promise<{ data: { _id: string; createdAt: string } }> {
+  return apiRequest(`/api/letters/${letterId}/comments`, { method: "POST", token, body: JSON.stringify({ content }) });
+}
+
+export async function deleteComment(letterId: string, commentId: string, token: string): Promise<{ success: boolean }> {
+  return apiRequest(`/api/letters/${letterId}/comments/${commentId}`, { method: "DELETE", token });
 }
 
 /**
@@ -392,6 +428,8 @@ export interface Story {
   likeCount?: number;
   /** 숨김·삭제 제외 답장 수 (featured·목록 응답에 실림) */
   replyCount?: number;
+  /** 댓글 수 (목록·상세 응답에 실림) */
+  commentCount?: number;
   /** 목록 응답: plainContent 앞 80자. content 는 실리지 않는다 */
   preview?: string;
   createdAt: string;

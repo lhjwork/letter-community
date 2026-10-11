@@ -1,17 +1,7 @@
-import Footer from "@/components/shareds/Footer";
-import Header from "@/components/shareds/Header";
+import SiteShell from "@/components/shareds/SiteShell";
 import { ReactNode } from "react";
 
-type Props = { children: ReactNode };
-
-export default function LetterLayout({ children }: Props) {
-  return (
-    <div className="flex justify-center w-full px-4 sm:px-6 lg:px-8">
-      <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[70%] max-w-[1400px]">
-        <Header />
-        {children}
-        <Footer />
-      </div>
-    </div>
-  );
+/** 항공우편 띠 + 헤더/푸터. 사연 상세는 1180 폭(v8), 마음 편지·실물 신청은 각 페이지가 기존 폭을 감싼다 */
+export default function LetterLayout({ children }: { children: ReactNode }) {
+  return <SiteShell>{children}</SiteShell>;
 }
