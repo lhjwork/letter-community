@@ -133,7 +133,12 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
         </div>
 
         {records.data.length === 0 ? (
-          <p className="m-0 font-pen text-2xl text-ink-2">아직 여기 담긴 편지가 없어요.</p>
+          <div className="flex flex-col items-start gap-4">
+            <p className="m-0 font-pen text-2xl text-ink-2">아직 여기 담긴 편지가 없어요.</p>
+            <Link href="/write" className="btn btn-brick">
+              편지 쓰기
+            </Link>
+          </div>
         ) : (
           <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-6 p-0 mobile-down:gap-5">
             {records.data.map((r, i) => (
@@ -149,6 +154,7 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
             더 보기
           </Link>
         )}
+        {records.total > records.data.length && n >= MAX && <p className="m-0 self-center text-[13px] text-ink-3">최근 {MAX}통까지 보여요.</p>}
       </section>
 
       <section className={`${WRAP} hidden pb-12 mobile-down:block`}>

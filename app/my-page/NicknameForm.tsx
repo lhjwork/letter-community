@@ -44,6 +44,7 @@ export default function NicknameForm({ name, nameUpdatedAt, unlockAt: unlockAtLo
           <input
             type="text"
             name="name"
+            aria-label="닉네임"
             className="field min-w-0 flex-1 disabled:cursor-not-allowed disabled:text-ink-3"
             value={value}
             maxLength={20}
