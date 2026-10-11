@@ -314,6 +314,13 @@ export interface Letter {
   ogBgColor?: string;
   ogIllustration?: string;
   ogFontSize?: number;
+  recipientName?: string;
+  /** 사연에 단 답장이면 사연 id·제목 (GET /api/letters/my) */
+  replyTo?: { _id: string; title: string };
+  /** 실물 편지 신청이 한 건이라도 들어왔는지 (GET /api/letters/my) */
+  physicalRequested?: boolean;
+  /** 답장이 채택된 시각 (관리자가 채택) */
+  adoptedAt?: string | null;
   // AI 분류 필드
   category?: string;
   aiMetadata?: {
@@ -336,21 +343,38 @@ export interface GetMyLettersResponse {
  */
 export async function getMyLetters(
   token: string,
-  params?: { page?: number; limit?: number },
+  params?: { page?: number; limit?: number; filter?: "all" | "sent" | "received" },
 ): Promise<GetMyLettersResponse> {
   const queryParams = new URLSearchParams();
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.filter) queryParams.append("filter", params.filter);
 
-  const endpoint =
-    params && (params.page || params.limit)
-      ? `/api/letters/my?${queryParams.toString()}`
-      : "/api/letters/my";
-
-  return apiRequest<GetMyLettersResponse>(endpoint, {
+  const qs = queryParams.toString();
+  return apiRequest<GetMyLettersResponse>(qs ? `/api/letters/my?${qs}` : "/api/letters/my", {
     method: "GET",
     token,
   });
+}
+
+export interface MyRequestSummary {
+  total: number;
+  latest: {
+    letterId: string;
+    letterTitle: string;
+    envelope?: string;
+    requestId: string;
+    name: string;
+    /** 구 단위까지 ("서울 성동구") */
+    region: string;
+    status: string;
+    requestedAt: string;
+  } | null;
+}
+
+/** 내가 쓴 마음 편지에 들어온 실물 편지 신청 수와 최근 1건 */
+export async function getMyRequestSummary(token: string): Promise<{ success: boolean; data: MyRequestSummary }> {
+  return apiRequest("/api/letters/my/physical-requests", { method: "GET", token });
 }
 
 /**

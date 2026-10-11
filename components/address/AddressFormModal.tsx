@@ -1,242 +1,136 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Address, AddressInput } from "@/types/address";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import type { Address, AddressInput } from "@/types/address";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import PostcodeSearch from "./PostcodeSearch";
 
-interface AddressFormModalProps {
+interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** 실패하면 Error 를 던진다. 메시지는 모달 안에 보인다 */
   onSubmit: (data: AddressInput) => Promise<void>;
   editAddress?: Address | null;
-  isLoading?: boolean;
 }
 
-const emptyFormData: AddressInput = {
-  addressName: "",
-  recipientName: "",
-  zipCode: "",
-  address: "",
-  addressDetail: "",
-  phone: "",
-  tel: "",
-  isDefault: false,
-};
+const LABEL = "flex flex-col gap-1.5";
+const LABEL_TXT = "font-pen text-xl";
 
-export default function AddressFormModal({ open, onOpenChange, onSubmit, editAddress, isLoading = false }: AddressFormModalProps) {
-  const [formData, setFormData] = useState<AddressInput>(emptyFormData);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+function formatPhone(raw: string) {
+  const n = raw.replace(/\D/g, "").slice(0, 11);
+  if (n.length < 4) return n;
+  if (n.length < 8) return `${n.slice(0, 3)}-${n.slice(3)}`;
+  return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`;
+}
 
-  const handleOpenChange = useCallback(
-    (newOpen: boolean) => {
-      if (newOpen) {
-        // 모달이 열릴 때 폼 데이터 초기화
-        if (editAddress) {
-          setFormData({
-            addressName: editAddress.addressName,
-            recipientName: editAddress.recipientName,
-            zipCode: editAddress.zipCode,
-            address: editAddress.address,
-            addressDetail: editAddress.addressDetail || "",
-            phone: editAddress.phone,
-            tel: editAddress.tel || "",
-            isDefault: editAddress.isDefault,
-          });
-        } else {
-          setFormData(emptyFormData);
-        }
-        setErrors({});
-      }
-      onOpenChange(newOpen);
-    },
-    [editAddress, onOpenChange]
+const fromAddress = (a?: Address | null) => ({
+  recipientName: a?.recipientName ?? "",
+  phone: a?.phone ?? "",
+  zipCode: a?.zipCode ?? "",
+  address: a?.address ?? "",
+  addressDetail: a?.addressDetail ?? "",
+  isDefault: a?.isDefault ?? false,
+});
+
+/** 주소 입력 모달 (v8-Modals-2 AddressFormModal). 모바일은 아래에서 올라오는 전체 폭 시트 */
+export default function AddressFormModal({ open, onOpenChange, onSubmit, editAddress }: Props) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        showCloseButton={false}
+        className="paper max-w-[520px] gap-4 rounded-none border-rule bg-paper px-9 pb-8 pt-10 shadow-[var(--paper-shadow)] mobile-down:bottom-0 mobile-down:top-auto mobile-down:max-w-none mobile-down:translate-y-0 mobile-down:px-5 mobile-down:pb-6 mobile-down:pt-9"
+      >
+        <div className="airmail absolute inset-x-0 top-0 h-2" aria-hidden="true" />
+        <span className="stampbox absolute -top-4 left-6 bg-paper text-ink mobile-down:left-4 mobile-down:text-[22px]">주소 입력</span>
+        <DialogClose aria-label="닫기" className="absolute right-3.5 top-3.5 z-10 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3">
+          ✕
+        </DialogClose>
+        {/* key 로 열 때마다 폼을 새로 만든다(수정 대상이 바뀌어도 이전 값이 남지 않게) */}
+        {open && <Form key={editAddress?._id ?? "new"} editAddress={editAddress} onSubmit={onSubmit} />}
+      </DialogContent>
+    </Dialog>
   );
+}
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
+function Form({ editAddress, onSubmit }: Pick<Props, "editAddress" | "onSubmit">) {
+  const [f, setF] = useState(() => fromAddress(editAddress));
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-    if (!formData.addressName.trim()) {
-      newErrors.addressName = "배송지명을 입력해주세요";
-    } else if (formData.addressName.length > 20) {
-      newErrors.addressName = "배송지명은 20자 이내로 입력해주세요";
-    }
+  const set = (k: "recipientName" | "phone" | "addressDetail") => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setF((s) => ({ ...s, [k]: k === "phone" ? formatPhone(e.target.value) : e.target.value }));
 
-    if (!formData.recipientName.trim()) {
-      newErrors.recipientName = "수령인을 입력해주세요";
-    } else if (formData.recipientName.length > 50) {
-      newErrors.recipientName = "수령인은 50자 이내로 입력해주세요";
-    }
-
-    if (!formData.zipCode.trim()) {
-      newErrors.zipCode = "우편번호를 검색해주세요";
-    }
-
-    if (!formData.address.trim()) {
-      newErrors.address = "주소를 입력해주세요";
-    }
-
-    if (formData.addressDetail && formData.addressDetail.length > 100) {
-      newErrors.addressDetail = "상세주소는 100자 이내로 입력해주세요";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "휴대전화를 입력해주세요";
-    } else if (!/^[\d-]+$/.test(formData.phone)) {
-      newErrors.phone = "휴대전화는 숫자와 하이픈만 입력 가능합니다";
-    }
-
-    if (formData.tel && !/^[\d-]*$/.test(formData.tel)) {
-      newErrors.tel = "연락처는 숫자와 하이픈만 입력 가능합니다";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validate()) return;
-    await onSubmit(formData);
-  };
-
-  const handlePostcodeComplete = (data: { zipCode: string; address: string; roadAddress: string; jibunAddress: string }) => {
-    setFormData((prev) => ({
-      ...prev,
-      zipCode: data.zipCode,
-      address: data.address,
-    }));
-    setErrors((prev) => ({ ...prev, zipCode: "", address: "" }));
+    const recipientName = f.recipientName.trim();
+    if (!recipientName) return setError("받으실 분의 이름을 적어 주세요.");
+    if (f.phone && !/^[\d-]+$/.test(f.phone)) return setError("연락처는 숫자와 - 만 적어 주세요.");
+    if (!f.zipCode || !f.address) return setError("우편번호 검색으로 주소를 골라 주세요.");
+    setError("");
+    setBusy(true);
+    try {
+      await onSubmit({
+        // 예전에 적은 배송지명은 그대로 둔다. 새 주소는 서버가 이름으로 채운다
+        ...(editAddress?.addressName ? { addressName: editAddress.addressName } : {}),
+        recipientName,
+        phone: f.phone,
+        zipCode: f.zipCode,
+        address: f.address,
+        addressDetail: f.addressDetail.trim(),
+        isDefault: f.isDefault,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "저장하지 못했어요. 다시 시도해 주세요.");
+      setBusy(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[600px] md:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-3xl text-[#424242] font-normal" style={{ fontFamily: "NanumJangMiCe, cursive" }}>{editAddress ? "배송지 수정" : "배송지 추가"}</DialogTitle>
-        </DialogHeader>
+    // 스탬프가 종이 위로 걸치도록 스크롤은 종이가 아니라 폼에 둔다(낮은 화면에서도 저장 버튼까지 닿게)
+    <form onSubmit={submit} className="-mx-1 flex max-h-[calc(90vh-72px)] flex-col gap-4 overflow-y-auto px-1">
+      <DialogTitle className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3]">받으실 분의 주소</DialogTitle>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          {/* 배송지명 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">
-              배송지명 <span className="text-[#FF7F65]">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.addressName}
-              onChange={(e) => setFormData((prev) => ({ ...prev, addressName: e.target.value }))}
-              placeholder="예: 집, 회사"
-              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
-              maxLength={20}
-            />
-            {errors.addressName && <p className="text-[#FF7F65] text-sm mt-1">{errors.addressName}</p>}
-          </div>
-
-          {/* 수령인 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">
-              수령인 <span className="text-[#FF7F65]">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.recipientName}
-              onChange={(e) => setFormData((prev) => ({ ...prev, recipientName: e.target.value }))}
-              placeholder="수령인 이름"
-              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
-              maxLength={50}
-            />
-            {errors.recipientName && <p className="text-[#FF7F65] text-sm mt-1">{errors.recipientName}</p>}
-          </div>
-
-          {/* 우편번호 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">
-              우편번호 <span className="text-[#FF7F65]">*</span>
-            </label>
-            <div className="flex gap-3">
-              <input type="text" value={formData.zipCode} readOnly placeholder="우편번호" className="flex-1 px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg bg-[#F5F5F5] text-[#424242]" />
-              <PostcodeSearch onComplete={handlePostcodeComplete} className="px-5 py-3 text-lg h-auto border-2 border-[#FF9883] text-[#FF9883] hover:bg-orange-50 hover:text-[#FF9883]" />
-            </div>
-            {errors.zipCode && <p className="text-[#FF7F65] text-sm mt-1">{errors.zipCode}</p>}
-          </div>
-
-          {/* 주소 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">
-              주소 <span className="text-[#FF7F65]">*</span>
-            </label>
-            <input type="text" value={formData.address} readOnly placeholder="주소" className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg bg-[#F5F5F5] text-[#424242]" />
-            {errors.address && <p className="text-[#FF7F65] text-sm mt-1">{errors.address}</p>}
-          </div>
-
-          {/* 상세주소 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">상세주소</label>
-            <input
-              type="text"
-              value={formData.addressDetail}
-              onChange={(e) => setFormData((prev) => ({ ...prev, addressDetail: e.target.value }))}
-              placeholder="상세주소 (동/호수 등)"
-              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
-              maxLength={100}
-            />
-            {errors.addressDetail && <p className="text-[#FF7F65] text-sm mt-1">{errors.addressDetail}</p>}
-          </div>
-
-          {/* 휴대전화 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">
-              휴대전화 <span className="text-[#FF7F65]">*</span>
-            </label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
-              placeholder="010-0000-0000"
-              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
-            />
-            {errors.phone && <p className="text-[#FF7F65] text-sm mt-1">{errors.phone}</p>}
-          </div>
-
-          {/* 연락처 */}
-          <div>
-            <label className="block text-lg font-medium text-[#424242] mb-2">연락처 (선택)</label>
-            <input
-              type="tel"
-              value={formData.tel}
-              onChange={(e) => setFormData((prev) => ({ ...prev, tel: e.target.value }))}
-              placeholder="02-0000-0000"
-              className="w-full px-4 py-3 text-lg border-2 border-[#C4C4C4] rounded-lg text-[#424242] focus:outline-none focus:border-[#FF7F65]"
-            />
-            {errors.tel && <p className="text-[#FF7F65] text-sm mt-1">{errors.tel}</p>}
-          </div>
-
-          {/* 기본 배송지 설정 */}
-          <div className="flex items-center gap-4 pt-2">
-            <input
-              type="checkbox"
-              id="isDefault"
-              checked={formData.isDefault}
-              onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-              className="w-5 h-5 accent-[#FF9883] rounded"
-            />
-            <label htmlFor="isDefault" className="text-lg text-[#424242]">
-              기본 배송지로 설정
-            </label>
-          </div>
-
-          <DialogFooter className="pt-6">
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} className="px-8 py-3 text-lg h-auto border-2 border-[#C4C4C4] text-[#757575] hover:bg-[#F5F5F5]">
-              취소
-            </Button>
-            <Button type="submit" disabled={isLoading} className="bg-[#FF7F65] hover:bg-[#ff6b50] text-white px-8 py-3 text-lg h-auto">
-              {isLoading ? "저장 중..." : editAddress ? "수정" : "추가"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <label className={LABEL}>
+        <span className={LABEL_TXT}>이름</span>
+        <input type="text" required maxLength={50} value={f.recipientName} onChange={set("recipientName")} className="field" placeholder="수취인 이름" autoComplete="name" />
+      </label>
+      <label className={LABEL}>
+        <span className={LABEL_TXT}>
+          연락처 <span className="text-base text-ink-3">(선택)</span>
+        </span>
+        <input type="tel" inputMode="numeric" value={f.phone} onChange={set("phone")} className="field" placeholder="010-0000-0000" autoComplete="tel" />
+      </label>
+      <div className={LABEL}>
+        <label htmlFor="addr-zip" className={LABEL_TXT}>
+          주소
+        </label>
+        <span className="flex gap-2">
+          <input id="addr-zip" type="text" readOnly value={f.zipCode} className="field min-w-0 flex-[1_1_120px]" placeholder="우편번호" />
+          <PostcodeSearch
+            onComplete={(d) => setF((s) => ({ ...s, zipCode: d.zipCode, address: d.address }))}
+            className="btn btn-ink whitespace-nowrap text-xl mobile-down:px-4 mobile-down:text-lg"
+          />
+        </span>
+      </div>
+      <input type="text" readOnly value={f.address} className="field" placeholder="주소" aria-label="기본 주소" />
+      <input type="text" maxLength={100} value={f.addressDetail} onChange={set("addressDetail")} className="field" placeholder="상세주소 (동/호수 등)" aria-label="상세 주소" />
+      <label className="flex min-h-11 items-center gap-2.5 self-start text-sm text-ink-2">
+        <input type="checkbox" checked={f.isDefault} onChange={(e) => setF((s) => ({ ...s, isDefault: e.target.checked }))} className="h-[18px] w-[18px] accent-ink" />
+        기본 배송지로
+      </label>
+      {error && (
+        <p role="alert" className="m-0 text-[15px] text-brick">
+          {error}
+        </p>
+      )}
+      <div className="flex justify-end gap-2.5">
+        <DialogClose type="button" className="btn btn-ink">
+          취소
+        </DialogClose>
+        <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-brick">
+          {busy ? "저장하는 중" : "저장"}
+        </button>
+      </div>
+    </form>
   );
 }

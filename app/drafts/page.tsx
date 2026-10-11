@@ -1,6 +1,6 @@
 "use client";
 
-import { showAlert } from "@/components/ui/AppAlert";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { getDrafts, deleteDraft } from "@/lib/draft-api";
 import type { DraftLetter } from "@/types/draft";
 import { useSession } from "next-auth/react";
@@ -19,6 +19,8 @@ export default function DraftsPage() {
   const { data: session } = useSession();
   const token = session?.backendToken;
   const [drafts, setDrafts] = useState<DraftLetter[] | null>(null);
+  const [removing, setRemoving] = useState<DraftLetter | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) return;
@@ -26,19 +28,21 @@ export default function DraftsPage() {
       .then((res) => setDrafts(res.data.drafts))
       .catch((e) => {
         console.error("임시저장 목록 실패:", e);
-        showAlert("임시저장 목록을 불러올 수 없습니다.");
+        setError("임시저장 목록을 불러오지 못했어요.");
         setDrafts([]);
       });
   }, [token]);
 
+  // 성공하면 목록에서 행이 사라지는 것으로 충분하다. 실패만 한 줄로 알린다
   const remove = async (id: string) => {
-    if (!token || !confirm("이 임시저장을 지울까요?")) return;
+    if (!token) return;
+    setError("");
     try {
       await deleteDraft(token, id);
       setDrafts((list) => list?.filter((d) => d._id !== id) ?? null);
     } catch (e) {
       console.error("임시저장 삭제 실패:", e);
-      showAlert("삭제하지 못했습니다.");
+      setError("삭제하지 못했어요. 다시 시도해 주세요.");
     }
   };
 
@@ -49,6 +53,11 @@ export default function DraftsPage() {
         <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">임시저장</h1>
       </section>
       <section className={`${WRAP} pb-24`}>
+        {error && (
+          <p role="alert" className="m-0 mb-4 text-[15px] text-brick">
+            {error}
+          </p>
+        )}
         {drafts === null ? (
           <p className="m-0 font-pen text-xl text-ink-3">불러오는 중...</p>
         ) : drafts.length === 0 ? (
@@ -69,7 +78,7 @@ export default function DraftsPage() {
                   <Link href={`/write?draftId=${d._id}`} className="btn btn-blue min-h-11 px-5 text-xl">
                     이어 쓰기
                   </Link>
-                  <button type="button" onClick={() => remove(d._id)} className="btn btn-ink min-h-11 px-5 text-xl">
+                  <button type="button" onClick={() => setRemoving(d)} className="btn btn-ink min-h-11 px-5 text-xl">
                     삭제
                   </button>
                 </div>
@@ -78,6 +87,15 @@ export default function DraftsPage() {
           </ul>
         )}
       </section>
+      <ConfirmDialog
+        open={removing !== null}
+        onOpenChange={(o) => !o && setRemoving(null)}
+        title="이 임시저장을 지울까요"
+        description={removing ? `‘${removing.title || removing.autoTitle || "제목 없음"}’이 지워져요.` : ""}
+        confirmText="삭제"
+        variant="destructive"
+        onConfirm={() => removing && remove(removing._id)}
+      />
     </main>
   );
 }

@@ -19,21 +19,7 @@ export async function getAddresses(token: string): Promise<AddressListResponse> 
   });
 }
 
-// 최근 배송지 조회
-export async function getRecentAddresses(token: string, limit = 20): Promise<AddressListResponse> {
-  return apiRequest<AddressListResponse>(`/api/addresses/recent?limit=${limit}`, {
-    method: "GET",
-    token,
-  });
-}
 
-// 배송지 상세 조회
-export async function getAddress(token: string, id: string): Promise<AddressResponse> {
-  return apiRequest<AddressResponse>(`/api/addresses/${id}`, {
-    method: "GET",
-    token,
-  });
-}
 
 // 배송지 추가
 export async function createAddress(token: string, data: AddressInput): Promise<AddressResponse> {
@@ -69,11 +55,3 @@ export async function setDefaultAddress(token: string, id: string): Promise<Addr
   });
 }
 
-// 최근 배송지를 주소록에 저장
-export async function saveRecentToBook(token: string, id: string, addressName?: string): Promise<AddressResponse> {
-  return apiRequest<AddressResponse>(`/api/addresses/${id}/save-to-book`, {
-    method: "POST",
-    token,
-    body: JSON.stringify({ addressName }),
-  });
-}

@@ -17,7 +17,8 @@ export default function StoryBrick({ story, index }: { story: Story; index: numb
       href={`/letter/${story._id}`}
       className={`ruled relative mb-7 flex break-inside-avoid flex-col border border-rule px-[26px] py-9 text-ink shadow-[0_6px_0_-3px_#E3DACB] hover:text-ink mobile-down:px-5 ${PAPERS[index % PAPERS.length]} ${TILTS[index % TILTS.length]}`}
     >
-      <span className={`tape ${TAPES[index % TAPES.length]}`} aria-hidden="true" />
+      {/* top:-10px 이면 단(column) 맨 위 카드의 테이프가 앞 단 바닥에 찍힌다(다단 조각). 0 에 두고 transform 으로 올린다 */}
+      <span className={`tape top-0 -translate-y-2.5 ${TAPES[index % TAPES.length]}`} aria-hidden="true" />
       <span className={`badge absolute right-4 top-3.5 ${n > 0 ? "bg-airblue" : "bg-brick"}`}>{n > 0 ? `답장 ${n}` : "답장 기다림"}</span>
       <span className="font-pen text-lg leading-9 text-brick">To. {story.recipientName || "누군가에게"}</span>
       <strong className="relative -top-0.5 font-pen text-[26px] font-normal leading-9 mobile-down:text-2xl">{story.title || preview}</strong>

@@ -7,22 +7,23 @@ export interface Address {
   zipCode: string;
   address: string;
   addressDetail?: string;
-  phone: string;
+  /** 연락처는 선택 */
+  phone?: string;
   tel?: string;
   isDefault: boolean;
-  isFromRecent: boolean;
   lastUsedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface AddressInput {
-  addressName: string;
+  /** 비우면 서버가 받는 분 이름으로 채운다 */
+  addressName?: string;
   recipientName: string;
   zipCode: string;
   address: string;
   addressDetail?: string;
-  phone: string;
+  phone?: string;
   tel?: string;
   isDefault?: boolean;
 }
