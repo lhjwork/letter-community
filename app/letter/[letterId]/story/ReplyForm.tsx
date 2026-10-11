@@ -60,7 +60,7 @@ export default function ReplyForm({ storyId, storyTitle, to }: Props) {
         maxLength={REPLY_MAX}
         onChange={(e) => setContent(e.target.value)}
         placeholder="천천히 써도 괜찮아요. 당신의 말이 누군가에겐 처음 듣는 말일 수 있어요."
-        className="mt-9 min-h-[216px] w-full resize-y border-0 bg-transparent p-0 text-[19px] leading-9 text-ink outline-none [--mobile-fs:19px] placeholder:text-ink-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        className="mt-9 min-h-[216px] w-full resize-y border-0 bg-transparent p-0 text-[19px] leading-9 text-ink outline-none [--mobile-fs:19px] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
       />
       <div className="mt-9 flex min-h-[72px] flex-wrap items-center justify-between gap-3 mobile-down:min-h-0 mobile-down:flex-col mobile-down:items-stretch mobile-down:gap-0">
         <label className="flex min-h-11 items-center gap-2.5 text-[15px] text-ink-2 mobile-down:h-9 mobile-down:min-h-0">

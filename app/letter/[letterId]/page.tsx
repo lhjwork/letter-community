@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { getComments, getStoryReplies, type StoryReply } from "@/lib/api";
+import { getComments, getStoryReplies } from "@/lib/api";
 import FriendDetail, { type FriendLetter } from "./friend/FriendDetail";
 import ReplyDetail, { type ReplyLetter } from "./story/ReplyDetail";
 import StoryDetail from "./story/StoryDetail";
@@ -20,21 +20,15 @@ type Letter = FriendLetter & {
 
 /** 토큰이 있으면 서버가 isAuthor 를 계산해 준다(작성자 ID 는 내려오지 않는다) */
 async function getLetter(letterId: string, token?: string): Promise<Letter | null> {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`, {
-      cache: "no-store",
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    });
-    if (!response.ok) return null;
-    const { data } = await response.json();
-    return {
-      ...data,
-      authorSettings: data.authorSettings || { allowPhysicalRequests: true },
-    };
-  } catch (error) {
-    console.error("Failed to fetch letter:", error);
-    return null;
-  }
+  // 없는 편지(400·404)만 null. 서버 오류는 throw → error.tsx 다시 시도 화면(가짜 "없음"·"답장 0통" 방지)
+  const response = await fetch(`${BACKEND_URL}/api/letters/${letterId}`, {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+  if (response.status === 404 || response.status === 400) return null;
+  if (!response.ok) throw new Error(`letter fetch ${response.status}`);
+  const { data } = await response.json();
+  return { ...data, authorSettings: data.authorSettings || { allowPhysicalRequests: true } };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ letterId: string }> }): Promise<Metadata> {
@@ -95,7 +89,7 @@ export default async function LetterDetailPage({ params }: { params: Promise<{ l
 
   if (letter.type === "story") {
     const [replies, comments] = await Promise.all([
-      getStoryReplies(letterId).then((r) => r.data).catch((): StoryReply[] => []),
+      getStoryReplies(letterId).then((r) => r.data),
       getComments(letterId, 1, token).then((r) => r.data).catch(() => ({ items: [], total: letter.commentCount ?? 0, hasNextPage: false })),
     ]);
     return <StoryDetail story={letter} replies={replies} comments={comments} />;

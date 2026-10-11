@@ -317,7 +317,7 @@ export default function WriteForm() {
                 setTo(e.target.value);
                 setDirty(true);
               }}
-              className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
+              className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
               style={penLine}
             />
           </label>
@@ -343,7 +343,7 @@ export default function WriteForm() {
               setContent(e.target.value);
               setDirty(true);
             }}
-            className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-[19px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-base"
+            className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-[19px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-base"
             style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), top: `calc(${cq(PAPER.bodyTop)} + var(--baseline-shift))`, height: cq(bodyHeight), lineHeight: cq(PAPER.line) }}
             required
           />

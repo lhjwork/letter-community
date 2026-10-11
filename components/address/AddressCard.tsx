@@ -21,7 +21,7 @@ export default function AddressCard({ address: a, index, busy, onEdit, onDelete,
         {a.isDefault ? (
           <span className="badge bg-approve">기본 배송지</span>
         ) : (
-          <button type="button" disabled={busy} onClick={() => onSetDefault(a)} className="inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent font-pen text-lg text-airblue hover:text-brick">
+          <button type="button" disabled={busy} onClick={() => onSetDefault(a)} className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center border-0 bg-transparent font-pen text-lg text-airblue hover:text-brick">
             <span className="border-b border-current">기본으로</span>
           </button>
         )}
