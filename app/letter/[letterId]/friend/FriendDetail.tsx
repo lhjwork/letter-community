@@ -83,7 +83,7 @@ export default function FriendDetail({ letter }: { letter: FriendLetter }) {
       )}
 
       {isAuthor && (
-        <section className={`${WRAP} pb-24 mobile-down:pb-12`}>
+        <section id="requests" className={`${WRAP} scroll-mt-6 pb-24 mobile-down:pb-12`}>
           <AuthorRequests letterId={letter._id} letterTitle={title} />
         </section>
       )}

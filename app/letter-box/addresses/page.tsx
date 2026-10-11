@@ -48,7 +48,7 @@ export default async function AddressesPage() {
                 {summary.latest.letterTitle} · {STATUS_SHORT[summary.latest.status] ?? summary.latest.status}
               </span>
             </div>
-            <Link href="/letter-box" className="btn btn-blue">
+            <Link href="/letter-box#requests" className="btn btn-blue">
               신청 현황 보기
             </Link>
           </div>

@@ -9,9 +9,12 @@ import { useEffect, useState } from "react";
 
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
+/** 10.11 · 14:02 (서울). 임시저장은 저장 시각으로 구분한다 */
 function fmt(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date(iso)).map((x) => [x.type, x.value]),
+  );
+  return `${p.month}.${p.day} · ${p.hour}:${p.minute}`;
 }
 
 /** 임시저장 목록. 우편함 보드 작업 때 그쪽으로 옮길 수 있음 */
@@ -48,6 +51,11 @@ export default function DraftsPage() {
 
   return (
     <main>
+      <section className={`${WRAP} pt-3 mobile-down:pt-1`}>
+        <Link href="/letter-box" className="inline-flex min-h-11 items-center font-pen text-xl text-ink-3 hover:text-brick mobile-down:text-lg">
+          ← 우편함
+        </Link>
+      </section>
       <section className={`${WRAP} flex flex-col gap-3 pb-10 pt-5 mobile-down:gap-2 mobile-down:pb-6 mobile-down:pt-3`}>
         <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">쓰다 만 편지</p>
         <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">임시저장</h1>
@@ -71,14 +79,15 @@ export default function DraftsPage() {
                   <span className="text-sm text-ink-2">
                     {d.type === "story" ? "사연 편지" : "마음 편지"}
                     {d.recipientName ? ` · To. ${d.recipientName}` : ""}
-                    {` · ${fmt(d.lastSavedAt)}`}
+                    {" · "}
+                    <span className="font-anton text-xs tracking-[0.1em] text-ink-3">{fmt(d.lastSavedAt)}</span>
                   </span>
                 </div>
                 <div className="flex gap-2.5">
                   <Link href={`/write?draftId=${d._id}`} className="btn btn-blue min-h-11 px-5 text-xl">
                     이어 쓰기
                   </Link>
-                  <button type="button" onClick={() => setRemoving(d)} className="btn btn-ink min-h-11 px-5 text-xl">
+                  <button type="button" onClick={() => setRemoving(d)} className="btn min-h-11 border-rule px-3.5 text-lg text-ink-3">
                     삭제
                   </button>
                 </div>
@@ -91,7 +100,7 @@ export default function DraftsPage() {
         open={removing !== null}
         onOpenChange={(o) => !o && setRemoving(null)}
         title="이 임시저장을 지울까요"
-        description={removing ? `‘${removing.title || removing.autoTitle || "제목 없음"}’이 지워져요.` : ""}
+        description={removing ? `‘${removing.title || removing.autoTitle || "제목 없음"}’ 임시저장이 지워져요.` : ""}
         confirmText="삭제"
         variant="destructive"
         onConfirm={() => removing && remove(removing._id)}

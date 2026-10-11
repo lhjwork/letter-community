@@ -95,7 +95,12 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
             목록을 불러오지 못했어요.
           </p>
         ) : current.data.length === 0 ? (
-          <p className="m-0 py-6 font-pen text-2xl text-ink-2">{tab === "letters" ? "아직 쓴 편지가 없어요." : "아직 남긴 사연이 없어요."}</p>
+          <div className="flex flex-col items-start gap-4 py-6">
+            <p className="m-0 font-pen text-2xl text-ink-2">{tab === "letters" ? "아직 쓴 편지가 없어요." : "아직 남긴 사연이 없어요."}</p>
+            <Link href={tab === "letters" ? "/write" : "/write?kind=story"} className={`btn ${tab === "letters" ? "btn-blue" : "btn-brick"}`}>
+              {tab === "letters" ? "편지 쓰기" : "사연 남기기"}
+            </Link>
+          </div>
         ) : tab === "letters" ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-6 mobile-down:gap-5">
             {letters!.data.map((l, i) => (
@@ -165,7 +170,7 @@ function LetterCard({ letter, tilt }: { letter: Letter; tilt: string }) {
         )}
       </div>
       {letter.recipientName && <span className="mt-2 font-pen text-lg leading-9 text-brick">To. {letter.recipientName}</span>}
-      <strong className={`font-pen text-[26px] font-normal leading-9 ${letter.recipientName ? "" : "mt-2"}`}>{reply ? `‘${reply.title || "사연"}’에 쓴 답장` : letter.title || "제목 없음"}</strong>
+      <strong className={`font-pen text-[26px] font-normal leading-9 ${letter.recipientName ? "" : "mt-2"}`}>{reply ? `‘${reply.title || "사연"}’\u2060에 쓴 답장` : letter.title || "제목 없음"}</strong>
       <span className="mt-2 font-anton text-xs tracking-[0.1em] text-ink-3">
         {d.mm}.{d.dd} · {d.wd}
       </span>
@@ -177,7 +182,7 @@ function LetterCard({ letter, tilt }: { letter: Letter; tilt: string }) {
 function RequestBlock({ summary }: { summary: MyRequestSummary | null }) {
   const r = summary?.latest;
   return (
-    <div className="relative flex flex-[1_1_380px] flex-col gap-3.5 border border-rule bg-paper p-8 mobile-down:flex-none mobile-down:gap-3 mobile-down:px-5 mobile-down:pb-6 mobile-down:pt-7">
+    <div id="requests" className="relative flex scroll-mt-6 flex-[1_1_380px] flex-col gap-3.5 border border-rule bg-paper p-8 mobile-down:flex-none mobile-down:gap-3 mobile-down:px-5 mobile-down:pb-6 mobile-down:pt-7">
       <div className="airmail absolute inset-x-0 top-0 h-2" aria-hidden="true" />
       <h2 className="m-0 mt-2 font-pen text-[32px] font-normal mobile-down:mt-1.5 mobile-down:text-[28px]">실물 편지 신청 현황</h2>
       {r ? (
@@ -190,7 +195,7 @@ function RequestBlock({ summary }: { summary: MyRequestSummary | null }) {
             </span>
           </div>
           <RequestSteps status={r.status} className="mt-1.5 mobile-down:mt-0" />
-          <UnderLink href={`/letter/${r.letterId}`} className="mt-1.5 self-start font-pen text-xl mobile-down:hidden">
+          <UnderLink href={`/letter/${r.letterId}#requests`} className="mt-1.5 self-start font-pen text-xl mobile-down:hidden">
             신청 내역 보기
           </UnderLink>
         </>
