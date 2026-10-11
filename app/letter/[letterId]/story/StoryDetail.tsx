@@ -17,6 +17,8 @@ export type StoryForDetail = {
   category?: string;
   createdAt: string;
   commentCount?: number;
+  /** 서버가 토큰으로 계산한 본인 여부(작성자 ID 는 내려오지 않는다) */
+  isAuthor?: boolean;
 };
 
 type Props = {
@@ -30,7 +32,9 @@ const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 /** v8-StoryDetail / M-StoryDetail. 괘선 36px 위에 모든 줄이 앉는다 */
 export default function StoryDetail({ story, replies, comments }: Props) {
   const p = seoulParts(story.createdAt);
-  const to = story.recipientName || "누군가에게";
+  // 사연은 레터에게 남긴다. 예전 사연은 적힌 받는 사람 그대로
+  const to = story.recipientName || "레터";
+  const mine = !!story.isAuthor;
   const commentCount = comments.total ?? story.commentCount ?? 0;
 
   return (
@@ -66,16 +70,16 @@ export default function StoryDetail({ story, replies, comments }: Props) {
         </article>
 
         <aside className="flex min-w-0 flex-[0_1_320px] flex-col gap-5 mobile-down:mt-8 mobile-down:flex-[1_1_100%] mobile-down:flex-row mobile-down:gap-2.5">
-          <ReplyCta storyId={story._id} className="btn btn-brick min-h-14 text-[28px] mobile-down:hidden" />
+          {!mine && <ReplyCta storyId={story._id} className="btn btn-brick min-h-14 text-[28px] mobile-down:hidden" />}
           <SaveButton letterId={story._id} />
           <CopyLinkButton />
         </aside>
       </section>
 
       <section className={`${WRAP} flex flex-col gap-7 pb-16 mobile-down:pb-10`}>
-        <h2 className="m-0 border-b-2 border-ink pb-3 font-pen text-[40px] font-normal leading-9 mobile-down:pb-2.5 mobile-down:text-[30px]">답장 {replies.length}통</h2>
+        <h2 className="m-0 border-b-2 border-ink pb-3 font-pen text-[40px] font-normal leading-9 mobile-down:pb-2.5 mobile-down:text-[30px]">받은 답장 {replies.length}통</h2>
         {replies.length === 0 ? (
-          <p className="m-0 py-9 text-center font-pen text-2xl text-ink-2">아직 답장이 없어요. 첫 답장을 써 주세요.</p>
+          <p className="m-0 py-9 text-center font-pen text-2xl text-ink-2">{mine ? "레터의 답장은 이 아래와 우편함에 와요." : "아직 답장이 없어요. 첫 답장을 써 주세요."}</p>
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(min(520px,100%),1fr))] items-start gap-7">
             {replies.map((r, i) => (
@@ -85,17 +89,22 @@ export default function StoryDetail({ story, replies, comments }: Props) {
         )}
       </section>
 
-      <section id="reply" className={`${WRAP} scroll-mt-6 pb-[72px] mobile-down:pb-10`}>
-        <ReplyForm storyId={story._id} storyTitle={story.title} to={to} />
-      </section>
+      {/* 답장 쓰기는 다른 사람만. 답장의 To. 는 예전 그대로 사연의 받는 사람(없으면 "누군가에게") */}
+      {!mine && (
+        <section id="reply" className={`${WRAP} scroll-mt-6 pb-[72px] mobile-down:pb-10`}>
+          <ReplyForm storyId={story._id} storyTitle={story.title} to={story.recipientName || "누군가에게"} />
+        </section>
+      )}
 
       <section id="comments" aria-labelledby="cmt-h" className="mx-auto flex w-full max-w-[908px] scroll-mt-6 flex-col gap-9 px-6 pb-24 mobile-down:gap-7 mobile-down:px-4 mobile-down:pb-10">
         <Comments letterId={story._id} initial={comments} />
       </section>
 
-      <div className="sticky bottom-0 hidden border-t border-rule bg-cream/95 px-4 pb-5 pt-3 mobile-down:block">
-        <ReplyCta storyId={story._id} className="btn btn-brick min-h-14 w-full text-[28px]" />
-      </div>
+      {!mine && (
+        <div className="sticky bottom-0 hidden border-t border-rule bg-cream/95 px-4 pb-5 pt-3 mobile-down:block">
+          <ReplyCta storyId={story._id} className="btn btn-brick min-h-14 w-full text-[28px]" />
+        </div>
+      )}
     </main>
   );
 }

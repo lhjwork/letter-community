@@ -16,7 +16,7 @@ type Letter = FriendLetter & {
   replyTo?: ReplyLetter["replyTo"];
   isAdminReply?: boolean;
   isAdopted?: boolean;
-};
+} & Pick<ReplyLetter, "canRequestPhysical" | "myPhysicalRequest">;
 
 /** 토큰이 있으면 서버가 isAuthor 를 계산해 준다(작성자 ID 는 내려오지 않는다) */
 async function getLetter(letterId: string, token?: string): Promise<Letter | null> {
@@ -95,7 +95,7 @@ export default async function LetterDetailPage({ params }: { params: Promise<{ l
     return <StoryDetail story={letter} replies={replies} comments={comments} />;
   }
 
-  // 사연에 단 답장은 읽기 전용 화면(실물 신청·작성자 관리 없음)
+  // 사연에 단 답장: 읽기 화면. 원래 사연을 남긴 본인에게만 서버가 canRequestPhysical(레터 답장·채택)과 내 신청을 준다
   if (letter.replyTo) {
     return <ReplyDetail reply={{ ...letter, replyTo: letter.replyTo }} />;
   }

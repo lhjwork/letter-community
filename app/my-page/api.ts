@@ -22,6 +22,10 @@ export interface RecordItem {
   badge: { text: string; tone: "blue" | "green" | "brick" | "muted" } | null;
   recipientName?: string;
   title: string;
+  /** 답장이면 원래 사연 제목 */
+  storyTitle?: string;
+  /** 받은 답장을 실물 편지로 신청했는지 */
+  physical?: boolean;
   createdAt: string;
 }
 

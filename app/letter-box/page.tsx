@@ -8,6 +8,7 @@ import { getAddresses } from "@/lib/address-api";
 import { seoulParts } from "@/lib/seoulDate";
 import type { Address } from "@/types/address";
 import { ENVELOPE_NAME } from "@/app/letter/[letterId]/friend/status";
+import { getMyRecords, type RecordItem } from "@/app/my-page/api";
 import { Pager, RequestSteps, UnderLink, WRAP, region } from "./parts";
 
 export const metadata: Metadata = { title: "우편함" };
@@ -23,19 +24,22 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
   if (!token) redirect("/");
 
   const sp = await searchParams;
-  const tab = sp.tab === "stories" ? "stories" : "letters";
+  const tab = sp.tab === "stories" ? "stories" : sp.tab === "replies" ? "replies" : "letters";
   const page = Math.max(1, Number(sp.page) || 1);
   const lp = tab === "letters" ? page : 1;
   const stp = tab === "stories" ? page : 1;
 
-  const [letters, stories, summary, addresses] = await Promise.all([
+  // 받은 답장 = 내 사연에 온 레터의 답장 + 채택된 답장(마이페이지 "받은 편지 · 사연"과 같은 데이터)
+  // ponytail: 최근 60통까지(API 상한), 쪽 이동은 그보다 많아지면
+  const [letters, stories, summary, addresses, replies] = await Promise.all([
     getMyLetters(token, { filter: "sent", page: lp, limit: LIMIT }).catch(() => null),
     getMyStories(token, { page: stp, limit: LIMIT }).catch(() => null),
     getMyRequestSummary(token).then((r) => r.data).catch(() => null),
     getAddresses(token).then((r) => r.data ?? []).catch(() => [] as Address[]),
+    getMyRecords(token, "received", "story", 60).catch(() => null),
   ]);
-  const current = tab === "letters" ? letters : stories;
-  const heading = tab === "letters" ? "내가 쓴 편지" : "내 사연";
+  const current = tab === "letters" ? letters : tab === "stories" ? stories : replies ? { data: replies.data, pagination: { totalPages: 1 } } : null;
+  const heading = { letters: "내가 쓴 편지", stories: "내 사연", replies: "받은 답장" }[tab];
 
   const tabCls = "inline-flex min-h-[52px] items-center whitespace-nowrap px-5 font-pen text-2xl mobile-down:min-h-12 mobile-down:px-3.5 mobile-down:text-[21px]";
   const subLinks = (
@@ -49,7 +53,7 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
     <main>
       <section className={`${WRAP} flex flex-wrap items-end justify-between gap-4 pb-9 pt-5 mobile-down:pb-6 mobile-down:pt-3`}>
         <div className="flex flex-col gap-3 mobile-down:gap-2">
-          <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">내가 쓴 편지와 사연이 여기 모여요</p>
+          <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">쓴 편지와 사연, 받은 답장이 모여요</p>
           <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">우편함</h1>
         </div>
         <div className="flex flex-wrap gap-2.5 mobile-down:hidden">
@@ -68,11 +72,12 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
             [
               ["letters", "내가 쓴 편지", letters?.pagination.total],
               ["stories", "내 사연", stories?.pagination.total],
+              ["replies", "받은 답장", replies?.total],
             ] as const
           ).map(([key, label, n]) => (
             <Link
               key={key}
-              href={key === "letters" ? "/letter-box" : "/letter-box?tab=stories"}
+              href={key === "letters" ? "/letter-box" : `/letter-box?tab=${key}`}
               aria-current={tab === key ? "page" : undefined}
               className={`${tabCls} ${tab === key ? "-mb-0.5 border-b-4 border-brick text-ink" : "text-ink-3"} hover:text-brick`}
             >
@@ -96,7 +101,7 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
           </p>
         ) : current.data.length === 0 ? (
           <div className="flex flex-col items-start gap-4 py-6">
-            <p className="m-0 font-pen text-2xl text-ink-2">{tab === "letters" ? "아직 쓴 편지가 없어요." : "아직 남긴 사연이 없어요."}</p>
+            <p className="m-0 font-pen text-2xl text-ink-2">{{ letters: "아직 쓴 편지가 없어요.", stories: "아직 남긴 사연이 없어요.", replies: "아직 받은 답장이 없어요. 사연을 남기면 레터가 답장해요." }[tab]}</p>
             <Link href={tab === "letters" ? "/write" : "/write?kind=story"} className={`btn ${tab === "letters" ? "btn-blue" : "btn-brick"}`}>
               {tab === "letters" ? "편지 쓰기" : "사연 남기기"}
             </Link>
@@ -107,6 +112,12 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
               <LetterCard key={l._id} letter={l} tilt={TILTS[i % TILTS.length]} />
             ))}
           </div>
+        ) : tab === "replies" ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-6 mobile-down:gap-5">
+            {replies!.data.map((r, i) => (
+              <ReceivedReplyCard key={r._id} item={r} tilt={TILTS[i % TILTS.length]} />
+            ))}
+          </div>
         ) : (
           <div className="[column-gap:28px] [columns:3_300px] mobile-down:columns-1">
             {stories!.data.map((s, i) => (
@@ -114,7 +125,7 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
             ))}
           </div>
         )}
-        {current && <Pager page={page} totalPages={current.pagination.totalPages} href={(p) => `/letter-box?${tab === "stories" ? "tab=stories&" : ""}page=${p}`} />}
+        {current && <Pager page={page} totalPages={current.pagination.totalPages} href={(p) => `/letter-box?${tab === "letters" ? "" : `tab=${tab}&`}page=${p}`} />}
         <p className="m-0 hidden flex-wrap gap-5 text-[15px] mobile-down:flex">{subLinks}</p>
       </section>
 
@@ -159,7 +170,7 @@ function LetterCard({ letter, tilt }: { letter: Letter; tilt: string }) {
         {/* 배지는 기록된 사실만: 채택(답장) · 실물 신청됨(마음 편지) */}
         {reply ? (
           <>
-            <span className="font-pen text-lg leading-none text-ink-3">사연 답장</span>
+            <span className="font-pen text-lg leading-none text-ink-3">답장</span>
             {letter.adoptedAt && <span className="badge bg-approve">채택</span>}
           </>
         ) : (
@@ -171,6 +182,30 @@ function LetterCard({ letter, tilt }: { letter: Letter; tilt: string }) {
       </div>
       {letter.recipientName && <span className="mt-2 font-pen text-lg leading-9 text-brick">To. {letter.recipientName}</span>}
       <strong className={`font-pen text-[26px] font-normal leading-9 ${letter.recipientName ? "" : "mt-2"}`}>{reply ? `‘${reply.title || "사연"}’\u2060에 쓴 답장` : letter.title || "제목 없음"}</strong>
+      <span className="mt-2 font-anton text-xs tracking-[0.1em] text-ink-3">
+        {d.mm}.{d.dd} · {d.wd}
+      </span>
+    </Link>
+  );
+}
+
+const cut = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+const TONE: Record<string, string> = { brick: "bg-brick", green: "bg-approve", blue: "bg-airblue", muted: "bg-ink-3" };
+
+/** 받은 답장 카드: "‘사연 제목’에 온 답장" + 레터의 답장/채택 + 실물 신청됨. 누르면 답장 읽기 화면 */
+function ReceivedReplyCard({ item, tilt }: { item: RecordItem; tilt: string }) {
+  const d = seoulParts(item.createdAt);
+  return (
+    <Link href={`/letter/${item._id}`} className={`card text-ink hover:text-ink mobile-down:px-5 mobile-down:pb-5 mobile-down:pt-6 ${tilt}`}>
+      <div className="airmail absolute inset-x-0 top-0 h-1.5" aria-hidden="true" />
+      <div className="mt-1 flex min-h-5 items-start justify-between gap-2">
+        <span className="font-pen text-lg leading-none text-ink-3">답장</span>
+        <span className="flex flex-wrap justify-end gap-1.5">
+          {item.badge && <span className={`badge ${TONE[item.badge.tone]}`}>{item.badge.text}</span>}
+          {item.physical && <span className="badge bg-approve">실물 신청됨</span>}
+        </span>
+      </div>
+      <strong className="mt-2 font-pen text-[26px] font-normal leading-9">‘{cut(item.storyTitle || "사연", 14)}’{"\u2060"}에 온 답장</strong>
       <span className="mt-2 font-anton text-xs tracking-[0.1em] text-ink-3">
         {d.mm}.{d.dd} · {d.wd}
       </span>
