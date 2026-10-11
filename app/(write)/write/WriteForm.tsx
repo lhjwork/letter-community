@@ -72,6 +72,7 @@ export default function WriteForm() {
   const [envelope, setEnvelope] = useState<Envelope>("seongsu");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [pages, setPages] = useState(1);
+  const [lines, setLines] = useState(1);
   const [dirty, setDirty] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(!!draftId || !!editId);
@@ -80,14 +81,31 @@ export default function WriteForm() {
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
+  // 입력 전에 줄 수를 미리 재는 빈 상자(React 가 자식을 관리하지 않으니 textContent 를 바꿔도 된다)
+  const probeRef = useRef<HTMLDivElement>(null);
+  const lastWarn = useRef(0);
+  const lastFit = useRef(""); // 마지막으로 9줄 안에 들었던 본문(한글 조합이 끝났을 때 되돌릴 값)
+  const warnFull = () => {
+    if (Date.now() - lastWarn.current < 2500) return;
+    lastWarn.current = Date.now();
+    showAlert(`편지지 한 장은 본문 ${LINES_PER_PAGE}줄까지예요.`, { tone: "error" });
+  };
+  const countLines = (text: string) => {
+    const p = probeRef.current;
+    if (!p) return 1;
+    p.textContent = text + "\u200b";
+    const lineH = parseFloat(getComputedStyle(p).lineHeight) || 1;
+    return Math.max(1, Math.round(p.offsetHeight / lineH));
+  };
 
   /* 줄 수 → 장 수. textarea 와 같은 폭·폰트·줄간격의 숨은 mirror div 높이만 읽는다(DOM 을 바꾸지 않으니 리사이즈 루프 없음) */
   const measure = useCallback(() => {
     const m = mirrorRef.current;
     if (!m) return;
     const lineH = parseFloat(getComputedStyle(m).lineHeight) || 1;
-    const lines = Math.max(1, Math.round(m.offsetHeight / lineH));
-    const next = Math.max(1, Math.ceil(lines / LINES_PER_PAGE));
+    const n = Math.max(1, Math.round(m.offsetHeight / lineH));
+    const next = Math.max(1, Math.ceil(n / LINES_PER_PAGE));
+    setLines((l) => (l === n ? l : n));
     setPages((p) => (p === next ? p : next));
   }, []);
 
@@ -113,7 +131,8 @@ export default function WriteForm() {
 
   const applyDraft = useCallback((d: DraftLetter) => {
     setTitle(d.title ?? "");
-    setContent((d.contentType === "html" ? htmlToText(d.content ?? "") : (d.content ?? "")).slice(0, CONTENT_MAX));
+    lastFit.current = (d.contentType === "html" ? htmlToText(d.content ?? "") : (d.content ?? "")).slice(0, CONTENT_MAX);
+    setContent(lastFit.current);
     if (d.type === "story" || d.type === "friend") setKind(d.type);
     if (d.category && (CATEGORIES as readonly string[]).includes(d.category)) setCategory(d.category);
     if (d.envelope) setEnvelope(d.envelope);
@@ -146,7 +165,8 @@ export default function WriteForm() {
       try {
         const { data } = await getLetter(editId);
         setTitle(data.title ?? "");
-        setContent((data.contentType === "html" ? htmlToText(data.content ?? "") : (data.content ?? "")).slice(0, CONTENT_MAX));
+        lastFit.current = (data.contentType === "html" ? htmlToText(data.content ?? "") : (data.content ?? "")).slice(0, CONTENT_MAX);
+        setContent(lastFit.current);
         if (data.type === "story" || data.type === "friend") setKind(data.type);
         if (data.category && (CATEGORIES as readonly string[]).includes(data.category)) setCategory(data.category);
         if (data.envelope) setEnvelope(data.envelope);
@@ -198,6 +218,8 @@ export default function WriteForm() {
     const body = content.trim();
     const letterTitle = title.trim();
     if (!letterTitle) return showAlert("제목을 입력해주세요.", { tone: "error" });
+    // 실물 편지지와 같은 한 장(본문 9줄). 예전에 길게 저장된 편지만 여기 걸린다
+    if (kind === "friend" && lines > LINES_PER_PAGE) return showAlert(`편지지 한 장은 본문 ${LINES_PER_PAGE}줄까지예요. ${lines - LINES_PER_PAGE}줄을 줄여 주세요.`, { tone: "error" });
     if (!body) return showAlert("내용을 입력해주세요.", { tone: "error" });
     if (body.length > CONTENT_MAX) return showAlert(`내용은 ${CONTENT_MAX}자 이내여야 합니다.`, { tone: "error" });
 
@@ -363,14 +385,33 @@ export default function WriteForm() {
                   {content}
                   {"\u200b"}
                 </div>
+                <div
+                  ref={probeRef}
+                  aria-hidden="true"
+                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-sans text-[19px] [overflow-wrap:break-word] mobile-down:text-base"
+                  style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
+                />
                 <textarea
                   id="body"
                   placeholder="여기에 당신의 마음을 담아주세요..."
                   maxLength={CONTENT_MAX}
                   value={content}
                   onChange={(e) => {
-                    setContent(e.target.value);
+                    const v = e.target.value;
                     setDirty(true);
+                    // 한글 조합 중에는 막지 않는다(막으면 글자가 깨짐). 조합이 끝나면 onCompositionEnd 에서 판정
+                    if ((e.nativeEvent as InputEvent).isComposing) return setContent(v);
+                    // 실물 편지지와 똑같이 본문 9줄(To 1 + 본문 9 + From 1 = 11줄)을 넘는 입력은 받지 않는다. 지우는 건 언제나 허용
+                    if (v.length > content.length && countLines(v) > LINES_PER_PAGE) return warnFull();
+                    lastFit.current = v;
+                    setContent(v);
+                  }}
+                  onCompositionEnd={(e) => {
+                    const v = e.currentTarget.value;
+                    if (countLines(v) > LINES_PER_PAGE) {
+                      setContent(lastFit.current);
+                      warnFull();
+                    } else lastFit.current = v;
                   }}
                   className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-[19px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-base"
                   style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), top: `calc(${cq(PAPER.bodyTop)} + var(--baseline-shift))`, height: cq(bodyHeight), lineHeight: cq(PAPER.line) }}
@@ -383,13 +424,15 @@ export default function WriteForm() {
 
               <div className="flex max-w-[720px] flex-wrap items-center justify-end gap-3">
                 <span className="flex items-center gap-2.5">
-                  <span className="badge bg-ink">{pages}장</span>
+                  <span className={`badge ${lines > LINES_PER_PAGE ? "bg-brick" : "bg-ink"}`}>
+                    {Math.min(lines, 99)} / {LINES_PER_PAGE}줄
+                  </span>
                   <span className="font-anton text-[13px] tracking-[0.1em] text-ink-3" aria-live="polite">
                     {content.length} / {CONTENT_MAX}
                   </span>
                 </span>
               </div>
-              <p className="m-0 max-w-[720px] text-sm leading-[1.7] text-ink-2">길어지면 편지지가 아래로 이어져요. 실물 편지도 같은 줄로 옮겨 적어요.</p>
+              <p className="m-0 max-w-[720px] text-sm leading-[1.7] text-ink-2">편지지 한 장, 본문 9줄까지 써요. 실물 편지도 같은 줄로 옮겨 적어요.</p>
             </>
           )}
           {isStory && (
