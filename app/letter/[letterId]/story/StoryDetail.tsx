@@ -1,4 +1,5 @@
 import Link from "next/link";
+import JumpLink from "@/components/ui/JumpLink";
 import type { StoryComment, StoryReply } from "@/lib/api";
 import { seoulParts } from "@/lib/seoulDate";
 import Comments from "./Comments";
@@ -49,7 +50,7 @@ export default function StoryDetail({ story, replies, comments }: Props) {
           </span>
           <p className="m-0 font-pen text-[28px] leading-9 text-brick mobile-down:text-2xl">To. {to}</p>
           {story.title && <h1 className="relative -top-0.5 m-0 font-pen text-[34px] font-normal leading-9 mobile-down:text-[32px]">{story.title}</h1>}
-          <StoryBody content={story.content} contentType={story.contentType} />
+          <LetterBody content={story.content} contentType={story.contentType} />
           <p className="m-0 mt-9 self-end font-pen text-[26px] leading-9 text-ink-2 mobile-down:text-2xl">From. {story.senderName || "익명"}</p>
           <div className="mt-9 flex h-9 flex-wrap items-center justify-between gap-2">
             <span className="chip min-h-7 px-2.5 text-base mobile-down:text-[15px]">{story.category || "기타"}</span>
@@ -57,9 +58,9 @@ export default function StoryDetail({ story, replies, comments }: Props) {
               <span className="font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:text-[11px]">
                 {p.mm}.{p.dd} · {p.wd} · 답장 {replies.length}
               </span>
-              <a href="#comments" className="inline-flex min-h-11 items-center font-anton text-xs tracking-[0.1em] text-ink-3 hover:text-brick mobile-down:text-[11px]">
+              <JumpLink to="comments" className="inline-flex min-h-11 items-center font-anton text-xs tracking-[0.1em] text-ink-3 hover:text-brick mobile-down:text-[11px]">
                 <span className="border-b-[1.5px] border-current">댓글 {commentCount}</span>
-              </a>
+              </JumpLink>
             </span>
           </div>
         </article>
@@ -76,7 +77,7 @@ export default function StoryDetail({ story, replies, comments }: Props) {
         {replies.length === 0 ? (
           <p className="m-0 py-9 text-center font-pen text-2xl text-ink-2">아직 답장이 없어요. 첫 답장을 써 주세요.</p>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(520px,100%),1fr))] items-start gap-7">
             {replies.map((r, i) => (
               <ReplyCard key={r._id} reply={r} index={i} />
             ))}
@@ -99,8 +100,8 @@ export default function StoryDetail({ story, replies, comments }: Props) {
   );
 }
 
-/** textarea 원문은 빈 줄로 단락을 나눠 36px 간격, 예전 HTML(TipTap) 사연은 p 를 줄에 앉힌다 */
-function StoryBody({ content, contentType }: { content: string; contentType?: "text" | "html" }) {
+/** textarea 원문은 빈 줄로 단락을 나눠 36px 간격, 예전 HTML(TipTap) 글은 p 를 줄에 앉힌다. 사연·마음 편지 공용 */
+export function LetterBody({ content, contentType }: { content: string; contentType?: "text" | "html" }) {
   if (contentType === "text") {
     const paras = content.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
     return (

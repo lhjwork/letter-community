@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { showAlert } from "@/components/ui/AppAlert";
 import LoginDialog from "@/components/shareds/LoginDialog";
+import JumpLink from "@/components/ui/JumpLink";
 import { useLike } from "@/hooks/useLike";
 
 /** "이 사연에 답장 쓰기" → #reply. 비로그인은 로그인 모달(로그인 후 폼으로) */
@@ -13,9 +14,9 @@ export function ReplyCta({ storyId, className }: { storyId: string; className: s
   const href = `/letter/${storyId}#reply`;
   if (status === "authenticated") {
     return (
-      <a href="#reply" className={className}>
+      <JumpLink to="reply" className={className}>
         이 사연에 답장 쓰기
-      </a>
+      </JumpLink>
     );
   }
   return (
@@ -51,7 +52,7 @@ export function SaveButton({ letterId }: { letterId: string }) {
   );
 }
 
-export function CopyLinkButton() {
+export function CopyLinkButton({ className = "btn btn-blue mobile-down:flex-1 mobile-down:px-3 mobile-down:text-xl" }: { className?: string }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
@@ -63,7 +64,7 @@ export function CopyLinkButton() {
     }
   };
   return (
-    <button type="button" onClick={copy} aria-live="polite" className="btn btn-blue mobile-down:flex-1 mobile-down:px-3 mobile-down:text-xl">
+    <button type="button" onClick={copy} aria-live="polite" className={className}>
       {copied ? "복사했어요" : "링크 복사"}
     </button>
   );
