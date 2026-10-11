@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { apiRequest } from "@/lib/api";
 import { showAlert } from "@/components/ui/AppAlert";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import V8Dialog, { V8Close, V8Title } from "@/components/ui/V8Dialog";
 import { seoulParts } from "@/lib/seoulDate";
 import { PHYSICAL_STATUS } from "./status";
 
@@ -52,7 +52,7 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
       setReason("");
       await load();
     } catch (err) {
-      showAlert(err instanceof Error ? err.message : "처리하지 못했어요. 다시 시도해 주세요.");
+      showAlert(err instanceof Error ? err.message : "처리하지 못했어요. 다시 시도해 주세요.", { tone: "error" });
     } finally {
       setBusy(null);
     }
@@ -99,14 +99,8 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
         </ul>
       )}
 
-      <Dialog open={reject !== null} onOpenChange={(o) => !o && setReject(null)}>
-        <DialogContent showCloseButton={false} className="paper max-w-[460px] gap-4 rounded-none border-rule bg-paper px-9 pb-8 pt-10 shadow-[var(--paper-shadow)]">
-          <div className="airmail absolute inset-x-0 top-0 h-1.5" aria-hidden="true" />
-          <span className="stampbox absolute -top-4 left-6 bg-paper text-ink">신청 거절</span>
-          <DialogClose aria-label="닫기" className="absolute right-3.5 top-3.5 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3">
-            ✕
-          </DialogClose>
-          <DialogTitle className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3]">이 실물 편지 신청을 거절할까요</DialogTitle>
+      <V8Dialog open={reject !== null} onOpenChange={(o) => !o && setReject(null)} stamp="신청 거절" width="max-w-[460px]">
+          <V8Title className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3] mobile-down:mt-0 mobile-down:text-[28px]">이 실물 편지 신청을 거절할까요</V8Title>
           {reject && (
             <div className="flex flex-col gap-0.5 border border-rule bg-paper px-5 py-4">
               <strong className="font-pen text-[22px] font-normal">
@@ -123,14 +117,13 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
             </span>
             <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} maxLength={500} className="field min-h-24 resize-y px-3.5 py-3 leading-[1.7]" placeholder="적은 사유는 신청한 분에게 보여요." />
           </label>
-          <div className="flex justify-end gap-2.5">
-            <DialogClose className="btn btn-ink">취소</DialogClose>
+          <div className="dlg-actions">
+            <V8Close className="btn btn-ink">취소</V8Close>
             <button type="button" disabled={!!busy} onClick={() => reject && decide(reject, "reject")} className="btn btn-brick">
               {busy ? "처리하는 중" : "거절"}
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </V8Dialog>
     </div>
   );
 }

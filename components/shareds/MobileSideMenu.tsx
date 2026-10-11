@@ -49,7 +49,8 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
       <nav
         aria-label="전체 메뉴"
         inert={!isOpen}
-        className={`fixed bottom-0 right-0 top-0 z-50 flex w-[82%] flex-col gap-5 border-l border-rule bg-paper px-5 pb-6 pt-4 shadow-[-16px_0_32px_rgba(43,43,43,0.2)] transition-transform duration-300 ease-in-out mobile-down:flex hidden ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        // 닫힘: 그림자를 떼고 invisible(닫는 전환이 끝난 뒤 적용, 열 때는 즉시 보여야 ✕ 에 포커스가 간다) — 닫힌 서랍 그림자가 화면 오른쪽에 번지지 않게
+        className={`fixed bottom-0 right-0 top-0 z-50 flex w-[82%] flex-col gap-5 border-l border-rule bg-paper px-5 pb-6 pt-4 duration-300 ease-in-out mobile-down:flex hidden ${isOpen ? "visible translate-x-0 shadow-[-16px_0_32px_rgba(43,43,43,0.2)] transition-transform" : "invisible translate-x-full transition-[translate,visibility]"}`}
       >
         <span className="airmail absolute bottom-0 left-0 top-0 w-2" aria-hidden="true" />
         <div className="flex items-center justify-between">

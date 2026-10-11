@@ -255,6 +255,12 @@ body {
 .btn-blue-fill { background: var(--airblue); color: #ffffff; border-color: var(--airblue); }
 .btn-ink { color: var(--ink); border-color: var(--ink); }
 .btn-green { background: var(--approve); color: #ffffff; border-color: var(--approve); }
+/* 모달 버튼 행: 데스크톱 오른쪽 정렬, 모바일 시트는 취소 1 : 확인 2 · 높이 52 (M-Sheet) */
+.dlg-actions { display: flex; justify-content: flex-end; gap: 10px; }
+@media (max-width: 767px) {
+  .dlg-actions > * { flex: 1; min-height: 52px; }
+  .dlg-actions > :last-child { flex: 2; }
+}
 .chip {
   display: inline-flex;
   align-items: center;

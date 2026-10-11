@@ -60,7 +60,7 @@ export function CopyLinkButton({ className = "btn btn-blue mobile-down:flex-1 mo
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      showAlert("링크를 복사하지 못했어요. 주소창의 주소를 복사해 주세요.");
+      showAlert("링크를 복사하지 못했어요. 주소창의 주소를 복사해 주세요.", { tone: "error" });
     }
   };
   return (

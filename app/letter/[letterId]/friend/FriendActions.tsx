@@ -50,7 +50,7 @@ export function AuthorActions({ letterId }: { letterId: string }) {
   const [confirm, setConfirm] = useState(false);
 
   const remove = async () => {
-    if (!session?.backendToken) return showAlert("로그인이 필요해요.");
+    if (!session?.backendToken) return showAlert("로그인이 필요해요.", { tone: "error" });
     await deleteLetter(letterId, session.backendToken);
     track("letter_delete", { letter_type: "friend", letter_id: letterId });
     router.push("/letter-box");

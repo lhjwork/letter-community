@@ -25,8 +25,8 @@ export default function ReplyForm({ storyId, storyTitle, to }: Props) {
     e.preventDefault();
     if (status !== "authenticated" || !session?.backendToken) return setLogin(true);
     const body = content.trim();
-    if (!body) return showAlert("답장 내용을 적어 주세요.");
-    if (body.length > REPLY_MAX) return showAlert(`답장은 ${REPLY_MAX}자 이내여야 해요.`);
+    if (!body) return showAlert("답장 내용을 적어 주세요.", { tone: "error" });
+    if (body.length > REPLY_MAX) return showAlert(`답장은 ${REPLY_MAX}자 이내여야 해요.`, { tone: "error" });
     const title = `Re: ${storyTitle || "사연"}`.slice(0, 100);
     setSubmitting(true);
     try {
@@ -36,10 +36,10 @@ export default function ReplyForm({ storyId, storyTitle, to }: Props) {
       );
       track("letter_create", { letter_type: "friend", is_reply: true, is_public: false, content_length: body.length });
       setContent("");
-      showAlert("답장을 보냈어요.");
+      showAlert("답장을 보냈어요.", { tone: "success" });
       router.refresh();
     } catch (err) {
-      showAlert(err instanceof Error ? err.message : "답장을 보내지 못했어요. 다시 시도해 주세요.");
+      showAlert(err instanceof Error ? err.message : "답장을 보내지 못했어요. 다시 시도해 주세요.", { tone: "error" });
     } finally {
       setSubmitting(false);
     }

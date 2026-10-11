@@ -1,74 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 
-// 브라우저 기본 alert() 대체. showAlert()는 어디서든 호출하고, <AlertHost />는 루트 레이아웃에 한 번만 둔다.
-// 기본 alert과 달리 코드 실행을 막지 않는다(비동기). 루트 레이아웃에 있어 페이지 이동 후에도 남는다.
-let listener: ((message: string) => void) | null = null;
+// 알림 토스트 (v8-Modals-1 "알림 · 토스트"). showAlert()는 어디서든 호출하고, <AlertHost />는 루트 레이아웃에 한 번만 둔다.
+// 화면 아래 중앙, 3초 뒤 사라짐, 여러 개면 위로 쌓인다. 루트 레이아웃에 있어 페이지 이동 후에도 남는다.
+type Tone = "info" | "success" | "error";
+type Toast = { id: number; text: string; tone: Tone };
 
-export function showAlert(message: unknown) {
+let listener: ((t: Toast) => void) | null = null;
+let seq = 0;
+
+export function showAlert(message: unknown, opts?: { tone?: "success" | "error" }) {
   const text = message instanceof Error ? message.message : String(message);
-  if (listener) listener(text);
+  if (listener) listener({ id: ++seq, text, tone: opts?.tone ?? "info" });
   else if (typeof window !== "undefined") window.alert(text); // 호스트 미마운트 시 폴백
 }
 
+const BAND: Record<Tone, string> = { info: "airmail", success: "bg-approve", error: "bg-brick" };
+const TILT = ["-rotate-[0.6deg]", "rotate-[0.5deg]", "-rotate-[0.4deg]"];
+
 export function AlertHost() {
-  const [message, setMessage] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
-    listener = setMessage;
+    listener = (t) => {
+      setToasts((ts) => [...ts, t]);
+      setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== t.id)), 3000);
+    };
     return () => {
       listener = null;
     };
   }, []);
 
-  useEffect(() => {
-    if (!message) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "Enter") setMessage(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [message]);
-
   return (
-    <AnimatePresence>
-      {message && (
-        <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setMessage(null)}
+    <div aria-live="polite" className="pointer-events-none fixed bottom-6 left-1/2 z-[100] flex w-max max-w-[calc(100%-32px)] -translate-x-1/2 flex-col items-center gap-3">
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          role={t.tone === "error" ? "alert" : "status"}
+          className={`relative flex min-h-[52px] items-center border border-rule bg-paper py-2 pl-6 pr-5 shadow-[0_10px_0_-4px_#e3dacb] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 ${TILT[t.id % 3]}`}
         >
-          <motion.div
-            role="alertdialog"
-            aria-modal="true"
-            aria-describedby="app-alert-message"
-            className="w-full max-w-sm rounded-2xl border-2 border-[#F0E0DC] bg-white p-6 sm:p-8 text-center text-[#424242]"
-            initial={{ opacity: 0, scale: 0.95, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image src="/icons/letter-heart-icon.svg" alt="" width={30} height={27} className="mx-auto mb-4 h-11 w-12" />
-            <p id="app-alert-message" className="whitespace-pre-line text-lg leading-relaxed font-['NanumJangMiCe']">
-              {message}
-            </p>
-            <button
-              type="button"
-              autoFocus
-              onClick={() => setMessage(null)}
-              className="mt-6 h-12 min-w-[120px] rounded-lg bg-[#FF9883] px-6 text-lg font-medium text-white transition-colors hover:bg-[#FF7F65] font-['NanumJangMiCe']"
-            >
-              확인
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <span className={`absolute inset-y-0 left-0 w-1.5 ${BAND[t.tone]}`} aria-hidden="true" />
+          <span className={`whitespace-pre-line font-pen text-[22px] leading-[1.3] ${t.tone === "error" ? "text-brick" : "text-ink"}`}>{t.text}</span>
+        </div>
+      ))}
+    </div>
   );
 }

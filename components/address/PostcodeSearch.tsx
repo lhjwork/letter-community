@@ -116,11 +116,19 @@ export default function PostcodeSearch({ onComplete, className, buttonText = "�
   }, [onComplete]);
 
   const isDisabled = status !== "ready";
-  const displayText = status === "loading" ? "로딩 중..." : status === "error" ? "로드 실패" : buttonText;
+  const displayText = status === "loading" ? "불러오는 중" : status === "error" ? "열지 못했어요" : buttonText;
 
+  // 실패 문구는 부모 행(flex-wrap) 아래 줄로 내려간다
   return (
-    <button type="button" onClick={handleClick} disabled={isDisabled} className={className}>
-      {displayText}
-    </button>
+    <>
+      <button type="button" onClick={handleClick} disabled={isDisabled} className={className}>
+        {displayText}
+      </button>
+      {status === "error" && (
+        <p role="alert" className="m-0 basis-full text-[15px] text-brick">
+          주소 검색을 열지 못했어요. 새로고침해 주세요.
+        </p>
+      )}
+    </>
   );
 }

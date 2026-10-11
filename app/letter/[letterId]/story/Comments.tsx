@@ -29,7 +29,7 @@ export default function Comments({ letterId, initial }: Props) {
     e.preventDefault();
     if (status !== "authenticated" || !token) return setLogin(true);
     const content = text.trim();
-    if (!content) return showAlert("댓글을 적어 주세요.");
+    if (!content) return showAlert("댓글을 적어 주세요.", { tone: "error" });
     setBusy(true);
     try {
       const { data } = await createComment(letterId, content, token);
@@ -39,7 +39,7 @@ export default function Comments({ letterId, initial }: Props) {
       setText("");
       router.refresh(); // 사연 종이의 "댓글 N" 동기화
     } catch (err) {
-      showAlert(err instanceof Error ? err.message : "댓글을 남기지 못했어요.");
+      showAlert(err instanceof Error ? err.message : "댓글을 남기지 못했어요.", { tone: "error" });
     } finally {
       setBusy(false);
     }
@@ -53,7 +53,7 @@ export default function Comments({ letterId, initial }: Props) {
       setTotal((n) => Math.max(0, n - 1));
       router.refresh();
     } catch (err) {
-      showAlert(err instanceof Error ? err.message : "댓글을 삭제하지 못했어요.");
+      showAlert(err instanceof Error ? err.message : "댓글을 삭제하지 못했어요.", { tone: "error" });
     }
   };
 
@@ -69,7 +69,7 @@ export default function Comments({ letterId, initial }: Props) {
       setHasNext(data.hasNextPage);
       setTotal(data.total);
     } catch {
-      showAlert("댓글을 더 불러오지 못했어요.");
+      showAlert("댓글을 더 불러오지 못했어요.", { tone: "error" });
     } finally {
       setBusy(false);
     }

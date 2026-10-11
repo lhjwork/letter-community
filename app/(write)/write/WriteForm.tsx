@@ -76,7 +76,7 @@ export default function WriteForm() {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(!!draftId || !!editId);
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(draftId ?? undefined);
-  const [share, setShare] = useState<{ url: string; title: string } | null>(null);
+  const [share, setShare] = useState<{ url: string; title: string; to?: string } | null>(null);
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const mirrorRef = useRef<HTMLDivElement>(null);
@@ -132,7 +132,7 @@ export default function WriteForm() {
         if (res.success) applyDraft(res.data);
       } catch (e) {
         console.error("임시저장 불러오기 실패:", e);
-        showAlert("임시저장을 불러올 수 없습니다.");
+        showAlert("임시저장을 불러올 수 없습니다.", { tone: "error" });
       } finally {
         setLoading(false);
       }
@@ -155,7 +155,7 @@ export default function WriteForm() {
         setDirty(false);
       } catch (e) {
         console.error("편지 불러오기 실패:", e);
-        showAlert("편지를 불러올 수 없습니다.");
+        showAlert("편지를 불러올 수 없습니다.", { tone: "error" });
         router.push("/letter-box");
       } finally {
         setLoading(false);
@@ -177,7 +177,7 @@ export default function WriteForm() {
       setCurrentDraftId(id);
       setDirty(false);
     },
-    onError: (msg) => showAlert(msg),
+    onError: (msg) => showAlert(msg, { tone: "error" }),
   });
 
   useBeforeUnload({ when: dirty && (content.length > 10 || title.length > 0), message: "작성 중인 편지가 저장되지 않았습니다. 정말 나가시겠습니까?" });
@@ -197,9 +197,9 @@ export default function WriteForm() {
     e.preventDefault();
     const body = content.trim();
     const letterTitle = title.trim();
-    if (!letterTitle) return showAlert("제목을 입력해주세요.");
-    if (!body) return showAlert("내용을 입력해주세요.");
-    if (body.length > CONTENT_MAX) return showAlert(`내용은 ${CONTENT_MAX}자 이내여야 합니다.`);
+    if (!letterTitle) return showAlert("제목을 입력해주세요.", { tone: "error" });
+    if (!body) return showAlert("내용을 입력해주세요.", { tone: "error" });
+    if (body.length > CONTENT_MAX) return showAlert(`내용은 ${CONTENT_MAX}자 이내여야 합니다.`, { tone: "error" });
 
     const token = session?.backendToken;
     const ogPreviewText = body.slice(0, 60) + (body.length > 60 ? "..." : "");
@@ -210,7 +210,7 @@ export default function WriteForm() {
         await updateLetter(editId, common, token as string);
         setDirty(false);
         track("letter_update", { letter_type: kind, letter_id: editId });
-        showAlert(kind === "story" ? "사연이 수정되었습니다." : "편지가 수정되었습니다.");
+        showAlert(kind === "story" ? "사연이 수정되었습니다." : "편지가 수정되었습니다.", { tone: "success" });
         router.push(`/letter/${editId}`);
         return;
       }
@@ -224,10 +224,10 @@ export default function WriteForm() {
       const result = await createLetter({ ...common, type: "friend", replyToId: replyTo || undefined }, token);
       track("letter_create", { letter_type: "friend", is_reply: !!replyTo, is_public: false, content_length: body.length });
       setDirty(false);
-      setShare({ url: result.data.url, title: result.data.title });
+      setShare({ url: result.data.url, title: result.data.title, to: to.trim() || undefined });
     } catch (err) {
       console.error("등록 실패:", err);
-      showAlert(err instanceof Error ? err.message : "등록에 실패했습니다. 다시 시도해주세요.");
+      showAlert(err instanceof Error ? err.message : "등록에 실패했습니다. 다시 시도해주세요.", { tone: "error" });
     } finally {
       setSubmitting(false);
     }
@@ -414,7 +414,7 @@ export default function WriteForm() {
         </p>
       </div>
 
-      <ShareModal isOpen={!!share} onClose={closeShare} letterUrl={share?.url || ""} letterTitle={share?.title || ""} />
+      <ShareModal isOpen={!!share} onClose={closeShare} letterUrl={share?.url || ""} letterTitle={share?.title || ""} recipientName={share?.to} />
     </form>
   );
 }

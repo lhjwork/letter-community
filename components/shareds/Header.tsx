@@ -4,6 +4,7 @@ import { track } from "@/lib/analytics/ga";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import LoginDialog from "./LoginDialog";
 import MobileSideMenu from "./MobileSideMenu";
@@ -19,8 +20,17 @@ export function todayLabel(d = new Date()) {
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${DAYS[d.getDay()]}`;
 }
 
+/** 지금 있는 섹션의 NAV href. /letter/* 는 사연 상세로 본다 */
+function currentSection(path: string) {
+  if (path.startsWith("/letter-box")) return "/letter-box";
+  if (path.startsWith("/stories") || path.startsWith("/letter/")) return "/stories";
+  if (path.startsWith("/write")) return "/write";
+  return null;
+}
+
 export default function Header() {
   const { data: session, status } = useSession();
+  const current = currentSection(usePathname() ?? "");
   const loggedIn = status === "authenticated";
   const [loginCallbackUrl, setLoginCallbackUrl] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,11 +43,11 @@ export default function Header() {
   // 로그인 전에는 보호 라우트 대신 로그인 모달. 보드 글자 크기·폰트는 그대로
   const navItem = (href: string, label: string, className: string) =>
     loggedIn || href === "/stories" ? (
-      <Link key={href} href={href} className={className}>
+      <Link key={href} href={href} aria-current={current === href ? "page" : undefined} className={`${className} ${current === href ? "border-brick" : "border-transparent"}`}>
         {label}
       </Link>
     ) : (
-      <button key={href} type="button" onClick={() => openLoginDialog(href)} className={`${className} cursor-pointer bg-transparent`}>
+      <button key={href} type="button" onClick={() => openLoginDialog(href)} className={`${className} cursor-pointer border-transparent bg-transparent`}>
         {label}
       </button>
     );
@@ -51,7 +61,7 @@ export default function Header() {
           <span className="font-pen text-[34px] leading-none text-ink">Letter</span>
         </Link>
         <nav aria-label="주 메뉴" className="flex flex-wrap gap-[34px] font-pen text-[22px]">
-          {NAV.map((n) => navItem(n.href, n.label, "inline-flex min-h-11 items-center text-ink hover:text-brick"))}
+          {NAV.map((n) => navItem(n.href, n.label, "inline-flex min-h-11 items-center border-b-2 text-ink hover:text-brick"))}
         </nav>
         <div className="flex items-center gap-[18px]">
           <span className="font-pen text-lg text-ink-3" suppressHydrationWarning>

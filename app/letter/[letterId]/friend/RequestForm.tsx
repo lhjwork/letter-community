@@ -76,7 +76,7 @@ export default function RequestForm({ letterId }: { letterId: string }) {
       </label>
       <label className={LABEL}>
         <span className={LABEL_TXT}>주소</span>
-        <span className="flex gap-2">
+        <span className="flex flex-wrap gap-2">
           <input type="text" name="zipCode" value={f.zipCode} readOnly className="field flex-[1_1_120px]" placeholder="우편번호" />
           <PostcodeSearch
             onComplete={(d) => setF((s) => ({ ...s, zipCode: d.zipCode, address1: d.address }))}

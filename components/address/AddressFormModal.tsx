@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Address, AddressInput } from "@/types/address";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import V8Dialog, { V8Close, V8Title } from "@/components/ui/V8Dialog";
 import PostcodeSearch from "./PostcodeSearch";
 
 interface Props {
@@ -32,23 +32,13 @@ const fromAddress = (a?: Address | null) => ({
   isDefault: a?.isDefault ?? false,
 });
 
-/** 주소 입력 모달 (v8-Modals-2 AddressFormModal). 모바일은 아래에서 올라오는 전체 폭 시트 */
+/** 주소 입력 모달 (v8-Modals-2 AddressFormModal). 모바일은 M-Sheet 바닥 시트(V8Dialog) */
 export default function AddressFormModal({ open, onOpenChange, onSubmit, editAddress }: Props) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="paper max-w-[520px] gap-4 rounded-none border-rule bg-paper px-9 pb-8 pt-10 shadow-[var(--paper-shadow)] mobile-down:bottom-0 mobile-down:top-auto mobile-down:max-w-none mobile-down:translate-y-0 mobile-down:px-5 mobile-down:pb-6 mobile-down:pt-9"
-      >
-        <div className="airmail absolute inset-x-0 top-0 h-2" aria-hidden="true" />
-        <span className="stampbox absolute -top-4 left-6 bg-paper text-ink mobile-down:left-4 mobile-down:text-[22px]">주소 입력</span>
-        <DialogClose aria-label="닫기" className="absolute right-3.5 top-3.5 z-10 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3">
-          ✕
-        </DialogClose>
+    <V8Dialog open={open} onOpenChange={onOpenChange} stamp="주소 입력" width="max-w-[520px]">
         {/* key 로 열 때마다 폼을 새로 만든다(수정 대상이 바뀌어도 이전 값이 남지 않게) */}
         {open && <Form key={editAddress?._id ?? "new"} editAddress={editAddress} onSubmit={onSubmit} />}
-      </DialogContent>
-    </Dialog>
+    </V8Dialog>
   );
 }
 
@@ -87,8 +77,8 @@ function Form({ editAddress, onSubmit }: Pick<Props, "editAddress" | "onSubmit">
 
   return (
     // 스탬프가 종이 위로 걸치도록 스크롤은 종이가 아니라 폼에 둔다(낮은 화면에서도 저장 버튼까지 닿게)
-    <form onSubmit={submit} className="-mx-1 flex max-h-[calc(90vh-72px)] flex-col gap-4 overflow-y-auto px-1">
-      <DialogTitle className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3]">받으실 분의 주소</DialogTitle>
+    <form onSubmit={submit} noValidate className="-mx-1 flex max-h-[calc(90vh-72px)] flex-col gap-4 overflow-y-auto px-1 mobile-down:max-h-none mobile-down:gap-3 mobile-down:overflow-visible">
+      <V8Title className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3] mobile-down:mt-0 mobile-down:text-[28px]">받으실 분의 주소</V8Title>
 
       <label className={LABEL}>
         <span className={LABEL_TXT}>이름</span>
@@ -104,7 +94,7 @@ function Form({ editAddress, onSubmit }: Pick<Props, "editAddress" | "onSubmit">
         <label htmlFor="addr-zip" className={LABEL_TXT}>
           주소
         </label>
-        <span className="flex gap-2">
+        <span className="flex flex-wrap gap-2">
           <input id="addr-zip" type="text" readOnly value={f.zipCode} className="field min-w-0 flex-[1_1_120px]" placeholder="우편번호" />
           <PostcodeSearch
             onComplete={(d) => setF((s) => ({ ...s, zipCode: d.zipCode, address: d.address }))}
@@ -123,10 +113,10 @@ function Form({ editAddress, onSubmit }: Pick<Props, "editAddress" | "onSubmit">
           {error}
         </p>
       )}
-      <div className="flex justify-end gap-2.5">
-        <DialogClose type="button" className="btn btn-ink">
+      <div className="dlg-actions">
+        <V8Close type="button" className="btn btn-ink">
           취소
-        </DialogClose>
+        </V8Close>
         <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-brick">
           {busy ? "저장하는 중" : "저장"}
         </button>
