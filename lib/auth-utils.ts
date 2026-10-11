@@ -4,16 +4,9 @@ import { signOut } from "next-auth/react";
  * 토큰 만료 시 자동 로그아웃 처리
  */
 export async function handleTokenExpiration() {
-  // 사용자 친화적 메시지 표시
-  if (typeof window !== "undefined") {
-    alert("로그인 세션이 만료되었습니다.\n다시 로그인해 주세요.");
-  }
-
-  // NextAuth 세션 종료 및 메인 페이지로 리다이렉트
-  await signOut({
-    callbackUrl: "/",
-    redirect: true,
-  });
+  // 브라우저 alert 대신: 홈에서 "로그인이 만료됐어요" 로그인 창(LoginPrompt)을 띄우고, 다시 로그인하면 보던 화면으로
+  const back = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/";
+  await signOut({ callbackUrl: `/?login=${encodeURIComponent(back)}&expired=1`, redirect: true });
 }
 
 /**

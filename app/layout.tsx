@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Nanum_Myeongjo, Nanum_Pen_Script } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/components/SessionProvider";
+import { Suspense } from "react";
 import { AlertHost } from "@/components/ui/AppAlert";
+import LoginPrompt from "@/components/shareds/LoginPrompt";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
 const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap", preload: false });
@@ -38,6 +40,9 @@ export default function RootLayout({
           <GoogleAnalytics />
           {children}
           <AlertHost />
+          <Suspense>
+            <LoginPrompt />
+          </Suspense>
         </SessionProvider>
       </body>
     </html>

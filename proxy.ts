@@ -11,9 +11,11 @@ export const proxy = auth((req) => {
     pathname.startsWith(route),
   );
 
-  // 로그인하지 않았는데 보호된 페이지 접근 시도
+  // 로그인 전에 보호된 페이지로 오면 홈에서 로그인 창을 띄우고(LoginPrompt), 로그인 뒤 원래 주소로 돌려보낸다
   if (!isLoggedIn && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/", req.url));
+    const home = new URL("/", req.url);
+    home.searchParams.set("login", pathname + req.nextUrl.search);
+    return NextResponse.redirect(home);
   }
 
   return NextResponse.next();

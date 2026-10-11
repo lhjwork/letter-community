@@ -1,7 +1,7 @@
 "use client";
 
 import { track } from "@/lib/analytics/ga";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
@@ -11,6 +11,8 @@ interface LoginDialogProps {
   isOpen: boolean;
   onClose: () => void;
   callbackUrl?: string;
+  /** 기본: "편지를 쓰려면 / 로그인이 필요해요" */
+  title?: ReactNode;
 }
 
 // 보드 v8-Modals-1 LoginDialog. 버튼 글자는 노랑·초록 바탕 대비를 위해 보드대로 잉크색
@@ -19,7 +21,7 @@ const PROVIDERS = [
   { id: "naver", label: "네이버로 시작하기", bg: "bg-[#03C75A] border-[#03C75A]" },
 ] as const;
 
-export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: LoginDialogProps) {
+export default function LoginDialog({ isOpen, onClose, callbackUrl = "/", title }: LoginDialogProps) {
   // 개인정보보호법 22조: 동의 사항은 구분해서 받는다(이용약관 / 개인정보 수집·이용)
   const [terms, setTerms] = useState(false);
   const [privacy, setPrivacy] = useState(false);
@@ -46,9 +48,13 @@ export default function LoginDialog({ isOpen, onClose, callbackUrl = "/" }: Logi
         <span className="font-pen text-[34px] leading-none">Letter</span>
       </div>
       <V8Title className="m-0 font-pen text-[30px] font-normal leading-[1.3] mobile-down:text-[28px]">
-        편지를 쓰려면
-        <br />
-        로그인이 필요해요
+        {title ?? (
+          <>
+            편지를 쓰려면
+            <br />
+            로그인이 필요해요
+          </>
+        )}
       </V8Title>
       <p className="m-0 text-sm leading-[1.8] text-ink-2">쓴 편지와 받은 답장은 우편함에 모여요.</p>
       <div className="mt-1 flex flex-col gap-2.5">
