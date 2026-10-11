@@ -10,7 +10,8 @@ export default function Footer() {
         <span className="font-pen text-base mobile-down:text-[15px]">답장이 있는 편지 플랫폼</span>
       </span>
       <div className="flex flex-wrap gap-6 mobile-down:gap-4">
-        <a href="mailto:letter-community@naver.com">문의하기</a>
+        <Link href="/notices">공지사항</Link>
+        <Link href="/inquiry">문의하기</Link>
         <Link href="/terms">이용약관</Link>
         <Link href="/privacy">개인정보처리방침</Link>
       </div>

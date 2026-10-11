@@ -56,7 +56,8 @@ export async function apiRequest<T>(
     const error = await response.json().catch(() => ({
       message: "Unknown error occurred",
     }));
-    throw new Error(error.message || error.error || `API Error: ${response.status}`);
+    // 백엔드 응답은 { message } 또는 { error: { message } } 두 형태
+    throw new Error(error.message || error.error?.message || (typeof error.error === "string" ? error.error : "") || `API Error: ${response.status}`);
   }
 
   return response.json();
@@ -589,4 +590,60 @@ export async function getMyLikes(
     method: "GET",
     token,
   });
+}
+
+// === 공지 ===
+export interface NoticeItem {
+  _id: string;
+  title: string;
+  isPinned: boolean;
+  createdAt: string;
+}
+export interface Notice extends NoticeItem {
+  content: string;
+  updatedAt: string;
+}
+export interface Paged<T> {
+  items: T[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+/** 게시된 공지 (고정 먼저 → 최신순) */
+export async function getNotices(page = 1, limit = 20): Promise<Paged<NoticeItem>> {
+  return apiRequest<{ data: Paged<NoticeItem> }>(`/api/notices?page=${page}&limit=${limit}`, { cache: "no-store" }).then((r) => r.data);
+}
+
+export async function getNotice(id: string): Promise<Notice> {
+  return apiRequest<{ data: Notice }>(`/api/notices/${encodeURIComponent(id)}`, { cache: "no-store" }).then((r) => r.data);
+}
+
+// === 1:1 문의 ===
+export const INQUIRY_CATEGORIES = ["서비스 이용", "실물 편지", "계정", "기타"] as const;
+export type InquiryCategory = (typeof INQUIRY_CATEGORIES)[number];
+export const INQUIRY_TITLE_MAX = 100;
+export const INQUIRY_CONTENT_MAX = 2000;
+
+export interface InquiryItem {
+  _id: string;
+  category: InquiryCategory;
+  title: string;
+  status: "open" | "answered";
+  createdAt: string;
+}
+export interface Inquiry extends InquiryItem {
+  content: string;
+  answer?: string;
+  answeredAt?: string;
+}
+
+export async function createInquiry(data: { category: InquiryCategory; title: string; content: string }, token: string): Promise<{ data: { _id: string; createdAt: string } }> {
+  return apiRequest(`/api/inquiries`, { method: "POST", token, body: JSON.stringify(data) });
+}
+
+export async function getMyInquiries(token: string): Promise<InquiryItem[]> {
+  return apiRequest<{ data: InquiryItem[] }>(`/api/inquiries/my`, { token, cache: "no-store" }).then((r) => r.data);
+}
+
+export async function getMyInquiry(id: string, token: string): Promise<Inquiry> {
+  return apiRequest<{ data: Inquiry }>(`/api/inquiries/my/${encodeURIComponent(id)}`, { token, cache: "no-store" }).then((r) => r.data);
 }

@@ -3,18 +3,16 @@
 import { track } from "@/lib/analytics/ga";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import type { SortOption } from "@/lib/api";
 
 export const useStoriesFilter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const search = searchParams.get("search") || "";
-  const sort = (searchParams.get("sort") as SortOption) || "latest";
   const category = searchParams.get("category") || "";
 
   const updateFilter = useCallback(
-    (updates: Partial<{ search: string; sort: string; category: string }>) => {
+    (updates: Partial<{ search: string; category: string }>) => {
       const params = new URLSearchParams(searchParams.toString());
 
       Object.entries(updates).forEach(([key, value]) => {
@@ -25,13 +23,14 @@ export const useStoriesFilter = () => {
         }
       });
 
-      // 필터 변경 시 페이지를 1로 리셋
+      // 필터 변경 시 페이지를 1로 리셋. 정렬은 최신순 고정이라 예전 sort 쿼리는 지운다
       params.delete("page");
+      params.delete("sort");
 
       track("story_filter", {
         search: params.get("search") || "",
         category: params.get("category") || "",
-        sort: params.get("sort") || "latest",
+        sort: "latest",
       });
 
       router.push(`/stories?${params.toString()}`);
@@ -45,7 +44,6 @@ export const useStoriesFilter = () => {
 
   return {
     search,
-    sort,
     category,
     updateFilter,
     resetFilter,

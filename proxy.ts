@@ -6,7 +6,7 @@ export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth;
 
   // 로그인이 필요한 페이지들
-  const protectedRoutes = ["/write", "/drafts", "/my-page", "/letter-box", "/home"];
+  const protectedRoutes = ["/write", "/drafts", "/my-page", "/letter-box", "/home", "/inquiry"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
   );

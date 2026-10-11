@@ -16,10 +16,20 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
   const { data: session, status } = useSession();
   const loggedIn = status === "authenticated";
   const closeRef = useRef<HTMLButtonElement>(null);
+  // 닫으면 열기 전 포커스(메뉴 버튼)로 돌려보낸다(키보드·스크린리더 사용자가 길을 잃지 않게)
+  const returnTo = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
-    if (isOpen) closeRef.current?.focus();
+    if (isOpen) {
+      const active = document.activeElement as HTMLElement | null;
+      // iOS Safari 는 버튼을 탭해도 포커스를 주지 않는다 → 헤더 메뉴 버튼으로
+      returnTo.current = active && active !== document.body ? active : document.querySelector<HTMLElement>('button[aria-label="메뉴"]');
+      closeRef.current?.focus();
+    } else if (returnTo.current) {
+      returnTo.current.focus();
+      returnTo.current = null;
+    }
     return () => {
       document.body.style.overflow = "";
     };
@@ -121,8 +131,9 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
               로그아웃
             </button>
           )}
-          <div className="flex gap-3.5 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
-            <a href="mailto:letter-community@naver.com">문의하기</a>
+          <div className="flex flex-wrap gap-x-3.5 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
+            <Link href="/notices" onClick={onClose}>공지사항</Link>
+            <Link href="/inquiry" onClick={onClose}>문의하기</Link>
             <Link href="/terms">이용약관</Link>
             <Link href="/privacy">개인정보처리방침</Link>
           </div>

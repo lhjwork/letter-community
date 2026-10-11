@@ -33,7 +33,7 @@ export function AlertHost() {
   }, []);
 
   return (
-    <div aria-live="polite" className="pointer-events-none fixed bottom-6 left-1/2 z-[100] flex w-max max-w-[calc(100%-32px)] -translate-x-1/2 flex-col items-center gap-3">
+    <div aria-live="polite" className="pointer-events-none fixed bottom-6 left-1/2 mobile-down:bottom-auto mobile-down:top-20 z-[100] flex w-max max-w-[calc(100%-32px)] -translate-x-1/2 flex-col items-center gap-3">
       {toasts.map((t) => (
         <div
           key={t.id}

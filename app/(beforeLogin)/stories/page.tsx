@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import AuthLink from "@/components/shareds/AuthLink";
 import { EmptyState, StoriesFilter, StoryList } from "@/components/stories";
-import { getStories, type GetStoriesParams, type SortOption, type StoriesResponse } from "@/lib/api";
+import { getStories, type GetStoriesParams, type StoriesResponse } from "@/lib/api";
 
 export const metadata: Metadata = { title: "답장을 기다리는 사연 | Letter" };
 // 쿼리로 필터하는 공개 목록. 빌드 시 프리렌더하지 않는다
@@ -10,14 +10,15 @@ export const dynamic = "force-dynamic";
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 const LIMIT = 12;
 
-type Search = Promise<{ search?: string; sort?: string; category?: string }>;
+type Search = Promise<{ search?: string; category?: string }>;
 
 export default async function StoriesPage({ searchParams }: { searchParams: Search }) {
   const sp = await searchParams;
   const params: GetStoriesParams = {
     limit: LIMIT,
     search: sp.search?.trim() || undefined,
-    sort: (sp.sort === "popular" ? "popular" : "latest") as SortOption,
+    // 최신순 고정(인기순은 소셜 피드 정서라 뺐다). 예전 ?sort=popular 링크도 최신순
+    sort: "latest",
     category: sp.category || undefined,
   };
 
@@ -28,7 +29,7 @@ export default async function StoriesPage({ searchParams }: { searchParams: Sear
     console.error("사연 목록 로드 실패:", error);
   }
   const stories = res?.data ?? [];
-  const listKey = `${params.search ?? ""}|${params.sort}|${params.category ?? ""}`;
+  const listKey = `${params.search ?? ""}|${params.category ?? ""}`;
 
   return (
     <main className="flex flex-col">
@@ -50,7 +51,7 @@ export default async function StoriesPage({ searchParams }: { searchParams: Sear
             사연을 불러오지 못했어요.
           </p>
         ) : stories.length === 0 ? (
-          <EmptyState filtered={Boolean(params.search || params.category || params.sort !== "latest")} />
+          <EmptyState filtered={Boolean(params.search || params.category)} />
         ) : (
           <StoryList key={listKey} initial={stories} pagination={res.pagination} params={params} />
         )}

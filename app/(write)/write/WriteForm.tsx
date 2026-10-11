@@ -449,7 +449,7 @@ export default function WriteForm() {
             {saveState.status === "saving" ? "저장 중..." : "임시저장"}
           </button>
           <p className="m-0 mt-1.5 text-[13px] leading-[1.7] text-ink-3 mobile-down:hidden">
-            <Link href="/drafts" className="underline underline-offset-2 hover:text-brick">
+            <Link href="/drafts" className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-brick">
               임시저장 목록
             </Link>
             에서 이어 쓸 수 있어요.

@@ -3,9 +3,9 @@ import type { NextConfig } from "next";
 // 우선 Report-Only 로 위반만 관찰. 콘솔에 위반이 없으면 Content-Security-Policy 로 승격
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' data: https://fonts.gstatic.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://t1.daumcdn.net",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://hangeul.pstatic.net",
+  "font-src 'self' data: https://fonts.gstatic.com https://hangeul.pstatic.net",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https:",
   "frame-ancestors 'none'",

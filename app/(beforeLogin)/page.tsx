@@ -180,7 +180,7 @@ function StoryCard({ story, tilt, hiddenOnMobile }: { story: Story; tilt: string
       <div className="airmail absolute left-0 right-0 top-0 hidden h-1.5 mobile-down:block" aria-hidden="true" />
       <span className={`badge absolute right-4 top-3.5 mobile-down:top-5 ${n > 0 ? "bg-airblue" : "bg-brick"}`}>{n > 0 ? `답장 ${n}` : "답장 기다림"}</span>
       <span className="hidden font-pen text-lg leading-none text-brick mobile-down:block">사연</span>
-      <span className="font-pen text-lg leading-9 text-brick mobile-down:mt-2">To. {story.recipientName || "누군가에게"}</span>
+      <span className="font-pen text-lg leading-9 text-brick mobile-down:mt-2">To. {story.recipientName || "레터"}</span>
       <strong className="line-clamp-1 font-pen text-[26px] font-normal leading-9">{story.title || preview(story)}</strong>
       <span className="line-clamp-1 text-base leading-9 text-ink-2 mobile-down:hidden">{preview(story)}</span>
       <span className="mt-2 hidden font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:block">

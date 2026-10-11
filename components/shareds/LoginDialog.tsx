@@ -56,7 +56,16 @@ export default function LoginDialog({ isOpen, onClose, callbackUrl = "/", title 
           </>
         )}
       </V8Title>
-      <p className="m-0 text-sm leading-[1.8] text-ink-2">쓴 편지와 받은 답장은 우편함에 모여요.</p>
+      {callbackUrl.startsWith("/inquiry") ? (
+        <p className="m-0 text-sm leading-[1.8] text-ink-2">
+          로그인 없이 문의하려면 메일로 보내 주세요.
+          <a href="mailto:letter-community@naver.com" className="flex min-h-11 items-center">
+            <span className="border-b border-ink-2">letter-community@naver.com</span>
+          </a>
+        </p>
+      ) : (
+        <p className="m-0 text-sm leading-[1.8] text-ink-2">쓴 편지와 받은 답장은 우편함에 모여요.</p>
+      )}
       <div className="mt-1 flex flex-col gap-2.5">
         {PROVIDERS.map((p) => (
           <button key={p.id} type="button" onClick={() => handleLogin(p.id)} disabled={!agreed} className={`btn min-h-[52px] text-ink disabled:cursor-not-allowed disabled:opacity-40 ${p.bg}`}>

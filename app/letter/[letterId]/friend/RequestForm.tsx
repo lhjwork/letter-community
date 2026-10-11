@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { track } from "@/lib/analytics/ga";
 import { apiRequest } from "@/lib/api";
+import { getAddresses } from "@/lib/address-api";
 import PostcodeSearch from "@/components/address/PostcodeSearch";
+import V8Dialog, { V8Title } from "@/components/ui/V8Dialog";
+import type { Address } from "@/types/address";
 import { requestKey } from "./status";
 
 const LABEL = "flex flex-col gap-1.5";
@@ -26,10 +29,32 @@ export default function RequestForm({ letterId }: { letterId: string }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [prev, setPrev] = useState<string | null>(null);
+  // 로그인한 사용자의 주소록. null = 비로그인이거나 아직 못 받음(버튼·안내 모두 숨김)
+  const [book, setBook] = useState<Address[] | null>(null);
+  const [picking, setPicking] = useState(false);
+  const token = session?.backendToken;
 
   useEffect(() => {
     setPrev(localStorage.getItem(requestKey(letterId)));
   }, [letterId]);
+
+  useEffect(() => {
+    if (!token) return setBook(null);
+    let alive = true;
+    getAddresses(token)
+      .then((r) => alive && setBook(r.data ?? []))
+      .catch(() => alive && setBook(null));
+    return () => {
+      alive = false;
+    };
+  }, [token]);
+
+  // 남의 편지를 신청하는 경우도 있어 기본 배송지를 미리 채우지 않는다. 고른 것만 채움
+  const pick = (a: Address) => {
+    setF((s) => ({ ...s, name: a.recipientName, phone: formatPhone(a.phone || a.tel || ""), zipCode: a.zipCode, address1: a.address, address2: a.addressDetail ?? "" }));
+    setError("");
+    setPicking(false);
+  };
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF((s) => ({ ...s, [k]: k === "phone" ? formatPhone(e.target.value) : e.target.value }));
 
@@ -64,6 +89,12 @@ export default function RequestForm({ letterId }: { letterId: string }) {
           <span className="border-b-[1.5px] border-current">이미 신청한 편지의 진행 보기</span>
         </a>
       )}
+      {book && book.length > 0 && (
+        <button type="button" onClick={() => setPicking(true)} className="btn btn-blue min-h-11 self-start px-4 text-xl">
+          주소록에서 불러오기
+        </button>
+      )}
+      {book && book.length === 0 && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">자주 쓰는 주소는 우편함 주소록에 저장해 두면 다음에 불러올 수 있어요.</p>}
       <label className={LABEL}>
         <span className={LABEL_TXT}>받으실 분의 이름</span>
         <input type="text" name="name" value={f.name} onChange={set("name")} maxLength={50} autoComplete="name" required className="field" placeholder="받으실 분의 이름" />
@@ -105,6 +136,30 @@ export default function RequestForm({ letterId }: { letterId: string }) {
       <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-brick mt-1.5 min-h-14 text-[26px] mobile-down:mt-1">
         {busy ? "신청하는 중" : "실물 편지 신청"}
       </button>
+
+      <V8Dialog open={picking} onOpenChange={setPicking} stamp="주소록" stampTone="text-airblue" width="max-w-[520px]">
+        <V8Title className="m-0 font-pen text-[30px] font-normal leading-[1.3] mobile-down:text-[28px]">받으실 분을 골라 주세요</V8Title>
+        <ul className="m-0 flex max-h-[min(420px,60dvh)] list-none flex-col gap-2.5 overflow-y-auto p-0 mobile-down:max-h-none mobile-down:overflow-visible">
+          {book?.map((a) => (
+            <li key={a._id}>
+              <button
+                type="button"
+                onClick={() => pick(a)}
+                className="flex min-h-11 w-full cursor-pointer flex-col items-start gap-1 rounded-[3px] border-[1.5px] border-rule bg-paper px-4 py-3 text-left text-ink hover:border-airblue focus-visible:border-airblue"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="font-pen text-2xl">{a.recipientName}</span>
+                  {a.isDefault && <span className="badge bg-approve">기본 배송지</span>}
+                </span>
+                <span className="text-[15px] leading-[1.7] text-ink-2">
+                  ({a.zipCode}) {a.address}
+                  {a.addressDetail ? `, ${a.addressDetail}` : ""}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </V8Dialog>
     </form>
   );
 }

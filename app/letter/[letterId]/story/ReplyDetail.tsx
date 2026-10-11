@@ -43,9 +43,9 @@ export default function ReplyDetail({ reply }: { reply: ReplyLetter }) {
 
       <section className={`${WRAP} flex flex-col items-center pb-24 pt-3 mobile-down:pb-12`}>
         {reply.replyTo.title && (
-          <p className="m-0 mb-8 text-center font-pen text-2xl text-ink-3 mobile-down:mb-6 mobile-down:text-xl">
+          <h1 className="m-0 mb-8 text-center font-pen text-2xl font-normal text-ink-3 mobile-down:mb-6 mobile-down:text-xl">
             ‘{reply.replyTo.title}’에 온 답장
-          </p>
+          </h1>
         )}
         <article className="paper ruled flex w-full max-w-[760px] -rotate-[0.4deg] flex-col px-14 py-[72px] mobile-down:px-5 mobile-down:py-9">
           <span className={`stampbox absolute -top-4 left-7 bg-paper mobile-down:left-4 mobile-down:text-[22px] ${stamp[1]}`}>{stamp[0]}</span>

@@ -52,6 +52,7 @@ export default function AddressBook({ initial }: { initial: Address[] }) {
         <div className="flex flex-col gap-3 mobile-down:gap-2">
           <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">실물 편지를 받을 분들</p>
           <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">주소록</h1>
+          <p className="m-0 text-[15px] leading-[1.8] text-ink-2">실물 편지를 신청할 때 여기 저장한 주소를 불러올 수 있어요.</p>
         </div>
         <button type="button" onClick={add} className="btn btn-brick mobile-down:hidden">
           + 주소 추가
