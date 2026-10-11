@@ -58,7 +58,9 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
     .slice(0, 120);
   const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og?text=${encodeURIComponent(previewText)}`;
   const title = (letter.replyTo && `‘${letter.replyTo.title || "사연"}’에 온 답장`) || (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || "당신에게 도착한 편지";
-  const description = letter.ogPreviewText || "특별한 편지가 도착했습니다.";
+  // 카톡·SNS 미리보기 설명: 저장된 미리보기 → 없으면 본문 앞부분. 줄바꿈은 한 줄로
+  const oneLine = (s?: string) => (s || "").replace(/\s+/g, " ").trim();
+  const description = (oneLine(letter.ogPreviewText) || previewText).slice(0, 100) || "특별한 편지가 도착했습니다.";
 
   return {
     title,
