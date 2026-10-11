@@ -1,19 +1,7 @@
-import { Metadata } from "next";
-import AnonymousPhysicalRequestFormPage from "./AnonymousPhysicalRequestFormPage";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "실물 편지 신청",
-  description: "실물 편지를 신청하세요",
-};
-
-interface PageProps {
-  params: Promise<{
-    letterId: string;
-  }>;
-}
-
-export default async function Page({ params }: PageProps) {
+/** 실물 편지 신청 폼은 편지 상세 안(#request)으로 옮겼다. 예전 링크 보호 */
+export default async function Page({ params }: { params: Promise<{ letterId: string }> }) {
   const { letterId } = await params;
-
-  return <AnonymousPhysicalRequestFormPage letterId={letterId} />;
+  redirect(`/letter/${letterId}#request`);
 }

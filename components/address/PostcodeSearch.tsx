@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useSyncExternalStore } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useCallback, useSyncExternalStore, type ReactNode } from "react";
 
 /**
  * 다음(카카오) 주소 검색 결과 타입
@@ -18,7 +17,7 @@ export interface PostcodeResult {
 interface PostcodeSearchProps {
   onComplete: (data: PostcodeResult) => void;
   className?: string;
-  buttonText?: string;
+  buttonText?: ReactNode;
 }
 
 const DAUM_POSTCODE_SCRIPT_URL = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
@@ -120,8 +119,8 @@ export default function PostcodeSearch({ onComplete, className, buttonText = "�
   const displayText = status === "loading" ? "로딩 중..." : status === "error" ? "로드 실패" : buttonText;
 
   return (
-    <Button type="button" variant="outline" onClick={handleClick} disabled={isDisabled} className={className}>
+    <button type="button" onClick={handleClick} disabled={isDisabled} className={className}>
       {displayText}
-    </Button>
+    </button>
   );
 }

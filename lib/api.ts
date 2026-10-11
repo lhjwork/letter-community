@@ -56,7 +56,7 @@ export async function apiRequest<T>(
     const error = await response.json().catch(() => ({
       message: "Unknown error occurred",
     }));
-    throw new Error(error.message || `API Error: ${response.status}`);
+    throw new Error(error.message || error.error || `API Error: ${response.status}`);
   }
 
   return response.json();
@@ -279,7 +279,7 @@ export async function getLetter(letterId: string): Promise<{
 //     const error = await response.json().catch(() => ({
 //       message: "Unknown error occurred",
 //     }));
-//     throw new Error(error.message || `API Error: ${response.status}`);
+//     throw new Error(error.message || error.error || `API Error: ${response.status}`);
 //   }
 //
 //   return response.json();
