@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getComments, getStoryReplies, type StoryReply } from "@/lib/api";
 import FriendDetail, { type FriendLetter } from "./friend/FriendDetail";
+import ReplyDetail, { type ReplyLetter } from "./story/ReplyDetail";
 import StoryDetail from "./story/StoryDetail";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
@@ -12,6 +13,9 @@ type Letter = FriendLetter & {
   title?: string;
   category?: string;
   commentCount?: number;
+  replyTo?: ReplyLetter["replyTo"];
+  isAdminReply?: boolean;
+  isAdopted?: boolean;
 };
 
 /** 토큰이 있으면 서버가 isAuthor 를 계산해 준다(작성자 ID 는 내려오지 않는다) */
@@ -53,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
     .join(" ")
     .slice(0, 120);
   const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og?text=${encodeURIComponent(previewText)}`;
-  const title = (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || "당신에게 도착한 편지";
+  const title = (letter.replyTo && `‘${letter.replyTo.title || "사연"}’에 온 답장`) || (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || "당신에게 도착한 편지";
   const description = letter.ogPreviewText || "특별한 편지가 도착했습니다.";
 
   return {
@@ -85,6 +89,11 @@ export default async function LetterDetailPage({ params }: { params: Promise<{ l
       getComments(letterId, 1, token).then((r) => r.data).catch(() => ({ items: [], total: letter.commentCount ?? 0, hasNextPage: false })),
     ]);
     return <StoryDetail story={letter} replies={replies} comments={comments} />;
+  }
+
+  // 사연에 단 답장은 읽기 전용 화면(실물 신청·작성자 관리 없음)
+  if (letter.replyTo) {
+    return <ReplyDetail reply={{ ...letter, replyTo: letter.replyTo }} />;
   }
 
   return <FriendDetail letter={letter} />;
