@@ -150,7 +150,7 @@ function LetterCard({ letter, tilt }: { letter: Letter; tilt: string }) {
   return (
     <Link href={`/letter/${letter._id}`} className={`card text-ink hover:text-ink mobile-down:px-5 mobile-down:pb-5 mobile-down:pt-6 ${tilt}`}>
       <div className="airmail absolute inset-x-0 top-0 h-1.5" aria-hidden="true" />
-      <div className="mt-1 flex items-start justify-between gap-2">
+      <div className="mt-1 flex min-h-5 items-start justify-between gap-2">
         {/* 배지는 기록된 사실만: 채택(답장) · 실물 신청됨(마음 편지) */}
         {reply ? (
           <>
