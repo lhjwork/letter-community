@@ -11,7 +11,7 @@ import { PHYSICAL_STATUS } from "./status";
 type Req = {
   requestId: string;
   name: string;
-  phone: string;
+  phone?: string;
   fullAddress: string;
   status: string;
   requestedAt: string;
@@ -84,7 +84,8 @@ export default function AuthorRequests({ letterId, letterTitle }: { letterId: st
                     <span className={`badge ${r.status === "rejected" ? "bg-ink-3" : pending ? "bg-brick" : "bg-approve"}`}>{PHYSICAL_STATUS[r.status] ?? r.status}</span>
                   </span>
                   <span className="text-sm text-ink-2">
-                    {r.fullAddress} · {r.phone}
+                    {r.fullAddress}
+                    {r.phone ? ` · ${r.phone}` : ""}
                   </span>
                   {r.memo && <span className="text-sm text-ink-3">{r.memo}</span>}
                 </div>

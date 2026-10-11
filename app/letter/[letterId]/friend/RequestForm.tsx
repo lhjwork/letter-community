@@ -37,7 +37,7 @@ export default function RequestForm({ letterId }: { letterId: string }) {
     e.preventDefault();
     const name = f.name.trim();
     if (name.length < 2 || name.length > 50) return setError("받으실 분의 이름을 2자 이상 적어 주세요.");
-    if (!/^01\d-\d{3,4}-\d{4}$/.test(f.phone)) return setError("연락처를 010-0000-0000 형식으로 적어 주세요.");
+    if (f.phone && !/^01\d-\d{3,4}-\d{4}$/.test(f.phone)) return setError("연락처를 010-0000-0000 형식으로 적어 주세요.");
     if (!/^\d{5}$/.test(f.zipCode) || f.address1.length < 5) return setError("우편번호 검색으로 주소를 골라 주세요.");
     setError("");
     setBusy(true);
@@ -64,8 +64,10 @@ export default function RequestForm({ letterId }: { letterId: string }) {
         <input type="text" name="name" value={f.name} onChange={set("name")} maxLength={50} autoComplete="name" required className="field" placeholder="받으실 분의 이름" />
       </label>
       <label className={LABEL}>
-        <span className={LABEL_TXT}>연락처</span>
-        <input type="tel" name="phone" value={f.phone} onChange={set("phone")} inputMode="numeric" autoComplete="tel" required className="field" placeholder="010-0000-0000" />
+        <span className={LABEL_TXT}>
+          연락처 <span className="text-base text-ink-3">(선택)</span>
+        </span>
+        <input type="tel" name="phone" value={f.phone} onChange={set("phone")} inputMode="numeric" autoComplete="tel" className="field" placeholder="010-0000-0000" />
       </label>
       <label className={LABEL}>
         <span className={LABEL_TXT}>주소</span>
