@@ -8,7 +8,7 @@ export const PHYSICAL_STATUS: Record<string, string> = {
   delivered: "도착했어요",
 };
 
-export const ENVELOPE_NAME: Record<string, string> = { seongsu: "성수", myeongdong: "명동" };
+export const ENVELOPE_NAME: Record<string, string> = { seongsu: "성수", myeongdong: "명동", letter: "레터" };
 
 /** 신청한 편지의 requestId 를 브라우저에 남겨 두는 키(예전 화면과 같은 키라 기존 신청도 이어진다) */
 export const requestKey = (letterId: string) => `physicalRequest_${letterId}`;

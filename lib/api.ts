@@ -132,7 +132,7 @@ export async function createStory(
     ogPreviewText?: string;
     category?: string;
     contentType?: "text" | "html";
-    envelope?: "seongsu" | "myeongdong";
+    envelope?: "seongsu" | "myeongdong" | "letter";
     isAnonymous?: boolean;
     recipientName?: string;
   },
@@ -162,7 +162,7 @@ export async function createLetter(
     authorName?: string; // 사연용
     category?: string;
     contentType?: "text" | "html";
-    envelope?: "seongsu" | "myeongdong";
+    envelope?: "seongsu" | "myeongdong" | "letter";
     isAnonymous?: boolean;
     recipientName?: string;
     recipientAddresses?: RecipientAddressInput[]; // 수신자 주소 목록
@@ -254,7 +254,7 @@ export async function getLetter(letterId: string): Promise<{
     content?: string;
     contentType?: "text" | "html";
     category?: string;
-    envelope?: "seongsu" | "myeongdong";
+    envelope?: "seongsu" | "myeongdong" | "letter";
     isAnonymous?: boolean;
     recipientName?: string;
     isPublic?: boolean;
@@ -410,7 +410,7 @@ export async function updateLetter(
     content?: string;
     category?: string;
     contentType?: "text" | "html";
-    envelope?: "seongsu" | "myeongdong";
+    envelope?: "seongsu" | "myeongdong" | "letter";
     isAnonymous?: boolean;
     recipientName?: string;
     isPublic?: boolean;

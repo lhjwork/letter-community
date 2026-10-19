@@ -16,12 +16,13 @@ import LetterSheet from "@/components/LetterSheet";
 import type { DraftLetter } from "@/types/draft";
 
 type Kind = "story" | "friend";
-type Envelope = "seongsu" | "myeongdong";
+type Envelope = "seongsu" | "myeongdong" | "letter";
 
 const CATEGORIES = ["위로", "가족", "감사", "사랑", "성장", "우정", "추억", "기타"] as const;
 const ENVELOPES: { id: Envelope; name: string; src: string }[] = [
   { id: "seongsu", name: "성수", src: "/v8/envelope-seongsu.png" },
   { id: "myeongdong", name: "명동", src: "/v8/envelope-myeongdong.png" },
+  { id: "letter", name: "레터", src: "/v8/envelope-letter.png" },
 ];
 export const CONTENT_MAX = 2000;
 

@@ -9,7 +9,7 @@ export interface DraftLetter {
   contentType?: "text" | "html";
   type: "friend" | "story";
   category: string;
-  envelope?: "seongsu" | "myeongdong";
+  envelope?: "seongsu" | "myeongdong" | "letter";
   isAnonymous?: boolean;
   recipientName?: string;
   wordCount: number;
@@ -56,7 +56,7 @@ export interface DraftSaveRequest {
   contentType?: "text" | "html";
   type?: "friend" | "story";
   category?: string;
-  envelope?: "seongsu" | "myeongdong";
+  envelope?: "seongsu" | "myeongdong" | "letter";
   isAnonymous?: boolean;
   recipientName?: string;
   recipientAddresses?: RecipientAddressInput[];
