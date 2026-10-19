@@ -17,7 +17,8 @@ const PAPER = {
   fromLeft: 130 / 7.2,
 };
 const cq = (n: number) => `${n.toFixed(4)}cqw`;
-const PEN = "font-pen text-[26px] mobile-down:text-xl";
+// 글씨 크기도 편지지 폭 비율(괘선의 약 72%). 720 폭 26px, 358 폭 약 20px, 아주 좁은 폭에서도 괘선 안에 앉는다
+const PEN = "font-pen text-[length:min(26px,5.7cqw)]";
 // 본문·textarea·mirror 공용 줄바꿈 규칙. keep-all: 한글도 띄어쓰기에서만 줄을 바꾼다(좁은 폭에서 "원/하시면" 방지)
 const WRAP = "whitespace-pre-wrap [word-break:keep-all] [overflow-wrap:break-word]";
 const penLine: CSSProperties = { lineHeight: cq(PAPER.line), height: cq(PAPER.line) };
@@ -64,7 +65,9 @@ function measureBreaks(m: HTMLDivElement, text: string, firstCap: number): numbe
     while (i < n && text[i] === "\n") i++;
     range.setStart(node, i);
     range.setEnd(node, i + 1);
-    return Math.floor((range.getBoundingClientRect().top - base + 1) / lh);
+    // 글자 상자 가운데로 잰다. 상자 위쪽은 글씨가 줄 간격보다 크면 윗줄로 올라가 한 줄 덜 센다
+    const r = range.getBoundingClientRect();
+    return Math.floor((r.top + r.height / 2 - base) / lh);
   };
   const breaks: number[] = [];
   let lo = 0;
@@ -212,7 +215,7 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
               </div>
             )}
             {first && title && (
-              <div className="absolute overflow-hidden text-ellipsis whitespace-nowrap font-pen text-[30px] mobile-down:text-[22px]" style={bodyBox(0, 1)}>
+              <div className="absolute overflow-hidden text-ellipsis whitespace-nowrap font-pen text-[length:min(30px,6.3cqw)]" style={bodyBox(0, 1)}>
                 {title}
               </div>
             )}
