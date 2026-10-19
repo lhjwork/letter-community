@@ -3,9 +3,11 @@ import { RecipientAddressInput } from "@/types/recipient";
 // 클라이언트와 서버 모두에서 사용 가능하도록 NEXT_PUBLIC_ 환경 변수 사용
 // 서버 사이드에서는 BACKEND_URL도 fallback으로 사용
 // 브라우저에서 환경 변수가 없으면 같은 오리진("")으로 요청 → nginx가 /api/ 를 백엔드로 프록시
+// 서버는 컨테이너 내부 주소(BACKEND_URL)를 먼저 쓴다. 공개 주소로 돌아 나가면 nginx 를 거쳐 막힐 수 있다
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  (typeof window === "undefined" ? process.env.BACKEND_URL : "");
+  typeof window === "undefined"
+    ? process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL
+    : process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 interface ApiRequestOptions extends RequestInit {
   token?: string;

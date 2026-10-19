@@ -31,12 +31,14 @@ export default async function LetterBoxPage({ searchParams }: { searchParams: Se
 
   // 받은 답장 = 내 사연에 온 레터의 답장 + 채택된 답장(마이페이지 "받은 편지 · 사연"과 같은 데이터)
   // ponytail: 최근 60통까지(API 상한), 쪽 이동은 그보다 많아지면
+  // 실패해도 화면은 그리되, 원인은 서버 로그에 남긴다
+  const fail = <T,>(what: string, fallback: T) => (e: unknown) => (console.error(`[letter-box] ${what}:`, e), fallback);
   const [letters, stories, summary, addresses, replies] = await Promise.all([
-    getMyLetters(token, { filter: "sent", page: lp, limit: LIMIT }).catch(() => null),
-    getMyStories(token, { page: stp, limit: LIMIT }).catch(() => null),
-    getMyRequestSummary(token).then((r) => r.data).catch(() => null),
-    getAddresses(token).then((r) => r.data ?? []).catch(() => [] as Address[]),
-    getMyRecords(token, "received", "story", 60).catch(() => null),
+    getMyLetters(token, { filter: "sent", page: lp, limit: LIMIT }).catch(fail("letters", null)),
+    getMyStories(token, { page: stp, limit: LIMIT }).catch(fail("stories", null)),
+    getMyRequestSummary(token).then((r) => r.data).catch(fail("requests", null)),
+    getAddresses(token).then((r) => r.data ?? []).catch(fail("addresses", [] as Address[])),
+    getMyRecords(token, "received", "story", 60).catch(fail("replies", null)),
   ]);
   const current = tab === "letters" ? letters : tab === "stories" ? stories : replies ? { data: replies.data, pagination: { totalPages: 1 } } : null;
   const heading = { letters: "내가 쓴 편지", stories: "내 사연", replies: "받은 답장" }[tab];
