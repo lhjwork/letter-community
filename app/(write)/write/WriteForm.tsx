@@ -379,7 +379,7 @@ export default function WriteForm() {
                 <div
                   ref={mirrorRef}
                   aria-hidden="true"
-                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-sans text-[19px] [overflow-wrap:break-word] mobile-down:text-base"
+                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-xl"
                   style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
                 >
                   {content}
@@ -388,7 +388,7 @@ export default function WriteForm() {
                 <div
                   ref={probeRef}
                   aria-hidden="true"
-                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-sans text-[19px] [overflow-wrap:break-word] mobile-down:text-base"
+                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-xl"
                   style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
                 />
                 <textarea
@@ -413,7 +413,7 @@ export default function WriteForm() {
                       warnFull();
                     } else lastFit.current = v;
                   }}
-                  className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-[19px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-base"
+                  className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] [--mobile-fs:20px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
                   style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), top: `calc(${cq(PAPER.bodyTop)} + var(--baseline-shift))`, height: cq(bodyHeight), lineHeight: cq(PAPER.line) }}
                   required
                 />
@@ -515,7 +515,7 @@ function StorySheet({ to, from, content, onChange }: { to: string; from: string;
         사연
       </label>
       <div className="grid min-h-[324px] [grid-template-areas:'s'] *:[grid-area:s]">
-        <div aria-hidden="true" className="invisible whitespace-pre-wrap text-[19px] leading-9 [overflow-wrap:break-word]">
+        <div aria-hidden="true" className="invisible whitespace-pre-wrap font-pen text-[26px] leading-9 [overflow-wrap:break-word] mobile-down:text-2xl">
           {content}
           {"\u200b"}
         </div>
@@ -525,7 +525,7 @@ function StorySheet({ to, from, content, onChange }: { to: string; from: string;
           maxLength={CONTENT_MAX}
           value={content}
           onChange={(e) => onChange(e.target.value)}
-          className="block h-full w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-[19px] leading-9 [--mobile-fs:19px] text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className="block h-full w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] leading-9 [--mobile-fs:24px] text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           required
         />
       </div>

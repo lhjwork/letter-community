@@ -116,12 +116,12 @@ export function LetterBody({ content, contentType }: { content: string; contentT
     return (
       <>
         {paras.map((para, i) => (
-          <p key={i} className={`m-0 whitespace-pre-line text-[19px] leading-9 ${i > 0 ? "mt-9" : ""}`}>
+          <p key={i} className={`m-0 whitespace-pre-line font-pen text-[26px] leading-9 mobile-down:text-2xl ${i > 0 ? "mt-9" : ""}`}>
             {para}
           </p>
         ))}
       </>
     );
   }
-  return <div className="text-[19px] leading-9 [&_p+p]:mt-9 [&_p:empty]:hidden [&_p]:m-0 [&_p]:leading-9" dangerouslySetInnerHTML={{ __html: content }} />;
+  return <div className="font-pen text-[26px] leading-9 mobile-down:text-2xl [&_p+p]:mt-9 [&_p:empty]:hidden [&_p]:m-0 [&_p]:leading-9" dangerouslySetInnerHTML={{ __html: content }} />;
 }

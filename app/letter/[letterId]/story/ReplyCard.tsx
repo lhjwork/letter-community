@@ -17,7 +17,7 @@ export default function ReplyCard({ reply, index }: { reply: StoryReply; index: 
         <span className={`truncate font-pen text-2xl ${reply.isAdminReply ? "text-brick" : "text-ink"}`}>From. {reply.isAdminReply ? "레터" : reply.authorName}</span>
         <span className={`badge shrink-0 ${badge[1]}`}>{badge[0]}</span>
       </div>
-      <p className="m-0 line-clamp-8 whitespace-pre-line text-[19px] leading-9">{body}</p>
+      <p className="m-0 line-clamp-8 whitespace-pre-line font-pen text-[26px] leading-9 mobile-down:text-2xl">{body}</p>
       <div className="mt-9 flex min-h-9 flex-wrap items-center justify-between gap-2">
         <span className="font-anton text-xs tracking-[0.1em] text-ink-3">
           {p.mm}.{p.dd} · {p.wd}

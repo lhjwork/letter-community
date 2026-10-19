@@ -98,11 +98,11 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
             ),
           )}
           {loggedIn ? (
-            <Link href="/drafts" onClick={onClose} className="text-[22px] text-ink-2">
+            <Link href="/drafts" onClick={onClose}>
               임시저장
             </Link>
           ) : (
-            <button type="button" onClick={needLogin("/drafts")} className="w-full border-0 border-b bg-transparent text-left text-[22px] text-ink-2">
+            <button type="button" onClick={needLogin("/drafts")} className="w-full border-0 border-b bg-transparent text-left">
               임시저장
             </button>
           )}
