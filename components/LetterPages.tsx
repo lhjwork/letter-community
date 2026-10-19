@@ -18,6 +18,8 @@ const PAPER = {
 };
 const cq = (n: number) => `${n.toFixed(4)}cqw`;
 const PEN = "font-pen text-[26px] mobile-down:text-xl";
+// 본문·textarea·mirror 공용 줄바꿈 규칙. keep-all: 한글도 띄어쓰기에서만 줄을 바꾼다(좁은 폭에서 "원/하시면" 방지)
+const WRAP = "whitespace-pre-wrap [word-break:keep-all] [overflow-wrap:break-word]";
 const penLine: CSSProperties = { lineHeight: cq(PAPER.line), height: cq(PAPER.line) };
 // --baseline-shift: 보드 수치 그대로면 본문 기준선이 괘선에서 6px 떠서(원칙 2~4px) 본문만 내린다. To./From. 은 정상
 const bodyBox = (top: number, lines: number): CSSProperties => ({
@@ -132,8 +134,14 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
       setTick((t) => t + 1);
     });
     ro.observe(sheet);
-    document.fonts?.ready.then(() => setTick((t) => t + 1));
-    return () => ro.disconnect();
+    // 펜 글꼴은 글자 묶음(unicode-range)마다 늦게 받아진다. 받을 때마다 다시 재야 대체 글꼴 폭으로 나눈 장이 남지 않는다
+    const refit = () => setTick((t) => t + 1);
+    document.fonts?.ready.then(refit);
+    document.fonts?.addEventListener("loadingdone", refit);
+    return () => {
+      ro.disconnect();
+      document.fonts?.removeEventListener("loadingdone", refit);
+    };
   }, []);
 
   /** k 장 textarea 가 v 로 바뀜. 뒤 장 시작 위치는 길이 차만큼 밀어 두고(조합 중에는 그대로 둠) 다시 재는 건 layout effect 몫 */
@@ -228,11 +236,11 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
                   setTick((t) => t + 1);
                 }}
                 onKeyDown={onKey(i)}
-                className={`absolute resize-none overflow-hidden border-0 bg-transparent p-0 text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 ${PEN}`}
+                className={`absolute resize-none overflow-hidden border-0 bg-transparent p-0 text-ink outline-none ${WRAP} placeholder:text-ink-3 ${PEN}`}
                 style={bodyBox(top, LINES_PER_PAGE - top)}
               />
             ) : (
-              <div className={`absolute overflow-hidden whitespace-pre-wrap text-ink [overflow-wrap:break-word] ${PEN}`} style={bodyBox(top, LINES_PER_PAGE - top)}>
+              <div className={`absolute overflow-hidden text-ink ${WRAP} ${PEN}`} style={bodyBox(top, LINES_PER_PAGE - top)}>
                 {slice.replace(/^\n+/, "")}
               </div>
             )}
@@ -248,7 +256,7 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
               <div
                 ref={mirrorRef}
                 aria-hidden="true"
-                className={`pointer-events-none invisible absolute top-0 whitespace-pre-wrap [overflow-wrap:break-word] ${PEN}`}
+                className={`pointer-events-none invisible absolute top-0 ${WRAP} ${PEN}`}
                 style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
               />
             )}
