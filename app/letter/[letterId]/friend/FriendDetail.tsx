@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { LetterBody } from "../story/StoryDetail";
-import LetterSheet from "@/components/LetterSheet";
+import LetterPages from "@/components/LetterPages";
+import { letterText } from "@/lib/letterText";
 import AuthorRequests from "./AuthorRequests";
 import { AuthorActions, ReaderActions } from "./FriendActions";
 import RequestForm from "./RequestForm";
@@ -28,7 +28,7 @@ export default function FriendDetail({ letter }: { letter: FriendLetter }) {
   const isAuthor = !!letter.isAuthor;
   const title = letter.ogTitle || letter.title || "당신에게 도착한 편지";
   const canRequest = !isAuthor && letter.authorSettings.allowPhysicalRequests;
-  const envelope = `${ENVELOPE_NAME[letter.envelope ?? ""] ?? "성수"} 봉투`;
+  const envelope = `${ENVELOPE_NAME[letter.envelope ?? ""] ?? "레터"} 봉투`;
 
   return (
     <main className="flex flex-col">
@@ -40,12 +40,13 @@ export default function FriendDetail({ letter }: { letter: FriendLetter }) {
       </section>
 
       <section className={`${WRAP} flex flex-col items-center pb-16 mobile-down:pb-10 mobile-down:pt-4`}>
-        <LetterSheet label="마음 편지">
-          <span className="stampbox absolute -top-4 left-7 bg-paper text-airblue mobile-down:left-4 mobile-down:text-[22px]">마음 편지</span>
-          <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {letter.recipientName || "당신"}</p>
-          <LetterBody content={letter.content} contentType={letter.contentType} />
-          <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {letter.senderName || "익명"}</p>
-        </LetterSheet>
+        <LetterPages
+          label="마음 편지"
+          stamp={<span className="stampbox absolute -top-4 left-7 bg-paper text-airblue mobile-down:left-4 mobile-down:text-[22px]">마음 편지</span>}
+          to={`To. ${letter.recipientName || "당신"}`}
+          text={letterText(letter.content, letter.contentType)}
+          from={`From. ${letter.senderName || "익명"}`}
+        />
 
         {isAuthor ? <AuthorActions letterId={letter._id} /> : <ReaderActions letterId={letter._id} canRequest={canRequest} />}
       </section>

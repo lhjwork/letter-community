@@ -207,22 +207,6 @@ body {
   transform: rotate(-2deg);
   letter-spacing: 0.02em;
 }
-/* 편지지(/v8/letter-paper.png)를 머리·본문 9줄·꼬리로 잘라 이어 붙인다. 본문이 길면 본문 띠가 반복된다.
-   수치는 쓰기 화면(WriteForm PAPER)과 같다. cqw 는 감싼 @container(LetterSheet) 폭 기준 */
-.letter-sheet {
-  --line: 7.9306cqw;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 140.5556cqw;
-  padding: 29.9167cqw 9.7222cqw 23.4306cqw 9.5833cqw;
-  line-height: var(--line);
-  background:
-    url(/v8/paper-head.png) top / 100% auto no-repeat,
-    url(/v8/paper-tail.png) bottom / 100% auto no-repeat,
-    url(/v8/paper-body.png) 0 37.8056cqw / 100% auto repeat-y,
-    var(--paper);
-}
 .paper {
   position: relative;
   background-color: var(--paper);
@@ -886,4 +870,17 @@ body {
 .story-lined h3 {
   line-height: 48px;
   margin: 0;
+}
+
+/* 편지지 넘기기(LetterPages). 다음 장은 오른쪽에서, 앞 장은 왼쪽에서 종이를 넘기듯 펼쳐진다 */
+@keyframes page-turn-next {
+  from { opacity: 0; transform: perspective(1800px) rotateY(-16deg) translateX(6%); }
+}
+@keyframes page-turn-prev {
+  from { opacity: 0; transform: perspective(1800px) rotateY(16deg) translateX(-6%); }
+}
+.page-turn-next { transform-origin: left center; animation: page-turn-next 0.35s ease-out; }
+.page-turn-prev { transform-origin: right center; animation: page-turn-prev 0.35s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-next, .page-turn-prev { animation: none; }
 }

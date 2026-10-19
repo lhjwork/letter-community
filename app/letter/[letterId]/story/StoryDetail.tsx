@@ -1,6 +1,7 @@
 import Link from "next/link";
 import JumpLink from "@/components/ui/JumpLink";
-import LetterSheet from "@/components/LetterSheet";
+import LetterPages from "@/components/LetterPages";
+import { letterText } from "@/lib/letterText";
 import type { StoryComment, StoryReply } from "@/lib/api";
 import { seoulParts } from "@/lib/seoulDate";
 import Comments from "./Comments";
@@ -30,7 +31,7 @@ type Props = {
 
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
-/** v8-StoryDetail / M-StoryDetail. 편지지(LetterSheet) 괘선 위에 모든 줄이 앉는다 */
+/** v8-StoryDetail / M-StoryDetail. 실물 편지지(LetterPages) 괘선 위에 모든 줄이 앉는다 */
 export default function StoryDetail({ story, replies, comments }: Props) {
   const p = seoulParts(story.createdAt);
   // 사연은 레터에게 남긴다. 예전 사연은 적힌 받는 사람 그대로
@@ -48,13 +49,14 @@ export default function StoryDetail({ story, replies, comments }: Props) {
 
       <section className={`${WRAP} flex flex-wrap items-start gap-10 pb-12 pt-3 mobile-down:gap-0 mobile-down:pb-8 mobile-down:pt-4`}>
         <div className="flex min-w-0 flex-[1_1_560px] flex-col gap-3 mobile-down:flex-[1_1_100%]">
-          <LetterSheet label="사연 편지">
-            <span className="stampbox absolute -top-4 left-7 bg-paper text-brick mobile-down:left-4 mobile-down:text-[22px]">사연 편지</span>
-            <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {to}</p>
-            {story.title && <h1 className="m-0 font-pen text-[30px] font-normal mobile-down:text-[22px]">{story.title}</h1>}
-            <LetterBody content={story.content} contentType={story.contentType} />
-            <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {story.senderName || "익명"}</p>
-          </LetterSheet>
+          <LetterPages
+            label="사연 편지"
+            stamp={<span className="stampbox absolute -top-4 left-7 bg-paper text-brick mobile-down:left-4 mobile-down:text-[22px]">사연 편지</span>}
+            to={`To. ${to}`}
+            title={story.title && <h1 className="m-0 truncate text-[length:inherit] font-normal leading-[inherit]">{story.title}</h1>}
+            text={letterText(story.content, story.contentType)}
+            from={`From. ${story.senderName || "익명"}`}
+          />
           <div className="flex max-w-[720px] flex-wrap items-center justify-between gap-2">
             <span className="chip min-h-7 px-2.5 text-base mobile-down:text-[15px]">{story.category || "기타"}</span>
             <span className="inline-flex items-center gap-2.5">
@@ -106,21 +108,4 @@ export default function StoryDetail({ story, replies, comments }: Props) {
       )}
     </main>
   );
-}
-
-/** textarea 원문은 빈 줄로 단락을 나눠 한 줄 간격, 예전 HTML(TipTap) 글은 p 를 줄에 앉힌다. 사연·마음 편지 공용 */
-export function LetterBody({ content, contentType }: { content: string; contentType?: "text" | "html" }) {
-  if (contentType === "text") {
-    const paras = content.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
-    return (
-      <>
-        {paras.map((para, i) => (
-          <p key={i} className={`m-0 whitespace-pre-line font-pen text-[26px] mobile-down:text-[20px] ${i > 0 ? "mt-(--line)" : ""}`}>
-            {para}
-          </p>
-        ))}
-      </>
-    );
-  }
-  return <div className="font-pen text-[26px] mobile-down:text-[20px] [&_p+p]:mt-(--line) [&_p:empty]:hidden [&_p]:m-0" dangerouslySetInnerHTML={{ __html: content }} />;
 }

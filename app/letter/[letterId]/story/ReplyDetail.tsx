@@ -1,10 +1,10 @@
 import Link from "next/link";
-import LetterSheet from "@/components/LetterSheet";
+import LetterPages from "@/components/LetterPages";
 import JumpLink from "@/components/ui/JumpLink";
 import { RequestSteps } from "@/app/letter-box/parts";
 import { seoulParts } from "@/lib/seoulDate";
 import RequestForm from "../friend/RequestForm";
-import { LetterBody } from "./StoryDetail";
+import { letterText } from "@/lib/letterText";
 import { CopyLinkButton } from "./StoryActions";
 
 export type ReplyLetter = {
@@ -25,7 +25,7 @@ export type ReplyLetter = {
 
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
-/** 사연에 달린 답장 한 통을 끝까지 읽는 화면. 사연과 같은 편지지(LetterSheet).
+/** 사연에 달린 답장 한 통을 끝까지 읽는 화면. 사연과 같은 편지지(LetterPages).
  * 사연자 본인에게만 레터 답장·채택 답장을 실물 편지로 받는 신청(#request). 다른 사람에게는 아무것도 안 보인다 */
 export default function ReplyDetail({ reply }: { reply: ReplyLetter }) {
   const p = seoulParts(reply.createdAt);
@@ -48,12 +48,13 @@ export default function ReplyDetail({ reply }: { reply: ReplyLetter }) {
             ‘{reply.replyTo.title}’에 온 답장
           </h1>
         )}
-        <LetterSheet label={stamp[0]}>
-          <span className={`stampbox absolute -top-4 left-7 bg-paper mobile-down:left-4 mobile-down:text-[22px] ${stamp[1]}`}>{stamp[0]}</span>
-          <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {reply.recipientName || "사연을 보낸 분께"}</p>
-          <LetterBody content={reply.content} contentType={reply.contentType} />
-          <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {from}</p>
-        </LetterSheet>
+        <LetterPages
+          label={stamp[0]}
+          stamp={<span className={`stampbox absolute -top-4 left-7 bg-paper mobile-down:left-4 mobile-down:text-[22px] ${stamp[1]}`}>{stamp[0]}</span>}
+          to={`To. ${reply.recipientName || "사연을 보낸 분께"}`}
+          text={letterText(reply.content, reply.contentType)}
+          from={`From. ${from}`}
+        />
         <p className="m-0 mt-3 w-full max-w-[720px] text-right font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:text-[11px]">
           {p.mm}.{p.dd} · {p.wd}
         </p>

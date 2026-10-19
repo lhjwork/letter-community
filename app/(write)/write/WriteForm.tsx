@@ -2,7 +2,7 @@
 
 import { track } from "@/lib/analytics/ga";
 import { showAlert } from "@/components/ui/AppAlert";
-import { useState, useEffect, useLayoutEffect, useRef, useCallback, type CSSProperties } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,51 +12,24 @@ import { getDraft } from "@/lib/draft-api";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import ShareModal from "@/components/ShareModal";
-import LetterSheet from "@/components/LetterSheet";
+import LetterPages, { LINES_PER_PAGE } from "@/components/LetterPages";
+import { htmlToText } from "@/lib/letterText";
 import type { DraftLetter } from "@/types/draft";
 
 type Kind = "story" | "friend";
 type Envelope = "seongsu" | "myeongdong" | "letter";
 
 const CATEGORIES = ["위로", "가족", "감사", "사랑", "성장", "우정", "추억", "기타"] as const;
-const ENVELOPES: { id: Envelope; name: string; src: string }[] = [
-  { id: "seongsu", name: "성수", src: "/v8/envelope-seongsu.png" },
-  { id: "myeongdong", name: "명동", src: "/v8/envelope-myeongdong.png" },
-  { id: "letter", name: "레터", src: "/v8/envelope-letter.png" },
+// soon: 실물 봉투 제작 중이라 아직 고를 수 없다
+const ENVELOPES: { id: Envelope; name: string; src: string; soon?: boolean }[] = [
+  { id: "letter", name: "레터", src: "/v8/envelope-letter-logo.png" },
+  { id: "seongsu", name: "성수", src: "/v8/envelope-seongsu.png", soon: true },
+  { id: "myeongdong", name: "명동", src: "/v8/envelope-myeongdong.png", soon: true },
 ];
 export const CONTENT_MAX = 2000;
 
-/* 편지지 기하. 보드 720×1012 기준, 모두 편지지 폭(cqw) 비율로 두어 358px 에서도 같은 코드 */
-const LINES_PER_PAGE = 9;
-const PAPER = {
-  sheet: 1012 / 7.2, // 140.56cqw
-  line: 57.1 / 7.2, // 7.93cqw = 괘선 간격
-  padL: 69 / 7.2,
-  padR: 70 / 7.2,
-  toTop: 215.4 / 7.2,
-  bodyTop: 272.2 / 7.2,
-  fromLeft: 130 / 7.2,
-};
-const PAGE_BODY = PAPER.line * LINES_PER_PAGE; // 71.375cqw
-const TAIL = PAPER.sheet - PAPER.bodyTop - PAGE_BODY; // From. 줄 + 아래 여백
-const cq = (n: number) => `${n.toFixed(4)}cqw`;
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 const LEGEND = "mb-3 w-full border-b-2 border-ink p-0 font-pen text-[26px] mobile-down:text-2xl";
-
-/** 예전 HTML(TipTap) 편지·임시저장을 textarea 에 넣기 위한 변환. 응답 contentType 이 html 일 때만 부른다 */
-function htmlToText(s: string) {
-  return s
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|div|li|h[1-6]|blockquote)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
 
 export default function WriteForm() {
   const router = useRouter();
@@ -71,73 +44,21 @@ export default function WriteForm() {
   const [to, setTo] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<string>("위로");
-  const [envelope, setEnvelope] = useState<Envelope>("seongsu");
+  const [envelope, setEnvelope] = useState<Envelope>("letter");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [pages, setPages] = useState(1);
-  const [lines, setLines] = useState(1);
   const [dirty, setDirty] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(!!draftId || !!editId);
   const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(draftId ?? undefined);
   const [share, setShare] = useState<{ url: string; title: string; to?: string } | null>(null);
 
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const mirrorRef = useRef<HTMLDivElement>(null);
-  // 입력 전에 줄 수를 미리 재는 빈 상자(React 가 자식을 관리하지 않으니 textContent 를 바꿔도 된다)
-  const probeRef = useRef<HTMLDivElement>(null);
-  const lastWarn = useRef(0);
-  const lastFit = useRef(""); // 마지막으로 9줄 안에 들었던 본문(한글 조합이 끝났을 때 되돌릴 값)
-  const warnFull = () => {
-    if (Date.now() - lastWarn.current < 2500) return;
-    lastWarn.current = Date.now();
-    showAlert(`편지지 한 장은 본문 ${LINES_PER_PAGE}줄까지예요.`, { tone: "error" });
-  };
-  const countLines = (text: string) => {
-    const p = probeRef.current;
-    if (!p) return 1;
-    p.textContent = text + "\u200b";
-    const lineH = parseFloat(getComputedStyle(p).lineHeight) || 1;
-    return Math.max(1, Math.round(p.offsetHeight / lineH));
-  };
-
-  /* 줄 수 → 장 수. textarea 와 같은 폭·폰트·줄간격의 숨은 mirror div 높이만 읽는다(DOM 을 바꾸지 않으니 리사이즈 루프 없음) */
-  const measure = useCallback(() => {
-    const m = mirrorRef.current;
-    if (!m) return;
-    const lineH = parseFloat(getComputedStyle(m).lineHeight) || 1;
-    const n = Math.max(1, Math.round(m.offsetHeight / lineH));
-    const next = Math.max(1, Math.ceil(n / LINES_PER_PAGE));
-    setLines((l) => (l === n ? l : n));
-    setPages((p) => (p === next ? p : next));
-  }, []);
-
-  useLayoutEffect(measure, [measure, content, kind]);
-  // 편지지 폭이 바뀔 때만(높이 변화는 무시) rAF 한 번으로 다시 잰다
-  useEffect(() => {
-    const sheet = sheetRef.current;
-    if (!sheet) return;
-    let width = sheet.clientWidth;
-    let raf = 0;
-    const ro = new ResizeObserver(() => {
-      if (sheet.clientWidth === width) return;
-      width = sheet.clientWidth;
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(measure);
-    });
-    ro.observe(sheet);
-    return () => {
-      ro.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [measure, kind]); // 사연 ↔ 마음 편지 전환 때 편지지가 새로 붙는다
-
   const applyDraft = useCallback((d: DraftLetter) => {
     setTitle(d.title ?? "");
-    lastFit.current = (d.contentType === "html" ? htmlToText(d.content ?? "") : (d.content ?? "")).slice(0, CONTENT_MAX);
-    setContent(lastFit.current);
+    setContent((d.contentType === "html" ? htmlToText(d.content ?? "") : (d.content ?? "")).slice(0, CONTENT_MAX));
     if (d.type === "story" || d.type === "friend") setKind(d.type);
     if (d.category && (CATEGORIES as readonly string[]).includes(d.category)) setCategory(d.category);
-    if (d.envelope) setEnvelope(d.envelope);
+    if (d.envelope && !ENVELOPES.find((e) => e.id === d.envelope)?.soon) setEnvelope(d.envelope);
     if (typeof d.isAnonymous === "boolean") setIsAnonymous(d.isAnonymous);
     setTo(d.recipientName ?? "");
     setCurrentDraftId(d._id);
@@ -167,11 +88,10 @@ export default function WriteForm() {
       try {
         const { data } = await getLetter(editId);
         setTitle(data.title ?? "");
-        lastFit.current = (data.contentType === "html" ? htmlToText(data.content ?? "") : (data.content ?? "")).slice(0, CONTENT_MAX);
-        setContent(lastFit.current);
+        setContent((data.contentType === "html" ? htmlToText(data.content ?? "") : (data.content ?? "")).slice(0, CONTENT_MAX));
         if (data.type === "story" || data.type === "friend") setKind(data.type);
         if (data.category && (CATEGORIES as readonly string[]).includes(data.category)) setCategory(data.category);
-        if (data.envelope) setEnvelope(data.envelope);
+        if (data.envelope && !ENVELOPES.find((e) => e.id === data.envelope)?.soon) setEnvelope(data.envelope);
         setIsAnonymous(data.isAnonymous ?? false); // 레거시 편지는 실명 작성
         setTo(data.recipientName ?? "");
         setDirty(false);
@@ -220,8 +140,6 @@ export default function WriteForm() {
     const body = content.trim();
     const letterTitle = title.trim();
     if (!letterTitle) return showAlert("제목을 입력해주세요.", { tone: "error" });
-    // 실물 편지지와 같은 한 장(본문 9줄). 예전에 길게 저장된 편지만 여기 걸린다
-    if (kind === "friend" && lines > LINES_PER_PAGE) return showAlert(`편지지 한 장은 본문 ${LINES_PER_PAGE}줄까지예요. ${lines - LINES_PER_PAGE}줄을 줄여 주세요.`, { tone: "error" });
     if (!body) return showAlert("내용을 입력해주세요.", { tone: "error" });
     if (body.length > CONTENT_MAX) return showAlert(`내용은 ${CONTENT_MAX}자 이내여야 합니다.`, { tone: "error" });
 
@@ -280,9 +198,6 @@ export default function WriteForm() {
     );
 
   const fromName = isStory ? (isAnonymous ? "익명" : session?.user?.name || "익명") : isAnonymous ? "익명의 당신" : session?.user?.name || "익명의 당신";
-  const bodyHeight = PAGE_BODY * pages;
-  const sheetImg = (offset: number): CSSProperties => ({ width: "100%", height: cq(PAPER.sheet), marginTop: offset ? `-${cq(offset)}` : 0, display: "block", maxWidth: "none" });
-  const penLine: CSSProperties = { lineHeight: cq(PAPER.line), height: cq(PAPER.line) };
 
   return (
     <>
@@ -331,34 +246,16 @@ export default function WriteForm() {
             <span className="text-[13px] text-ink-3">{isStory ? "사연 목록과 사연 화면에 보여요." : "제목은 목록과 링크에만 보여요."}</span>
           </label>
 
-          {isStory ? (
-            <StorySheet
-              to="레터"
-              from={fromName}
-              content={content}
-              onChange={(v) => {
-                setContent(v);
-                setDirty(true);
-              }}
-            />
-          ) : (
-            <>
-              {/* --baseline-shift: 보드 수치 그대로면 본문 기준선이 괘선에서 6px 떠서(원칙 2~4px) textarea 만 내린다. To./From. 은 정상 */}
-              <div ref={sheetRef} className="@container relative w-full max-w-[720px] shadow-[var(--paper-shadow)] [--baseline-shift:3px] mobile-down:[--baseline-shift:-2px]" aria-label="편지지" role="group">
-                {/* 편지지 그림: 머리 / 본문 띠(장 수만큼) / 꼬리. 띠를 이어 붙여 괘선이 끊기지 않게 */}
-                <div className="overflow-hidden" style={{ height: cq(PAPER.bodyTop) }} aria-hidden="true">
-                  <Image src="/v8/letter-paper.png" alt="" width={1024} height={1440} priority style={sheetImg(0)} />
-                </div>
-                {Array.from({ length: pages }, (_, i) => (
-                  <div key={i} className="overflow-hidden" style={{ height: cq(PAGE_BODY) }} aria-hidden="true">
-                    <Image src="/v8/letter-paper.png" alt="" width={1024} height={1440} style={sheetImg(PAPER.bodyTop)} />
-                  </div>
-                ))}
-                <div className="overflow-hidden" style={{ height: cq(TAIL) }} aria-hidden="true">
-                  <Image src="/v8/letter-paper.png" alt="" width={1024} height={1440} style={sheetImg(PAPER.bodyTop + PAGE_BODY)} />
-                </div>
-
-                <label htmlFor="to" className="absolute flex items-baseline gap-2 font-pen text-[26px] text-brick mobile-down:text-xl" style={{ ...penLine, left: cq(PAPER.padL), right: cq(PAPER.padR), top: cq(PAPER.toTop) }}>
+          <label htmlFor="body" className="sr-only">
+            {isStory ? "사연" : "내용"}
+          </label>
+          <LetterPages
+            label={isStory ? "사연 종이" : "편지지"}
+            to={
+              isStory ? (
+                "To. 레터"
+              ) : (
+                <label htmlFor="to" className="flex min-w-0 flex-1 items-baseline gap-2">
                   To.
                   <input
                     id="to"
@@ -370,81 +267,33 @@ export default function WriteForm() {
                       setTo(e.target.value);
                       setDirty(true);
                     }}
-                    className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
-                    style={penLine}
+                    className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] leading-[inherit] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
                   />
                 </label>
-                <label htmlFor="body" className="sr-only">
-                  내용
-                </label>
-                {/* 측정용 mirror: textarea 와 같은 폭·폰트·줄바꿈 규칙 */}
-                <div
-                  ref={mirrorRef}
-                  aria-hidden="true"
-                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-xl"
-                  style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
-                >
-                  {content}
-                  {"\u200b"}
-                </div>
-                <div
-                  ref={probeRef}
-                  aria-hidden="true"
-                  className="pointer-events-none invisible absolute top-0 whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-xl"
-                  style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
-                />
-                <textarea
-                  id="body"
-                  placeholder="여기에 당신의 마음을 담아주세요..."
-                  maxLength={CONTENT_MAX}
-                  value={content}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setDirty(true);
-                    // 한글 조합 중에는 막지 않는다(막으면 글자가 깨짐). 조합이 끝나면 onCompositionEnd 에서 판정
-                    if ((e.nativeEvent as InputEvent).isComposing) return setContent(v);
-                    // 실물 편지지와 똑같이 본문 9줄(To 1 + 본문 9 + From 1 = 11줄)을 넘는 입력은 받지 않는다. 지우는 건 언제나 허용
-                    if (v.length > content.length && countLines(v) > LINES_PER_PAGE) return warnFull();
-                    lastFit.current = v;
-                    setContent(v);
-                  }}
-                  onCompositionEnd={(e) => {
-                    const v = e.currentTarget.value;
-                    if (countLines(v) > LINES_PER_PAGE) {
-                      setContent(lastFit.current);
-                      warnFull();
-                    } else lastFit.current = v;
-                  }}
-                  className="absolute resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] [--mobile-fs:20px] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
-                  style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), top: `calc(${cq(PAPER.bodyTop)} + var(--baseline-shift))`, height: cq(bodyHeight), lineHeight: cq(PAPER.line) }}
-                  required
-                />
-                <p className="absolute m-0 text-right font-pen text-[26px] text-ink-2 mobile-down:text-xl" style={{ ...penLine, left: cq(PAPER.fromLeft), right: cq(PAPER.padR), top: cq(PAPER.bodyTop + bodyHeight) }}>
-                  From. {fromName}
-                </p>
-              </div>
-
-              <div className="flex max-w-[720px] flex-wrap items-center justify-end gap-3">
-                <span className="flex items-center gap-2.5">
-                  <span className={`badge ${lines > LINES_PER_PAGE ? "bg-brick" : "bg-ink"}`}>
-                    {Math.min(lines, 99)} / {LINES_PER_PAGE}줄
-                  </span>
-                  <span className="font-anton text-[13px] tracking-[0.1em] text-ink-3" aria-live="polite">
-                    {content.length} / {CONTENT_MAX}
-                  </span>
-                </span>
-              </div>
-              <p className="m-0 max-w-[720px] text-sm leading-[1.7] text-ink-2">편지지 한 장, 본문 9줄까지 써요. 실물 편지도 같은 줄로 옮겨 적어요.</p>
-            </>
-          )}
-          {isStory && (
-            <div className="flex max-w-[720px] flex-wrap items-center justify-between gap-3">
-              <p className="m-0 text-sm leading-[1.7] text-ink-2">길어지면 아래로 이어져요.</p>
+              )
+            }
+            from={`From. ${fromName}`}
+            text={content}
+            onPages={setPages}
+            edit={{
+              id: "body",
+              placeholder: isStory ? "털어놓고 싶은 이야기를 적어 주세요." : "여기에 당신의 마음을 담아주세요...",
+              maxLength: CONTENT_MAX,
+              onChange: (v) => {
+                setContent(v);
+                setDirty(true);
+              },
+            }}
+          />
+          <div className="flex max-w-[720px] flex-wrap items-center justify-between gap-3">
+            <p className="m-0 text-sm leading-[1.7] text-ink-2">한 장에 본문 {LINES_PER_PAGE}줄, 넘치면 다음 장으로 이어져요.</p>
+            <span className="flex items-center gap-2.5">
+              <span className="badge bg-ink">{pages}장</span>
               <span className="font-anton text-[13px] tracking-[0.1em] text-ink-3" aria-live="polite">
                 {content.length} / {CONTENT_MAX}
               </span>
-            </div>
-          )}
+            </span>
+          </div>
         </div>
 
         {/* 마음 · 봉투 · 익명 */}
@@ -466,12 +315,13 @@ export default function WriteForm() {
               <legend className={LEGEND}>어떤 봉투에 담을까요</legend>
               <div className="flex flex-wrap gap-3 px-0.5 py-1">
                 {ENVELOPES.map((env) => (
-                  <label key={env.id} className="swatch">
-                    <input type="radio" name="envelope" value={env.id} checked={envelope === env.id} onChange={() => setEnvelope(env.id)} className="sr-only" />
+                  <label key={env.id} className={`swatch ${env.soon ? "cursor-not-allowed" : ""}`}>
+                    <input type="radio" name="envelope" value={env.id} checked={envelope === env.id} disabled={env.soon} onChange={() => setEnvelope(env.id)} className="sr-only" />
                     <span className="pv h-[98px] w-[140px] mobile-down:h-[105px] mobile-down:w-[150px]">
-                      <Image src={env.src} alt={`${env.name} 봉투`} width={504} height={352} className="block h-full w-full object-cover" />
+                      <Image src={env.src} alt={`${env.name} 봉투`} width={504} height={352} className={`block h-full w-full object-cover ${env.soon ? "opacity-40 grayscale" : ""}`} />
+                      {env.soon && <span className="badge absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-ink">제작 중</span>}
                     </span>
-                    <span className="nm">{env.name}</span>
+                    <span className={`nm ${env.soon ? "text-ink-3!" : ""}`}>{env.name}</span>
                   </label>
                 ))}
               </div>
@@ -504,34 +354,5 @@ export default function WriteForm() {
         <ShareModal isOpen={!!share} onClose={closeShare} letterUrl={share?.url || ""} letterTitle={share?.title || ""} recipientName={share?.to} />
       </form>
     </>
-  );
-}
-
-/** 사연 쓰기 종이. 사연 상세와 같은 편지지(LetterSheet) 위에 To./본문/From. 이 줄마다 앉는다.
- * 높이는 같은 칸에 겹친 숨은 mirror 가 정하고 textarea 는 그 칸을 채운다(JS 측정 없음) */
-function StorySheet({ to, from, content, onChange }: { to: string; from: string; content: string; onChange: (v: string) => void }) {
-  return (
-    <LetterSheet label="사연 종이">
-      <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {to}</p>
-      <label htmlFor="body" className="sr-only">
-        사연
-      </label>
-      <div className="grid min-h-[calc(var(--line)*9)] [grid-template-areas:'s'] *:[grid-area:s]">
-        <div aria-hidden="true" className="invisible whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-[20px]">
-          {content}
-          {"\u200b"}
-        </div>
-        <textarea
-          id="body"
-          placeholder="털어놓고 싶은 이야기를 적어 주세요."
-          maxLength={CONTENT_MAX}
-          value={content}
-          onChange={(e) => onChange(e.target.value)}
-          className="block h-full w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] leading-(--line) [--mobile-fs:20px] text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-          required
-        />
-      </div>
-      <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {from}</p>
-    </LetterSheet>
   );
 }
