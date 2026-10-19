@@ -12,6 +12,7 @@ import { getDraft } from "@/lib/draft-api";
 import { useDraftManualSave } from "@/hooks/useDraftManualSave";
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import ShareModal from "@/components/ShareModal";
+import LetterSheet from "@/components/LetterSheet";
 import type { DraftLetter } from "@/types/draft";
 
 type Kind = "story" | "friend";
@@ -505,17 +506,17 @@ export default function WriteForm() {
   );
 }
 
-/** 사연 쓰기 종이. 사연 상세와 같은 paper·ruled(괘선 36px) 위에 To./본문/From. 이 줄마다 앉는다.
+/** 사연 쓰기 종이. 사연 상세와 같은 편지지(LetterSheet) 위에 To./본문/From. 이 줄마다 앉는다.
  * 높이는 같은 칸에 겹친 숨은 mirror 가 정하고 textarea 는 그 칸을 채운다(JS 측정 없음) */
 function StorySheet({ to, from, content, onChange }: { to: string; from: string; content: string; onChange: (v: string) => void }) {
   return (
-    <div className="paper ruled flex w-full max-w-[720px] flex-col px-14 py-[72px] mobile-down:px-5 mobile-down:py-9" role="group" aria-label="사연 종이">
-      <p className="m-0 font-pen text-[28px] leading-9 text-brick mobile-down:text-2xl">To. {to}</p>
+    <LetterSheet label="사연 종이">
+      <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {to}</p>
       <label htmlFor="body" className="sr-only">
         사연
       </label>
-      <div className="grid min-h-[324px] [grid-template-areas:'s'] *:[grid-area:s]">
-        <div aria-hidden="true" className="invisible whitespace-pre-wrap font-pen text-[26px] leading-9 [overflow-wrap:break-word] mobile-down:text-2xl">
+      <div className="grid min-h-[calc(var(--line)*9)] [grid-template-areas:'s'] *:[grid-area:s]">
+        <div aria-hidden="true" className="invisible whitespace-pre-wrap font-pen text-[26px] [overflow-wrap:break-word] mobile-down:text-[20px]">
           {content}
           {"\u200b"}
         </div>
@@ -525,11 +526,11 @@ function StorySheet({ to, from, content, onChange }: { to: string; from: string;
           maxLength={CONTENT_MAX}
           value={content}
           onChange={(e) => onChange(e.target.value)}
-          className="block h-full w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] leading-9 [--mobile-fs:24px] text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className="block h-full w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-pen text-[26px] leading-(--line) [--mobile-fs:20px] text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           required
         />
       </div>
-      <p className="m-0 mt-9 self-end font-pen text-[26px] leading-9 text-ink-2 mobile-down:text-2xl">From. {from}</p>
-    </div>
+      <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {from}</p>
+    </LetterSheet>
   );
 }

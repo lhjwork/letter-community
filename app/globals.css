@@ -207,6 +207,22 @@ body {
   transform: rotate(-2deg);
   letter-spacing: 0.02em;
 }
+/* 편지지(/v8/letter-paper.png)를 머리·본문 9줄·꼬리로 잘라 이어 붙인다. 본문이 길면 본문 띠가 반복된다.
+   수치는 쓰기 화면(WriteForm PAPER)과 같다. cqw 는 감싼 @container(LetterSheet) 폭 기준 */
+.letter-sheet {
+  --line: 7.9306cqw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 140.5556cqw;
+  padding: 29.9167cqw 9.7222cqw 23.4306cqw 9.5833cqw;
+  line-height: var(--line);
+  background:
+    url(/v8/paper-head.png) top / 100% auto no-repeat,
+    url(/v8/paper-tail.png) bottom / 100% auto no-repeat,
+    url(/v8/paper-body.png) 0 37.8056cqw / 100% auto repeat-y,
+    var(--paper);
+}
 .paper {
   position: relative;
   background-color: var(--paper);

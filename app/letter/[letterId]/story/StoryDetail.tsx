@@ -1,5 +1,6 @@
 import Link from "next/link";
 import JumpLink from "@/components/ui/JumpLink";
+import LetterSheet from "@/components/LetterSheet";
 import type { StoryComment, StoryReply } from "@/lib/api";
 import { seoulParts } from "@/lib/seoulDate";
 import Comments from "./Comments";
@@ -29,7 +30,7 @@ type Props = {
 
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
-/** v8-StoryDetail / M-StoryDetail. 괘선 36px 위에 모든 줄이 앉는다 */
+/** v8-StoryDetail / M-StoryDetail. 편지지(LetterSheet) 괘선 위에 모든 줄이 앉는다 */
 export default function StoryDetail({ story, replies, comments }: Props) {
   const p = seoulParts(story.createdAt);
   // 사연은 레터에게 남긴다. 예전 사연은 적힌 받는 사람 그대로
@@ -46,17 +47,15 @@ export default function StoryDetail({ story, replies, comments }: Props) {
       </section>
 
       <section className={`${WRAP} flex flex-wrap items-start gap-10 pb-12 pt-3 mobile-down:gap-0 mobile-down:pb-8 mobile-down:pt-4`}>
-        <article className="paper ruled flex min-w-0 flex-[1_1_560px] -rotate-[0.4deg] flex-col px-14 py-[72px] mobile-down:flex-[1_1_100%] mobile-down:px-5 mobile-down:py-9">
-          <span className="stampbox absolute -top-4 left-7 bg-paper text-brick mobile-down:left-4 mobile-down:text-[22px]">사연 편지</span>
-          <span aria-hidden="true" className="post absolute right-8 top-7 h-[72px] w-[72px] rotate-[12deg] text-[11px] mobile-down:right-4 mobile-down:top-4 mobile-down:h-[60px] mobile-down:w-[60px] mobile-down:text-[9px]">
-            SEOUL<span className="text-[15px] mobile-down:text-[13px]">26</span>
-            {p.mm}.{p.dd}
-          </span>
-          <p className="m-0 font-pen text-[28px] leading-9 text-brick mobile-down:text-2xl">To. {to}</p>
-          {story.title && <h1 className="relative -top-0.5 m-0 font-pen text-[34px] font-normal leading-9 mobile-down:text-[32px]">{story.title}</h1>}
-          <LetterBody content={story.content} contentType={story.contentType} />
-          <p className="m-0 mt-9 self-end font-pen text-[26px] leading-9 text-ink-2 mobile-down:text-2xl">From. {story.senderName || "익명"}</p>
-          <div className="mt-9 flex h-9 flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-[1_1_560px] flex-col gap-3 mobile-down:flex-[1_1_100%]">
+          <LetterSheet label="사연 편지">
+            <span className="stampbox absolute -top-4 left-7 bg-paper text-brick mobile-down:left-4 mobile-down:text-[22px]">사연 편지</span>
+            <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {to}</p>
+            {story.title && <h1 className="m-0 font-pen text-[30px] font-normal mobile-down:text-[22px]">{story.title}</h1>}
+            <LetterBody content={story.content} contentType={story.contentType} />
+            <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {story.senderName || "익명"}</p>
+          </LetterSheet>
+          <div className="flex max-w-[720px] flex-wrap items-center justify-between gap-2">
             <span className="chip min-h-7 px-2.5 text-base mobile-down:text-[15px]">{story.category || "기타"}</span>
             <span className="inline-flex items-center gap-2.5">
               <span className="font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:text-[11px]">
@@ -67,7 +66,7 @@ export default function StoryDetail({ story, replies, comments }: Props) {
               </JumpLink>
             </span>
           </div>
-        </article>
+        </div>
 
         <aside className="flex min-w-0 flex-[0_1_320px] flex-col gap-5 mobile-down:mt-8 mobile-down:flex-[1_1_100%] mobile-down:flex-row mobile-down:gap-2.5">
           {!mine && <ReplyCta storyId={story._id} className="btn btn-brick min-h-14 text-[28px] mobile-down:hidden" />}
@@ -109,19 +108,19 @@ export default function StoryDetail({ story, replies, comments }: Props) {
   );
 }
 
-/** textarea 원문은 빈 줄로 단락을 나눠 36px 간격, 예전 HTML(TipTap) 글은 p 를 줄에 앉힌다. 사연·마음 편지 공용 */
+/** textarea 원문은 빈 줄로 단락을 나눠 한 줄 간격, 예전 HTML(TipTap) 글은 p 를 줄에 앉힌다. 사연·마음 편지 공용 */
 export function LetterBody({ content, contentType }: { content: string; contentType?: "text" | "html" }) {
   if (contentType === "text") {
     const paras = content.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
     return (
       <>
         {paras.map((para, i) => (
-          <p key={i} className={`m-0 whitespace-pre-line font-pen text-[26px] leading-9 mobile-down:text-2xl ${i > 0 ? "mt-9" : ""}`}>
+          <p key={i} className={`m-0 whitespace-pre-line font-pen text-[26px] mobile-down:text-[20px] ${i > 0 ? "mt-(--line)" : ""}`}>
             {para}
           </p>
         ))}
       </>
     );
   }
-  return <div className="font-pen text-[26px] leading-9 mobile-down:text-2xl [&_p+p]:mt-9 [&_p:empty]:hidden [&_p]:m-0 [&_p]:leading-9" dangerouslySetInnerHTML={{ __html: content }} />;
+  return <div className="font-pen text-[26px] mobile-down:text-[20px] [&_p+p]:mt-(--line) [&_p:empty]:hidden [&_p]:m-0" dangerouslySetInnerHTML={{ __html: content }} />;
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { seoulParts } from "@/lib/seoulDate";
 import { LetterBody } from "../story/StoryDetail";
+import LetterSheet from "@/components/LetterSheet";
 import AuthorRequests from "./AuthorRequests";
 import { AuthorActions, ReaderActions } from "./FriendActions";
 import RequestForm from "./RequestForm";
@@ -25,8 +25,6 @@ const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
 /** v8-LetterOpen / M-LetterOpen. 작성자에게는 같은 자리에 "내가 쓴 편지"와 수정·삭제·신청 관리 */
 export default function FriendDetail({ letter }: { letter: FriendLetter }) {
-  const p = seoulParts(letter.createdAt);
-  const yy = String(new Date(letter.createdAt).getFullYear()).slice(-2);
   const isAuthor = !!letter.isAuthor;
   const title = letter.ogTitle || letter.title || "당신에게 도착한 편지";
   const canRequest = !isAuthor && letter.authorSettings.allowPhysicalRequests;
@@ -42,18 +40,12 @@ export default function FriendDetail({ letter }: { letter: FriendLetter }) {
       </section>
 
       <section className={`${WRAP} flex flex-col items-center pb-16 mobile-down:pb-10 mobile-down:pt-4`}>
-        <article className="paper ruled flex w-full max-w-[760px] -rotate-[0.4deg] flex-col px-14 py-[72px] mobile-down:px-5 mobile-down:py-9">
+        <LetterSheet label="마음 편지">
           <span className="stampbox absolute -top-4 left-7 bg-paper text-airblue mobile-down:left-4 mobile-down:text-[22px]">마음 편지</span>
-          <span aria-hidden="true" className="post absolute right-8 top-7 h-[72px] w-[72px] rotate-[12deg] text-[11px] mobile-down:right-4 mobile-down:top-4 mobile-down:h-[60px] mobile-down:w-[60px] mobile-down:text-[9px]">
-            SEOUL<span className="text-[15px] mobile-down:text-[13px]">{yy}</span>
-            {p.mm}.{p.dd}
-          </span>
-          <p className="m-0 font-pen text-[28px] leading-9 text-brick mobile-down:text-[26px]">To. {letter.recipientName || "당신"}</p>
-          <div className="mt-9">
-            <LetterBody content={letter.content} contentType={letter.contentType} />
-          </div>
-          <p className="m-0 mt-9 self-end font-pen text-[26px] leading-9 text-ink-2 mobile-down:text-2xl">From. {letter.senderName || "익명"}</p>
-        </article>
+          <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {letter.recipientName || "당신"}</p>
+          <LetterBody content={letter.content} contentType={letter.contentType} />
+          <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {letter.senderName || "익명"}</p>
+        </LetterSheet>
 
         {isAuthor ? <AuthorActions letterId={letter._id} /> : <ReaderActions letterId={letter._id} canRequest={canRequest} />}
       </section>

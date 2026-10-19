@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LetterSheet from "@/components/LetterSheet";
 import JumpLink from "@/components/ui/JumpLink";
 import { RequestSteps } from "@/app/letter-box/parts";
 import { seoulParts } from "@/lib/seoulDate";
@@ -24,7 +25,7 @@ export type ReplyLetter = {
 
 const WRAP = "mx-auto w-full max-w-[1180px] px-6 mobile-down:px-4";
 
-/** 사연에 달린 답장 한 통을 끝까지 읽는 화면. 사연 종이와 같은 괘선 36px 리듬.
+/** 사연에 달린 답장 한 통을 끝까지 읽는 화면. 사연과 같은 편지지(LetterSheet).
  * 사연자 본인에게만 레터 답장·채택 답장을 실물 편지로 받는 신청(#request). 다른 사람에게는 아무것도 안 보인다 */
 export default function ReplyDetail({ reply }: { reply: ReplyLetter }) {
   const p = seoulParts(reply.createdAt);
@@ -47,19 +48,15 @@ export default function ReplyDetail({ reply }: { reply: ReplyLetter }) {
             ‘{reply.replyTo.title}’에 온 답장
           </h1>
         )}
-        <article className="paper ruled flex w-full max-w-[760px] -rotate-[0.4deg] flex-col px-14 py-[72px] mobile-down:px-5 mobile-down:py-9">
+        <LetterSheet label={stamp[0]}>
           <span className={`stampbox absolute -top-4 left-7 bg-paper mobile-down:left-4 mobile-down:text-[22px] ${stamp[1]}`}>{stamp[0]}</span>
-          <span aria-hidden="true" className="post absolute right-8 top-7 h-[72px] w-[72px] rotate-[12deg] text-[11px] mobile-down:right-4 mobile-down:top-4 mobile-down:h-[60px] mobile-down:w-[60px] mobile-down:text-[9px]">
-            SEOUL<span className="text-[15px] mobile-down:text-[13px]">{String(new Date(reply.createdAt).getFullYear()).slice(-2)}</span>
-            {p.mm}.{p.dd}
-          </span>
-          <p className="m-0 font-pen text-[28px] leading-9 text-brick mobile-down:text-2xl">To. {reply.recipientName || "사연을 보낸 분께"}</p>
+          <p className="m-0 font-pen text-[26px] text-brick mobile-down:text-[20px]">To. {reply.recipientName || "사연을 보낸 분께"}</p>
           <LetterBody content={reply.content} contentType={reply.contentType} />
-          <p className="m-0 mt-9 self-end font-pen text-[26px] leading-9 text-ink-2 mobile-down:text-2xl">From. {from}</p>
-          <p className="m-0 mt-9 h-9 font-anton text-xs leading-9 tracking-[0.1em] text-ink-3 mobile-down:text-[11px]">
-            {p.mm}.{p.dd} · {p.wd}
-          </p>
-        </article>
+          <p className="m-0 mt-auto self-end font-pen text-[26px] text-ink-2 mobile-down:text-[20px]">From. {from}</p>
+        </LetterSheet>
+        <p className="m-0 mt-3 w-full max-w-[720px] text-right font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:text-[11px]">
+          {p.mm}.{p.dd} · {p.wd}
+        </p>
 
         {requested && (
           <div className="mt-10 flex w-full max-w-[760px] flex-col items-center gap-3 text-center mobile-down:mt-8">
