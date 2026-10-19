@@ -8,13 +8,19 @@ export default function Footer() {
         <Image src="/v8/logo.png" alt="" width={48} height={32} className="h-8 w-12 object-contain mobile-down:h-7 mobile-down:w-[42px]" />
         <span className="font-pen text-[26px] text-ink mobile-down:text-2xl">Letter</span>
         <span className="font-pen text-base mobile-down:text-[15px]">답장이 있는 편지 플랫폼</span>
+        <a href="https://www.instagram.com/letter_251109/" target="_blank" rel="noopener noreferrer" aria-label="레터 인스타그램 (새 창)" className="ml-1 min-w-11 justify-center">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
+          </svg>
+        </a>
       </span>
       <div className="flex flex-wrap gap-6 mobile-down:gap-4">
         <Link href="/notices">공지사항</Link>
         <Link href="/inquiry">문의하기</Link>
         <Link href="/terms">이용약관</Link>
         <Link href="/privacy">개인정보처리방침</Link>
-        <a href="https://www.instagram.com/letter_251109/" target="_blank" rel="noopener noreferrer">인스타그램 ↗</a>
       </div>
       <span>© 2026 Letter</span>
     </footer>
