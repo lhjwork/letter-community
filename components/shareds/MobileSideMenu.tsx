@@ -136,6 +136,7 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
             <Link href="/inquiry" onClick={onClose}>문의하기</Link>
             <Link href="/terms">이용약관</Link>
             <Link href="/privacy">개인정보처리방침</Link>
+            <a href="https://www.instagram.com/letter_251109/" target="_blank" rel="noopener noreferrer">인스타그램 ↗</a>
           </div>
         </div>
       </nav>
