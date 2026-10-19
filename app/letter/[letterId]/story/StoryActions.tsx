@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { showAlert } from "@/components/ui/AppAlert";
 import LoginDialog from "@/components/shareds/LoginDialog";
@@ -29,8 +30,8 @@ export function ReplyCta({ storyId, className }: { storyId: string; className: s
   );
 }
 
-/** 마음에 담기 = 기존 like 토글. 숫자는 보여주지 않는다 */
-export function SaveButton({ letterId }: { letterId: string }) {
+/** 마음에 담기 = 기존 like 토글. 숫자는 보여주지 않는다. 아이콘은 레터 손그림 하트(담으면 진하게) */
+export function SaveButton({ letterId, className = "btn btn-ink mobile-down:flex-1 mobile-down:px-3 mobile-down:text-xl" }: { letterId: string; className?: string }) {
   const { isLiked, isToggling, toggleLike, isLoggedIn } = useLike({ letterId, letterType: "story" });
   const [open, setOpen] = useState(false);
   return (
@@ -40,11 +41,9 @@ export function SaveButton({ letterId }: { letterId: string }) {
         aria-pressed={isLiked}
         disabled={isToggling}
         onClick={() => (isLoggedIn ? toggleLike() : setOpen(true))}
-        className="btn btn-ink mobile-down:flex-1 mobile-down:px-3 mobile-down:text-xl"
+        className={className}
       >
-        <span aria-hidden="true" className={`mr-2 mobile-down:mr-1.5 ${isLiked ? "text-brick" : ""}`}>
-          {isLiked ? "♥" : "♡"}
-        </span>
+        <Image src="/icons/letter-heart-icon.svg" alt="" width={30} height={27} aria-hidden="true" className={`mr-2 h-[22px] w-auto transition-[opacity,transform] mobile-down:mr-1.5 ${isLiked ? "scale-110" : "opacity-55"}`} />
         {isLiked ? "마음에 담았어요" : "마음에 담기"}
       </button>
       <LoginDialog isOpen={open} onClose={() => setOpen(false)} callbackUrl={`/letter/${letterId}`} />
