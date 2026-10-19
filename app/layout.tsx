@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { AlertHost } from "@/components/ui/AppAlert";
 import LoginPrompt from "@/components/shareds/LoginPrompt";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { OG_IMAGE } from "@/lib/og";
 
 const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap", preload: false });
 const pen = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], variable: "--font-pen", display: "swap", preload: false });
@@ -19,8 +20,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
   title: "Letter Community",
   description: "사연을 공유하는 커뮤니티",
+  openGraph: { images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Letter — 답장이 있는 편지" }], type: "website" },
+  twitter: { card: "summary_large_image", images: [OG_IMAGE] },
 };
 
 export default function RootLayout({

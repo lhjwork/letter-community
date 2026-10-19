@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getComments, getStoryReplies } from "@/lib/api";
+import { OG_IMAGE } from "@/lib/og";
 import FriendDetail, { type FriendLetter } from "./friend/FriendDetail";
 import ReplyDetail, { type ReplyLetter } from "./story/ReplyDetail";
 import StoryDetail from "./story/StoryDetail";
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
     return { title: "편지를 찾을 수 없습니다" };
   }
 
-  // 본문 앞 2줄만 OG 이미지에 표시
+  // 본문 앞 2줄 → 미리보기 설명(저장된 미리보기가 없을 때)
   const previewText = (letter.content || "")
     .replace(/<\/(p|div|br)>|<br\s*\/?>/gi, "\n")
     .replace(/<[^>]+>/g, "")
@@ -51,15 +52,8 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
     .join(" ")
     .slice(0, 120);
   const title = (letter.replyTo && `‘${letter.replyTo.title || "사연"}’에 온 답장`) || (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || "당신에게 도착한 편지";
-  const cut = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
-  const og = new URLSearchParams({
-    text: previewText,
-    // 답장은 사연 제목만 줄이고 "에 온 답장"은 남긴다
-    title: letter.replyTo ? `‘${cut(letter.replyTo.title || "사연", 14)}’에 온 답장` : title,
-    kind: letter.replyTo ? "reply" : letter.type,
-    to: letter.recipientName || "",
-  });
-  const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/api/og?${og}`;
+  // OG 이미지는 항공우편 봉투 한 장(정적). 제목·첫 줄은 카톡·SNS 가 이미지 아래에 따로 보여준다
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}${OG_IMAGE}`;
   // 카톡·SNS 미리보기 설명: 저장된 미리보기 → 없으면 본문 앞부분. 줄바꿈은 한 줄로
   const oneLine = (s?: string) => (s || "").replace(/\s+/g, " ").trim();
   const description = (oneLine(letter.ogPreviewText) || previewText).slice(0, 100) || "특별한 편지가 도착했습니다.";
