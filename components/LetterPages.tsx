@@ -218,6 +218,7 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
                 aria-label={first ? undefined : `${label} ${i + 1}장`}
                 placeholder={first ? edit.placeholder : undefined}
                 value={slice}
+                autoComplete="off"
                 required={first}
                 onChange={(e) => change(i, e.target.value, e.target.selectionEnd)}
                 onCompositionStart={() => (composing.current = true)}
@@ -227,7 +228,7 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
                   setTick((t) => t + 1);
                 }}
                 onKeyDown={onKey(i)}
-                className={`absolute resize-none overflow-hidden border-0 bg-transparent p-0 text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${PEN}`}
+                className={`absolute resize-none overflow-hidden border-0 bg-transparent p-0 text-ink outline-none [overflow-wrap:break-word] placeholder:text-ink-3 ${PEN}`}
                 style={bodyBox(top, LINES_PER_PAGE - top)}
               />
             ) : (

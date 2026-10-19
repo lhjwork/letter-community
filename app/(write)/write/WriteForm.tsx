@@ -260,6 +260,7 @@ export default function WriteForm() {
                   <input
                     id="to"
                     type="text"
+                    autoComplete="off"
                     placeholder="받는 사람 (비우면 모두에게)"
                     maxLength={50}
                     value={to}
@@ -267,7 +268,7 @@ export default function WriteForm() {
                       setTo(e.target.value);
                       setDirty(true);
                     }}
-                    className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] leading-[inherit] text-ink outline-none placeholder:text-ink-3 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink mobile-down:text-xl"
+                    className="min-w-0 flex-1 border-0 bg-transparent p-0 font-pen text-[26px] leading-[inherit] text-ink outline-none placeholder:text-ink-3 mobile-down:text-xl"
                   />
                 </label>
               )

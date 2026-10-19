@@ -75,21 +75,36 @@ function Hero() {
   );
 }
 
-// [데스크톱 문구, 모바일 문구] — v8-TwoLetters / M-Home 보드 그대로
+// [데스크톱 문구, 모바일 문구] — v8-TwoLetters / M-Home 보드 그대로.
+// 강조 표시: *빨강(사연·레터)* _파랑(마음 편지·받는 사람)_ +초록(종이 편지)+
 const STEPS: Record<"story" | "friend", [string, string][]> = {
   story: [
-    ["사연을 올리면 레터가 편지 한 통을 꼭 써서 답장해요", "사연을 올리면 레터가 꼭 답장해요"],
-    ["사연을 읽은 다른 사람들도 답장을 써요", "다른 사람들도 답장을 써요"],
-    ["그중 레터가 고른 답장이 사연자에게 전해져요", "레터가 고른 답장이 전해져요"],
-    ["원하면 그 답장을 종이 편지로 받아볼 수 있어요", "원하면 종이 편지로 받아요"],
+    ["사연을 올리면 *레터가 편지 한 통을 꼭 써서 답장*해요", "사연을 올리면 *레터가 꼭 답장*해요"],
+    ["사연을 읽은 _다른 사람들도_ 답장을 써요", "_다른 사람들도_ 답장을 써요"],
+    ["그중 *레터가 고른 답장*이 사연자에게 전해져요", "*레터가 고른 답장*이 전해져요"],
+    ["원하면 그 답장을 +종이 편지+로 받아볼 수 있어요", "원하면 +종이 편지+로 받아요"],
   ],
   friend: [
-    ["여기서 편지를 써요", "편지를 쓰면 링크가 생겨요"],
-    ["링크를 카카오톡이나 문자로 보내요", "카톡으로 보내면 봉투처럼 보여요"],
-    ["받는 사람에게는 봉투처럼 제목과 첫 줄이 보여요", "받는 사람이 열어 읽어요"],
-    ["원하면 종이 편지로도 받을 수 있어요", "원하면 종이 편지로 받아요"],
+    ["여기서 _편지_를 써요", "_편지_를 쓰면 *링크*가 생겨요"],
+    ["*링크*를 카카오톡이나 문자로 보내요", "카톡으로 보내면 _봉투처럼_ 보여요"],
+    ["받는 사람에게는 _봉투처럼_ 제목과 첫 줄이 보여요", "_받는 사람_이 열어 읽어요"],
+    ["원하면 +종이 편지+로도 받을 수 있어요", "원하면 +종이 편지+로 받아요"],
   ],
 };
+const MARK: Record<string, string> = { "*": "text-brick", _: "text-airblue", "+": "text-approve" };
+
+/** STEPS 문구의 강조 표시를 색 글자로 */
+function Marked({ text }: { text: string }) {
+  return text.split(/(\*[^*]+\*|_[^_]+_|\+[^+]+\+)/).map((part, i) =>
+    MARK[part[0]] && part.length > 2 && part.at(-1) === part[0] ? (
+      <strong key={i} className={`font-normal ${MARK[part[0]]}`}>
+        {part.slice(1, -1)}
+      </strong>
+    ) : (
+      part
+    ),
+  );
+}
 
 function TwoLetters() {
   return (
@@ -110,13 +125,17 @@ function LetterPaper({ kind }: { kind: "story" | "friend" }) {
     <div className={`ruled relative flex-1 basis-[440px] border border-rule bg-paper px-8 py-9 mobile-down:basis-auto mobile-down:px-5 mobile-down:shadow-[0_6px_0_-3px_#E3DACB] ${story ? "-rotate-[0.5deg]" : "rotate-[0.6deg] mobile-down:rotate-[0.5deg]"}`}>
       <span className={`stampbox absolute left-6 top-[-16px] bg-paper mobile-down:left-4 mobile-down:text-[22px] ${color}`}>{story ? "사연 편지" : "마음 편지"}</span>
       <h3 className="m-0 font-pen text-[30px] font-normal leading-9 mobile-down:text-[26px]">{story ? "모르는 누군가에게 받는 답장" : "아는 사람에게 보내는 편지"}</h3>
-      <p className="m-0 text-base leading-9 text-ink-2 mobile-down:hidden">{story ? "말 못 한 이야기를 사연으로 남겨 보세요." : "부모님, 친구, 오래 못 본 사람에게."}</p>
+      <p className="m-0 font-pen text-[22px] leading-9 text-ink-2 mobile-down:hidden">{story ? "말 못 한 이야기를 사연으로 남겨 보세요." : "부모님, 친구, 오래 못 본 사람에게."}</p>
       <ol className="m-0 flex list-none flex-col p-0">
         {STEPS[kind].map(([desktop, mobile], i) => (
-          <li key={desktop} className="flex gap-3.5 text-base leading-9 mobile-down:gap-3">
+          <li key={desktop} className="flex gap-3.5 font-pen text-[22px] leading-9 mobile-down:gap-3 mobile-down:text-xl">
             <span className={`w-[22px] shrink-0 font-anton ${color} mobile-down:w-[18px]`}>{i + 1}</span>
-            <span className="mobile-down:hidden">{desktop}</span>
-            <span className="hidden mobile-down:inline">{mobile}</span>
+            <span className="mobile-down:hidden">
+              <Marked text={desktop} />
+            </span>
+            <span className="hidden mobile-down:inline">
+              <Marked text={mobile} />
+            </span>
           </li>
         ))}
       </ol>
