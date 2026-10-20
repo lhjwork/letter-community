@@ -1,8 +1,8 @@
 import { DraftLetter, DraftListResponse, DraftSaveRequest, DraftPublishRequest } from "@/types/draft";
 import { checkAuthError } from "./auth-utils";
 
-// API Base URL 설정
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001";
+// 브라우저 전용. 환경 변수가 없으면 같은 오리진("") → nginx 가 /api/ 를 백엔드로 프록시
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 // 임시저장 생성/수정
 export async function saveDraft(token: string, data: DraftSaveRequest): Promise<{ success: boolean; data: DraftLetter }> {
