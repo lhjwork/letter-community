@@ -53,12 +53,21 @@ type Props = {
 /** 본문을 장 단위로 자른 시작 위치들(2장부터). 숨은 mirror 에 전체 본문을 이어 쓰고 글자마다 몇 번째 줄인지 읽는다.
  * 줄바꿈 위치는 이어 쓴 본문과 같으니 잘라서 장마다 따로 그려도 줄이 그대로다 */
 function measureBreaks(m: HTMLDivElement, text: string, firstCap: number): number[] {
+  const base = m.getBoundingClientRect().top;
+  const range = document.createRange();
+  // 줄 간격은 computed line-height 가 아니라 실제로 잰다. 일부 iOS WebKit 은 소수 px line-height 를 정수로 깎아 그려서
+  // 계산값으로 나누면 아래쪽 줄을 덜 세고, 한 장에 10줄이 들어가 마지막 줄이 잘린다
+  const PROBE = 100;
+  m.textContent = "x" + "\n".repeat(PROBE) + "x";
+  const topAt = (i: number) => {
+    range.setStart(m.firstChild!, i);
+    range.setEnd(m.firstChild!, i + 1);
+    return range.getBoundingClientRect().top;
+  };
+  const lh = (topAt(PROBE + 1) - topAt(0)) / PROBE || parseFloat(getComputedStyle(m).lineHeight) || 1;
   m.textContent = text + "​"; // 마지막 줄바꿈 뒤 빈 줄도 한 줄로 센다
   const node = m.firstChild;
   if (!node) return [];
-  const lh = parseFloat(getComputedStyle(m).lineHeight) || 1;
-  const base = m.getBoundingClientRect().top;
-  const range = document.createRange();
   const n = text.length; // n 번째 글자 = 끝에 붙인 ​
   // i 번째 글자의 줄 번호. \n 은 자리가 애매해 그 뒤 첫 글자로 잰다
   const lineAt = (i: number) => {
