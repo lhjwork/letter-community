@@ -65,8 +65,10 @@ function measureBreaks(m: HTMLDivElement, text: string, firstCap: number): numbe
     while (i < n && text[i] === "\n") i++;
     range.setStart(node, i);
     range.setEnd(node, i + 1);
-    // 글자 상자 가운데로 잰다. 상자 위쪽은 글씨가 줄 간격보다 크면 윗줄로 올라가 한 줄 덜 센다
-    const r = range.getBoundingClientRect();
+    // 글자 상자 가운데로 잰다. 상자 위쪽은 글씨가 줄 간격보다 크면 윗줄로 올라가 한 줄 덜 센다.
+    // 마지막 상자만 본다: iOS WebKit 은 줄 첫 글자에 윗줄 끝 빈 상자까지 붙여 줘서 합친 상자로 재면 윗줄로 센다("저|는" 으로 장이 갈림)
+    const rs = range.getClientRects();
+    const r = rs[rs.length - 1] ?? range.getBoundingClientRect();
     return Math.floor((r.top + r.height / 2 - base) / lh);
   };
   const breaks: number[] = [];
