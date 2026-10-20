@@ -253,19 +253,17 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
                 {from}
               </div>
             )}
-
-            {/* 측정용 mirror: 본문과 같은 폭·폰트·줄바꿈 규칙. 첫 장 제목만큼 아래에서 시작할 필요는 없다(줄 번호만 센다) */}
-            {first && (
-              <div
-                ref={mirrorRef}
-                aria-hidden="true"
-                className={`pointer-events-none invisible absolute top-0 ${WRAP} ${PEN}`}
-                style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
-              />
-            )}
           </div>
         );
       })}
+      {/* 측정용 mirror: 본문과 같은 폭·폰트·줄바꿈 규칙. 넘김 애니메이션(rotateY)이 걸린 장 밖에 둬야 기울어진 좌표로 줄을 잘못 세지 않는다 */}
+      <div aria-hidden="true" className="@container pointer-events-none invisible relative w-full [grid-area:1/1]">
+        <div
+          ref={mirrorRef}
+          className={`absolute top-0 ${WRAP} ${PEN}`}
+          style={{ left: cq(PAPER.padL), right: cq(PAPER.padR), lineHeight: cq(PAPER.line) }}
+        />
+      </div>
       </div>
 
       {pages.length > 1 && (
