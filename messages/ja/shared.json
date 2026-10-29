@@ -1,0 +1,157 @@
+{
+  "footer": {
+    "tagline": "返事がある手紙のプラットフォーム",
+    "instagram": "レター Instagram（新しいウィンドウで開く）",
+    "notices": "お知らせ",
+    "inquiry": "お問い合わせ",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
+  },
+  "header": {
+    "nav": {
+      "write": "手紙を書く",
+      "stories": "お話",
+      "letterBox": "メールボックス"
+    },
+    "home": "レター ホーム",
+    "mainMenu": "メインメニュー",
+    "myPage": "マイページ",
+    "login": "ログイン",
+    "letterBox": "メールボックス",
+    "menu": "メニュー"
+  },
+  "mobileMenu": {
+    "closeMenu": "メニューを閉じる",
+    "fullMenu": "全メニュー",
+    "close": "閉じる",
+    "myPage": "マイページ →",
+    "login": "ログイン",
+    "drafts": "下書き",
+    "leaveStory": "お話を送る",
+    "logout": "ログアウト",
+    "notices": "お知らせ",
+    "inquiry": "お問い合わせ",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "instagram": "Instagram ↗"
+  },
+  "login": {
+    "stamp": "ログイン",
+    "title1": "手紙を書くには",
+    "title2": "ログインが必要です",
+    "inquiryNoLogin": "ログインなしでお問い合わせの場合はメールでお送りください。",
+    "lead": "書いた手紙と受け取った返事はメールボックスに集まります。",
+    "kakao": "Kakao で始める",
+    "naver": "Naver で始める",
+    "required": "必須",
+    "terms": "<link>利用規約</link> に同意します",
+    "privacy": "<link>個人情報の収集・利用</link> に同意します",
+    "expired1": "ログインが期限切れです",
+    "expired2": "もう一度ログインしてください",
+    "continue1": "ログインすると",
+    "continue2": "すぐに続けて見られます"
+  },
+  "letterPages": {
+    "page": "{label} {n} 枚",
+    "nav": "手紙をめくる",
+    "prev": "‹ 前のページ",
+    "next": "次のページ ›"
+  },
+  "address": {
+    "stamp": "ご住所を入力",
+    "title": "受け取る人のご住所",
+    "name": "お名前",
+    "namePlaceholder": "受け取る人のお名前",
+    "phone": "電話番号",
+    "optional": "（任意）",
+    "address": "ご住所",
+    "zipPlaceholder": "郵便番号",
+    "addressPlaceholder": "ご住所",
+    "addressLabel": "基本ご住所",
+    "detailPlaceholder": "詳細ご住所（建物/号室など）",
+    "detailLabel": "詳細ご住所",
+    "setDefault": "デフォルト配達先に",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saving": "保存中",
+    "errName": "受け取る人のお名前を入力してください。",
+    "errPhone": "電話番号は数字と - のみで入力してください。",
+    "errAddress": "郵便番号検索でご住所を選択してください。",
+    "errSave": "保存できませんでした。もう一度お試しください。",
+    "defaultBadge": "デフォルト配達先",
+    "makeDefault": "デフォルトに",
+    "noPhone": "電話番号なし",
+    "edit": "編集",
+    "editLabel": "{name} さんのご住所を編集",
+    "delete": "削除",
+    "deleteLabel": "{name} さんのご住所を削除",
+    "postcode": "郵便番号検索",
+    "postcodeLoading": "読み込み中",
+    "postcodeFailed": "開けませんでした",
+    "postcodeError": "ご住所検索を開けませんでした。更新してください。"
+  },
+  "share": {
+    "copied": "リンクをコピーしました",
+    "copyFailed": "リンクをコピーできませんでした。リンク欄を長く押してコピーしてください。",
+    "stamp": "手紙の完成",
+    "title": "手紙が封筒に入りました",
+    "desc1": "リンクを送ると、受け取る人の画面に",
+    "desc2": "封筒のように届きます。",
+    "link": "共有リンク",
+    "copy": "リンクをコピー",
+    "read": "手紙を読む"
+  },
+  "dialog": {
+    "close": "閉じる",
+    "confirmStamp": "確認",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "processing": "処理中"
+  },
+  "stories": {
+    "emptyFiltered": "この条件に合うお話がありません。",
+    "empty": "まだお話がありません。",
+    "loading": "読み込み中",
+    "more": "お話をもっと見る",
+    "moreShort": "もっと見る",
+    "loadFailed": "読み込めませんでした。もう一度押してください。",
+    "searchLabel": "お話を検索",
+    "searchPlaceholder": "検索",
+    "categoryGroup": "心",
+    "all": "すべて",
+    "replies": "{n, plural, one {返事 #} other {返事 #}}",
+    "waiting": "返事待ち",
+    "defaultRecipient": "レター"
+  },
+  "categories": {
+    "comfort": "慰め",
+    "family": "家族",
+    "thanks": "感謝",
+    "love": "恋愛",
+    "growth": "成長",
+    "friendship": "友情",
+    "memories": "思い出",
+    "other": "その他"
+  },
+  "record": {
+    "label": {
+      "myStory": "自分のお話",
+      "sentReply": "送った · 返事",
+      "receivedReply": "受け取った · お話の返事",
+      "sentHeart": "送った · 心の手紙",
+      "receivedHeart": "受け取った · 心の手紙"
+    },
+    "badge": {
+      "adopted": "採択",
+      "reviewing": "検討中",
+      "fromLetter": "レターからの返事",
+      "physical": "紙の申し込み済み",
+      "waiting": "返事待ち",
+      "replies": "{count, plural, one {返事 #} other {返事 #}}"
+    },
+    "title": {
+      "wrote": "「{title}」に書いた返事",
+      "received": "「{title}」から受け取った返事"
+    }
+  }
+}

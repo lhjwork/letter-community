@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "story": "お話を送る",
+    "friend": "手紙を書く",
+    "drafts": "下書き"
+  },
+  "loading": "読み込み中...",
+  "form": {
+    "eyebrow": "ゆっくり書いてくださいね",
+    "titleStory": "お話を送る",
+    "titleFriend": "手紙を書く",
+    "kindLegend": "どんな手紙ですか",
+    "kind": {
+      "story": {
+        "name": "お話の手紙",
+        "desc": "気持ちを打ち明けるとレターが返事を書きます。",
+        "mdesc": "レターが返事を書きます"
+      },
+      "friend": {
+        "name": "心の手紙",
+        "desc": "知っている人にリンクで送ります。",
+        "mdesc": "知っている人に · リンクで送ります"
+      }
+    },
+    "titleLabelStory": "お話のタイトル",
+    "titleLabelFriend": "タイトル",
+    "titlePlaceholderStory": "一行で入力してください",
+    "titlePlaceholderFriend": "タイトルを入力してください",
+    "titleHintStory": "お話一覧とお話ページに表示されます。",
+    "titleHintFriend": "タイトルはリストとリンクにのみ表示されます。",
+    "bodyLabelStory": "お話",
+    "bodyLabelFriend": "内容",
+    "paperLabelStory": "用紙",
+    "paperLabelFriend": "手紙の紙",
+    "toLetter": "宛先 · レター",
+    "toPlaceholder": "受け取る人（空白で全員）",
+    "fromAnonymousStory": "匿名",
+    "fromAnonymousFriend": "匿名のあなた",
+    "bodyPlaceholderStory": "気になることや心配なことを書いてみてください。",
+    "bodyPlaceholderFriend": "あなたの気持ちをここに込めてください...",
+    "pageHint": "1ページに本文 {lines} 行。超えたら次のページに続きます。",
+    "pages": "{count, plural, one {# 枚} other {# 枚}}",
+    "categoryLegend": "どんな気持ちですか",
+    "category": {
+      "comfort": "慰め",
+      "family": "家族",
+      "thanks": "感謝",
+      "love": "恋愛",
+      "growth": "成長",
+      "friendship": "友情",
+      "memories": "思い出",
+      "other": "その他"
+    },
+    "envelopeLegend": "どんな封筒に入れますか",
+    "envelope": {
+      "letter": "レター",
+      "seongsu": "成水",
+      "myeongdong": "明洞"
+    },
+    "envelopeAlt": "{name} 封筒",
+    "envelopeSoon": "製作中",
+    "anonymous": "匿名で送る",
+    "storyNote": "レターが必ず返事を書きます。メールボックスで受け取ってください。",
+    "submittingStory": "送信中…",
+    "submittingFriend": "送信中...",
+    "submitEdit": "編集完了",
+    "submitStory": "お話を送る",
+    "submitFriend": "手紙を送る",
+    "saving": "保存中...",
+    "saveDraft": "下書きに保存",
+    "leaveStory": "書いているお話が保存されていません。出ていいですか？",
+    "leaveFriend": "書いている手紙が保存されていません。出ていいですか？",
+    "errors": {
+      "draftLoad": "下書きが読み込めません。",
+      "letterLoad": "手紙が読み込めません。",
+      "titleRequired": "タイトルを入力してください。",
+      "contentRequired": "内容を入力してください。",
+      "contentMax": "内容は {max} 字以内にしてください。",
+      "submit": "登録に失敗しました。もう一度お試しください。"
+    },
+    "done": {
+      "editStory": "お話を編集しました。",
+      "editFriend": "手紙を編集しました。",
+      "story": "お話を送りました。"
+    },
+    "draftsHint": "<link>下書き一覧</link> から続けて書けます。"
+  },
+  "drafts": {
+    "back": "← メールボックス",
+    "eyebrow": "書きかけの手紙",
+    "title": "下書き",
+    "empty": "下書きがありません。",
+    "untitled": "タイトルなし",
+    "story": "お話の手紙",
+    "friend": "心の手紙",
+    "continue": "続けて書く",
+    "delete": "削除",
+    "loadError": "下書き一覧が読み込めませんでした。",
+    "deleteError": "削除できませんでした。もう一度お試しください。",
+    "confirmTitle": "この下書きを削除しますか",
+    "confirmDesc": "「{title}」の下書きが削除されます。",
+    "loading": "読み込み中..."
+  }
+}

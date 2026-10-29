@@ -1,0 +1,73 @@
+{
+  "meta": { "title": "メールボックス", "likes": "心に留めたお話", "addresses": "アドレス帳" },
+  "steps": {
+    "label": "進行段階",
+    "requested": "承認待ち",
+    "rejected": "見送られました",
+    "approved": "承認されました",
+    "writing": "手書き作成中",
+    "sent": "発送済み",
+    "delivered": "配達完了"
+  },
+  "pager": { "label": "ページを移動", "prev": "前へ", "next": "次へ" },
+  "back": "← メールボックス",
+  "loadFailed": "リストを読み込めませんでした。",
+  "home": {
+    "eyebrow": "書いた手紙とお話、受け取った返事が集まります",
+    "title": "メールボックス",
+    "newStory": "お話を送る",
+    "newLetter": "手紙を書く",
+    "tabsLabel": "メールボックスの分類",
+    "tabs": { "letters": "書いた手紙", "stories": "自分のお話", "replies": "受け取った返事" },
+    "likes": "心に留めたお話",
+    "drafts": "下書き",
+    "empty": {
+      "letters": "まだ書いた手紙がありません。",
+      "stories": "まだお話を送っていません。",
+      "replies": "まだ返事を受け取っていません。お話を送るとレターが返事を送ります。"
+    },
+    "addressBook": "アドレス帳",
+    "noAddresses": "保存したご住所がありません。",
+    "default": "デフォルト",
+    "manageAddresses": "受け取る人のご住所を管理"
+  },
+  "card": {
+    "reply": "返事",
+    "adopted": "採択",
+    "heart": "心の手紙",
+    "physicalRequested": "紙の申し込み済み",
+    "story": "お話",
+    "untitled": "タイトルなし",
+    "replyTo": "「{title}」に書いた返事",
+    "replyFrom": "「{title}」から受け取った返事"
+  },
+  "requests": {
+    "title": "紙の手紙の申し込み状況",
+    "requestedOn": "{date} に申し込み",
+    "envelope": "{name} 封筒",
+    "view": "申し込み内容を見る",
+    "none": "まだ申し込みが入っていません。",
+    "failed": "申し込み状況を読み込めませんでした。"
+  },
+  "likes": {
+    "title": "心に留めたお話",
+    "empty": "心に留めたお話がありません。",
+    "browse": "お話を見に行く"
+  },
+  "addresses": {
+    "title": "アドレス帳",
+    "failed": "アドレス帳を読み込めませんでした。",
+    "eyebrow": "紙の手紙を受け取る人たち",
+    "desc": "紙の手紙を申し込むときに、ここに保存したご住所を読み込めます。",
+    "add": "+ ご住所を追加",
+    "empty": "保存したご住所がありません。",
+    "loginRequired": "ログインが必要です。",
+    "setDefaultFailed": "デフォルト配達先に変更できませんでした。",
+    "deleteTitle": "このご住所を削除しますか",
+    "deleteDesc": "{name} さんのご住所がアドレス帳から削除されます。",
+    "delete": "削除",
+    "deleteFailed": "削除できませんでした。",
+    "summary": "{total, plural, one {書いた手紙への紙の申し込み # 件} other {書いた手紙への紙の申し込み # 件}}",
+    "viewStatus": "申し込み状況を見る"
+  }
+}

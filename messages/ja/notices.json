@@ -1,0 +1,17 @@
+{
+  "list": {
+    "eyebrow": "レターがお届けするニュース",
+    "title": "お知らせ",
+    "loadError": "お知らせが読み込めませんでした。しばらくしてからお試しください。",
+    "empty": "まだお知らせはありません。",
+    "pinned": "ピン留め"
+  },
+  "detail": {
+    "metaTitle": "{title} | お知らせ",
+    "metaTitleFallback": "お知らせ",
+    "back": "← お知らせ一覧",
+    "stamp": "お知らせ",
+    "from": "レターより",
+    "backToList": "一覧へ"
+  }
+}

@@ -19,7 +19,7 @@ export const NAV = [
 
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
 export function todayLabel(locale: string, d = new Date()) {
-  if (locale !== "ko") return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  if (locale !== "ko") return d.toLocaleDateString(locale === "ja" ? "ja-JP" : "en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${DAYS[d.getDay()]}`;
 }
 
@@ -35,7 +35,7 @@ export default function Header() {
   const t = useTranslations("shared.header");
   const locale = useLocale();
   const { data: session, status } = useSession();
-  const current = currentSection((usePathname() ?? "").replace(/^\/en(?=\/|$)/, ""));
+  const current = currentSection((usePathname() ?? "").replace(/^\/(en|ja)(?=\/|$)/, ""));
   const loggedIn = status === "authenticated";
   const [loginCallbackUrl, setLoginCallbackUrl] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -1,0 +1,35 @@
+{
+  "meta": { "title": "お問い合わせ", "detail": "お問い合わせ | お問い合わせ詳細" },
+  "categories": { "service": "サービス利用", "physical": "手紙の配送", "account": "アカウント", "etc": "その他" },
+  "status": { "open": "回答待ち", "answered": "回答済み" },
+  "page": {
+    "eyebrow": "ご質問や不便な点をお聞きします",
+    "title": "お問い合わせ",
+    "jumpToMine": "{count, plural, one {お客様のお問い合わせ # 件を見る ↓} other {お客様のお問い合わせ # 件を見る ↓}}",
+    "mine": "お客様のお問い合わせ",
+    "mineFailed": "お問い合わせが読み込めませんでした。しばらくしてからお試しください。",
+    "mineEmpty": "まだお問い合わせはありません。"
+  },
+  "form": {
+    "category": "分類",
+    "title": "タイトル",
+    "titlePlaceholder": "簡潔にご説明ください",
+    "content": "内容",
+    "contentPlaceholder": "いつ、どの画面で起きたかを教えていただければ、より早くお力になれます。",
+    "email": "メールでも受け取る",
+    "submitting": "送信中",
+    "submit": "お問い合わせを送信",
+    "needCategory": "分類を選択してください。",
+    "needTitle": "タイトルを入力してください。",
+    "needContent": "内容を入力してください。",
+    "sent": "お問い合わせを送信しました。回答はお客様のお問い合わせページでご確認ください。",
+    "failed": "お問い合わせを送信できませんでした。もう一度お試しください。"
+  },
+  "detail": {
+    "back": "← お客様のお問い合わせ",
+    "mine": "お客様のお問い合わせ",
+    "answer": "レターからの回答",
+    "from": "レターより",
+    "waiting": "回答が届くとここに表示されます。"
+  }
+}

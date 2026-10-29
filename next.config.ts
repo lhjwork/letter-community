@@ -18,18 +18,18 @@ const CSP = [
 const nextConfig: NextConfig = {
   output: "standalone",
   // isomorphic-dompurify → jsdom 을 서버 번들에 넣으면 dev(webpack)에서 default-stylesheet.css ENOENT 로 500. 외부 패키지로 둔다
-  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom", "geoip-country"],
   poweredByHeader: false,
   // reactCompiler: true, // Disabled due to HMR infinite loop issues
 
   // Add empty turbopack config to silence the warning
   turbopack: {},
 
-  // /en/x 는 같은 페이지 /x 를 영어로(언어는 proxy.ts 가 x-locale 로 정한다)
+  // /en/x, /ja/x 는 같은 페이지 /x 를 그 언어로(언어는 proxy.ts 가 x-locale 로 정한다)
   async rewrites() {
     return [
-      { source: "/en", destination: "/" },
-      { source: "/en/:path*", destination: "/:path*" },
+      { source: "/:locale(en|ja)", destination: "/" },
+      { source: "/:locale(en|ja)/:path*", destination: "/:path*" },
     ];
   },
 

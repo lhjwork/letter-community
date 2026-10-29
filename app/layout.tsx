@@ -24,12 +24,12 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("landing.meta");
-  // 같은 페이지의 한국어(/x)·영어(/en/x) 주소를 검색엔진에 알린다. 하위 페이지가 canonical 을 따로 두면 그쪽이 이긴다
+  // 같은 페이지의 한국어(/x)·영어(/en/x)·일본어(/ja/x) 주소를 검색엔진에 알린다. 하위 페이지가 canonical 을 따로 두면 그쪽이 이긴다
   const h = await headers();
   const path = h.get("x-pathname") ?? "/";
-  const en = `/en${path === "/" ? "" : path}`;
+  const at = (l: string) => (l === "ko" ? path : `/${l}${path === "/" ? "" : path}`);
   return {
-    alternates: { canonical: h.get("x-locale") === "en" ? en : path, languages: { ko: path, en, "x-default": path } },
+    alternates: { canonical: at(h.get("x-locale") ?? "ko"), languages: { ko: path, en: at("en"), ja: at("ja"), "x-default": path } },
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
     title: t("title"),
     description: t("description"),

@@ -1,0 +1,33 @@
+{
+  "meta": { "title": "マイページ | Letter" },
+  "tabs": { "all": "すべて", "sent": "送った手紙", "received": "受け取った手紙", "stories": "自分のお話" },
+  "flows": { "all": "すべて", "story": "お話の手紙", "heart": "心の手紙" },
+  "eyebrow": "あなたのレター",
+  "title": "マイページ",
+  "toLetterBox": "メールボックスへ",
+  "logout": "ログアウト",
+  "joined": "{date} に登録",
+  "email": "メールアドレス",
+  "linkedAccounts": "連携アカウント",
+  "records": "記録",
+  "recordsSummary": "送った手紙 {sent} · 受け取った手紙 {received} · お話 {stories} · 紙の手紙 {physical}",
+  "short": { "sent": "送った", "received": "受け取った", "stories": "お話", "physical": "紙の手紙" },
+  "tabsLabel": "記録の分類",
+  "empty": "ここにはまだ手紙がありません。",
+  "write": "手紙を書く",
+  "more": "もっと見る",
+  "limit": "最新 {max} 通まで表示されます。",
+  "nickname": {
+    "label": "ニックネーム",
+    "required": "ニックネームを入力してください。",
+    "same": "現在のニックネームと同じです。",
+    "failed": "ニックネームを変更できませんでした。",
+    "saving": "保存中",
+    "saved": "保存しました",
+    "save": "保存",
+    "unlockAt": "{date} から変更できます。",
+    "rulePrefix": "ニックネームは ",
+    "rule": "月に一度だけ変更できます。",
+    "lastChanged": "最後に変更したのは {date}"
+  }
+}

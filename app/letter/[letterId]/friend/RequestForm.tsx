@@ -88,7 +88,7 @@ export default function RequestForm({ letterId }: { letterId: string }) {
   return (
     <form onSubmit={submit} className="flex flex-[1_1_380px] flex-col gap-3.5 mobile-down:mt-1 mobile-down:flex-none mobile-down:gap-3">
       {/* 배송은 국내만(다음 우편번호 검색·5자리 우편번호). 한국어 화면은 기존 그대로 */}
-      {locale === "en" && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">{t("koreaOnly")}</p>}
+      {locale !== "ko" && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">{t("koreaOnly")}</p>}
       {prev && (
         <a href={`/letter/${letterId}/request/${prev}`} className="inline-flex min-h-11 items-center self-start font-pen text-xl text-ink-2 hover:text-brick">
           <span className="border-b-[1.5px] border-current">{t("viewPrevious")}</span>
