@@ -110,7 +110,7 @@ export default function MobileSideMenu({ isOpen, onClose, onLoginClick }: Mobile
               {t("mobileMenu.drafts")}
             </button>
           )}
-          <LocaleSwitch className="w-full border-0 border-b bg-transparent text-left" />
+          <LocaleSwitch open="inline" className="flex w-full items-center justify-between border-0 border-b bg-transparent text-left" />
         </div>
 
         {loggedIn ? (

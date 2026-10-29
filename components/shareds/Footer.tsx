@@ -24,7 +24,7 @@ export default function Footer() {
         <Link href="/inquiry">{t("inquiry")}</Link>
         <Link href="/terms">{t("terms")}</Link>
         <Link href="/privacy">{t("privacy")}</Link>
-        <LocaleSwitch className="inline-flex min-h-11 items-center text-ink-3 hover:text-brick" />
+        <LocaleSwitch open="up" className="inline-flex min-h-11 items-center text-ink-3 hover:text-brick" />
       </div>
       <span>© 2026 Letter</span>
     </footer>
