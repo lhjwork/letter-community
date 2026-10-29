@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { CATEGORY_KEY } from "./StoriesFilter";
 import type { Story } from "@/lib/api";
 import { seoulParts } from "@/lib/seoulDate";
 
@@ -9,7 +11,9 @@ const TAPES = ["left-[22px] rotate-[4deg]", "left-[40%] -rotate-[3deg]"];
 
 /** 사연 목록 벽돌 카드. 괘선 36px 위에 모든 줄이 앉는다(line-height 36, 세로 여백 36 배수) */
 export default function StoryBrick({ story, index }: { story: Story; index: number }) {
+  const t = useTranslations("shared");
   const n = story.replyCount ?? 0;
+  const cat = story.category || "기타";
   const p = seoulParts(story.createdAt);
   const preview = story.preview ?? (story.content ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
   return (
@@ -19,12 +23,12 @@ export default function StoryBrick({ story, index }: { story: Story; index: numb
     >
       {/* top:-10px 이면 단(column) 맨 위 카드의 테이프가 앞 단 바닥에 찍힌다(다단 조각). 0 에 두고 transform 으로 올린다 */}
       <span className={`tape top-0 -translate-y-2.5 ${TAPES[index % TAPES.length]}`} aria-hidden="true" />
-      <span className={`badge absolute right-4 top-3.5 ${n > 0 ? "bg-airblue" : "bg-brick"}`}>{n > 0 ? `답장 ${n}` : "답장 기다림"}</span>
-      <span className="font-pen text-lg leading-9 text-brick">To. {story.recipientName || "레터"}</span>
+      <span className={`badge absolute right-4 top-3.5 ${n > 0 ? "bg-airblue" : "bg-brick"}`}>{n > 0 ? t("stories.replies", { n }) : t("stories.waiting")}</span>
+      <span className="font-pen text-lg leading-9 text-brick">To. {story.recipientName || t("stories.defaultRecipient")}</span>
       <strong className="relative -top-0.5 font-pen text-[26px] font-normal leading-9 mobile-down:text-2xl">{story.title || preview}</strong>
       {story.title && preview && <span className="line-clamp-3 text-base leading-9 text-ink-2">{preview}</span>}
       <span className="mt-9 flex h-9 items-center justify-between text-xs text-ink-3">
-        <span className="chip min-h-7 px-2.5 text-base">{story.category || "기타"}</span>
+        <span className="chip min-h-7 px-2.5 text-base">{CATEGORY_KEY[cat] ? t(`categories.${CATEGORY_KEY[cat]}`) : cat}</span>
         <span className="font-anton tracking-[0.1em]">
           {p.mm}.{p.dd} · {p.wd}
         </span>

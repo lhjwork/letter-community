@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import V8Dialog, { V8Description, V8Title } from "@/components/ui/V8Dialog";
 
 interface ConfirmDialogProps {
@@ -15,7 +16,8 @@ interface ConfirmDialogProps {
   variant?: "default" | "destructive";
 }
 
-export default function ConfirmDialog({ open, onOpenChange, title, description, confirmText = "확인", cancelText = "취소", onConfirm, onCancel, variant = "default" }: ConfirmDialogProps) {
+export default function ConfirmDialog({ open, onOpenChange, title, description, confirmText, cancelText, onConfirm, onCancel, variant = "default" }: ConfirmDialogProps) {
+  const t = useTranslations("shared.dialog");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -37,15 +39,15 @@ export default function ConfirmDialog({ open, onOpenChange, title, description, 
 
   return (
     // v8-Modals-1 확인창: 스탬프 "확인"·✕ 는 V8Dialog
-    <V8Dialog open={open} onOpenChange={onOpenChange} stamp="확인" width="max-w-[420px]" described>
+    <V8Dialog open={open} onOpenChange={onOpenChange} stamp={t("confirmStamp")} width="max-w-[420px]" described>
       <V8Title className="m-0 mt-2 font-pen text-[30px] font-normal leading-[1.3] mobile-down:mt-0 mobile-down:text-[28px]">{title}</V8Title>
       <V8Description className="m-0 text-sm leading-[1.8] text-ink-2">{description}</V8Description>
       <div className="dlg-actions mt-2">
         <button type="button" onClick={handleCancel} disabled={isLoading} className="btn btn-ink">
-          {cancelText}
+          {cancelText ?? t("cancel")}
         </button>
         <button type="button" onClick={handleConfirm} disabled={isLoading} aria-busy={isLoading} className={variant === "destructive" ? "btn btn-brick" : "btn btn-ink"}>
-          {isLoading ? "처리하는 중" : confirmText}
+          {isLoading ? t("processing") : (confirmText ?? t("confirm"))}
         </button>
       </div>
     </V8Dialog>

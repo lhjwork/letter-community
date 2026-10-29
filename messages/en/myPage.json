@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "title": "My page | Letter"
+  },
+  "tabs": {
+    "all": "All",
+    "sent": "Sent",
+    "received": "Received",
+    "stories": "My stories"
+  },
+  "flows": {
+    "all": "All",
+    "story": "Story letters",
+    "heart": "Heart letters"
+  },
+  "eyebrow": "My Letter",
+  "title": "My page",
+  "toLetterBox": "Go to mailbox",
+  "logout": "Log out",
+  "joined": "Joined {date}",
+  "email": "Email",
+  "linkedAccounts": "Linked accounts",
+  "records": "Activity",
+  "recordsSummary": "Sent {sent} · Received {received} · Stories {stories} · Paper {physical}",
+  "short": {
+    "sent": "Sent",
+    "received": "Received",
+    "stories": "Stories",
+    "physical": "Paper"
+  },
+  "tabsLabel": "My activity sections",
+  "empty": "No letters here yet.",
+  "write": "Write a letter",
+  "more": "Show more",
+  "limit": "Showing your latest {max} letters.",
+  "nickname": {
+    "label": "Nickname",
+    "required": "Please enter a nickname.",
+    "same": "That's already your nickname.",
+    "failed": "We couldn't change your nickname.",
+    "saving": "Saving",
+    "saved": "Saved",
+    "save": "Save",
+    "unlockAt": "You can change it again on {date}.",
+    "rulePrefix": "",
+    "rule": "You can change your nickname once a month.",
+    "lastChanged": " Last changed {date}"
+  }
+}

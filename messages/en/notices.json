@@ -1,0 +1,17 @@
+{
+  "list": {
+    "eyebrow": "News from Letter",
+    "title": "Notices",
+    "loadError": "We couldn't load the notices. Please try again in a moment.",
+    "empty": "No notices yet.",
+    "pinned": "Pinned"
+  },
+  "detail": {
+    "metaTitle": "{title} | Notices",
+    "metaTitleFallback": "Notices",
+    "back": "← All notices",
+    "stamp": "Notice",
+    "from": "From. Letter",
+    "backToList": "Back to list"
+  }
+}

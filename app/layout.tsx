@@ -7,6 +7,8 @@ import { AlertHost } from "@/components/ui/AppAlert";
 import LoginPrompt from "@/components/shareds/LoginPrompt";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { OG_IMAGE } from "@/lib/og";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap", preload: false });
 const pen = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], variable: "--font-pen", display: "swap", preload: false });
@@ -19,31 +21,35 @@ export const viewport: Viewport = {
   userScalable: true,
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-  title: "Letter Community",
-  description: "사연을 공유하는 커뮤니티",
-  openGraph: { images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Letter — 답장이 있는 편지" }], type: "website" },
-  twitter: { card: "summary_large_image", images: [OG_IMAGE] },
-  verification: {
-    google: "LRhuIOX7f2AalDx5wB6oEQJ38I9UeGcaFLZj3WeoKgU",
-    other: { "naver-site-verification": "4bfed1167a4e5e6ca008bfc0650ea80dbbdc3f99" },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("landing.meta");
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
+    title: t("title"),
+    description: t("description"),
+    openGraph: { images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: t("ogAlt") }], type: "website" },
+    twitter: { card: "summary_large_image", images: [OG_IMAGE] },
+    verification: {
+      google: "LRhuIOX7f2AalDx5wB6oEQJ38I9UeGcaFLZj3WeoKgU",
+      other: { "naver-site-verification": "4bfed1167a4e5e6ca008bfc0650ea80dbbdc3f99" },
+    },
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${myeongjo.variable} ${pen.variable} ${anton.variable}`}>
+    <html lang={await getLocale()} className={`${myeongjo.variable} ${pen.variable} ${anton.variable}`}>
       <head>
         <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumJangMiCe.css" rel="stylesheet" />
         {/* 편지지·봉투 SVG(components/stationery)가 폰트명 문자열로 쓴다 */}
         <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased">
+        <NextIntlClientProvider>
         <SessionProvider>
           <GoogleAnalytics />
           {children}
@@ -52,6 +58,7 @@ export default function RootLayout({
             <LoginPrompt />
           </Suspense>
         </SessionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

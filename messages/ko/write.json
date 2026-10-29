@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "story": "사연 남기기",
+    "friend": "편지 쓰기",
+    "drafts": "임시저장"
+  },
+  "loading": "불러오는 중...",
+  "form": {
+    "eyebrow": "천천히 써도 괜찮아요",
+    "titleStory": "사연 남기기",
+    "titleFriend": "편지 쓰기",
+    "kindLegend": "어떤 편지인가요",
+    "kind": {
+      "story": {
+        "name": "사연 편지",
+        "desc": "털어놓으면 레터가 답장을 써요.",
+        "mdesc": "레터가 답장을 써요"
+      },
+      "friend": {
+        "name": "마음 편지",
+        "desc": "아는 사람에게 링크로 보내요.",
+        "mdesc": "아는 사람에게 · 링크로 보내요"
+      }
+    },
+    "titleLabelStory": "사연 제목",
+    "titleLabelFriend": "제목",
+    "titlePlaceholderStory": "한 줄로 적어 주세요",
+    "titlePlaceholderFriend": "제목을 입력해주세요",
+    "titleHintStory": "사연 목록과 사연 화면에 보여요.",
+    "titleHintFriend": "제목은 목록과 링크에만 보여요.",
+    "bodyLabelStory": "사연",
+    "bodyLabelFriend": "내용",
+    "paperLabelStory": "사연 종이",
+    "paperLabelFriend": "편지지",
+    "toLetter": "To. 레터",
+    "toPlaceholder": "받는 사람 (비우면 모두에게)",
+    "fromAnonymousStory": "익명",
+    "fromAnonymousFriend": "익명의 당신",
+    "bodyPlaceholderStory": "털어놓고 싶은 이야기를 적어 주세요.",
+    "bodyPlaceholderFriend": "여기에 당신의 마음을 담아주세요...",
+    "pageHint": "한 장에 본문 {lines}줄, 넘치면 다음 장으로 이어져요.",
+    "pages": "{count}장",
+    "categoryLegend": "어떤 마음인가요",
+    "category": {
+      "comfort": "위로",
+      "family": "가족",
+      "thanks": "감사",
+      "love": "사랑",
+      "growth": "성장",
+      "friendship": "우정",
+      "memories": "추억",
+      "other": "기타"
+    },
+    "envelopeLegend": "어떤 봉투에 담을까요",
+    "envelope": {
+      "letter": "레터",
+      "seongsu": "성수",
+      "myeongdong": "명동"
+    },
+    "envelopeAlt": "{name} 봉투",
+    "envelopeSoon": "제작 중",
+    "anonymous": "익명으로 올려요",
+    "storyNote": "레터가 꼭 답장해요. 우편함에서 받아요.",
+    "submittingStory": "남기는 중…",
+    "submittingFriend": "보내는 중...",
+    "submitEdit": "수정 완료",
+    "submitStory": "사연 남기기",
+    "submitFriend": "편지 보내기",
+    "saving": "저장 중...",
+    "saveDraft": "임시저장",
+    "leaveStory": "쓰던 사연이 저장되지 않았어요. 나갈까요?",
+    "leaveFriend": "쓰던 편지가 저장되지 않았어요. 나갈까요?",
+    "errors": {
+      "draftLoad": "임시저장을 불러올 수 없습니다.",
+      "letterLoad": "편지를 불러올 수 없습니다.",
+      "titleRequired": "제목을 입력해주세요.",
+      "contentRequired": "내용을 입력해주세요.",
+      "contentMax": "내용은 {max}자 이내여야 합니다.",
+      "submit": "등록에 실패했습니다. 다시 시도해주세요."
+    },
+    "done": {
+      "editStory": "사연을 고쳤어요.",
+      "editFriend": "편지를 고쳤어요.",
+      "story": "사연을 남겼어요."
+    },
+    "draftsHint": "<link>임시저장 목록</link>에서 이어 쓸 수 있어요."
+  },
+  "drafts": {
+    "back": "← 우편함",
+    "eyebrow": "쓰다 만 편지",
+    "title": "임시저장",
+    "empty": "임시저장한 편지가 없어요.",
+    "untitled": "제목 없음",
+    "story": "사연 편지",
+    "friend": "마음 편지",
+    "continue": "이어 쓰기",
+    "delete": "삭제",
+    "loadError": "임시저장 목록을 불러오지 못했어요.",
+    "deleteError": "삭제하지 못했어요. 다시 시도해 주세요.",
+    "confirmTitle": "이 임시저장을 지울까요",
+    "confirmDesc": "‘{title}’ 임시저장이 지워져요.",
+    "loading": "불러오는 중..."
+  }
+}

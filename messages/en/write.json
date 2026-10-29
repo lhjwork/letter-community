@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "story": "Share your story",
+    "friend": "Write a letter",
+    "drafts": "Drafts"
+  },
+  "loading": "Loading...",
+  "form": {
+    "eyebrow": "Take your time",
+    "titleStory": "Share your story",
+    "titleFriend": "Write a letter",
+    "kindLegend": "What kind of letter?",
+    "kind": {
+      "story": {
+        "name": "Story letter",
+        "desc": "Share what's on your mind, and Letter writes back.",
+        "mdesc": "Letter writes back"
+      },
+      "friend": {
+        "name": "Heart letter",
+        "desc": "Send it to someone you know with a link.",
+        "mdesc": "To someone you know · by link"
+      }
+    },
+    "titleLabelStory": "Story title",
+    "titleLabelFriend": "Title",
+    "titlePlaceholderStory": "Sum it up in one line",
+    "titlePlaceholderFriend": "Add a title",
+    "titleHintStory": "Shown in the story list and on your story.",
+    "titleHintFriend": "Only shown in lists and on the link.",
+    "bodyLabelStory": "Story",
+    "bodyLabelFriend": "Message",
+    "paperLabelStory": "Story paper",
+    "paperLabelFriend": "Letter paper",
+    "toLetter": "To. Letter",
+    "toPlaceholder": "Recipient (leave blank for anyone)",
+    "fromAnonymousStory": "Anonymous",
+    "fromAnonymousFriend": "Someone",
+    "bodyPlaceholderStory": "Write what you'd like to share.",
+    "bodyPlaceholderFriend": "Put your heart into words here...",
+    "pageHint": "{lines} lines per page. Longer letters continue on the next page.",
+    "pages": "{count, plural, one {# page} other {# pages}}",
+    "categoryLegend": "What's it about?",
+    "category": {
+      "comfort": "Comfort",
+      "family": "Family",
+      "thanks": "Thanks",
+      "love": "Love",
+      "growth": "Growth",
+      "friendship": "Friendship",
+      "memories": "Memories",
+      "other": "Other"
+    },
+    "envelopeLegend": "Pick an envelope",
+    "envelope": {
+      "letter": "Letter",
+      "seongsu": "Seongsu",
+      "myeongdong": "Myeongdong"
+    },
+    "envelopeAlt": "{name} envelope",
+    "envelopeSoon": "Coming soon",
+    "anonymous": "Post anonymously",
+    "storyNote": "Letter always writes back. Look for it in your mailbox.",
+    "submittingStory": "Sending…",
+    "submittingFriend": "Sending...",
+    "submitEdit": "Save changes",
+    "submitStory": "Send your story",
+    "submitFriend": "Send letter",
+    "saving": "Saving...",
+    "saveDraft": "Save draft",
+    "leaveStory": "Your story isn't saved yet. Leave anyway?",
+    "leaveFriend": "Your letter isn't saved yet. Leave anyway?",
+    "errors": {
+      "draftLoad": "Couldn't load your draft.",
+      "letterLoad": "Couldn't load the letter.",
+      "titleRequired": "Please add a title.",
+      "contentRequired": "Please write something first.",
+      "contentMax": "Keep it under {max} characters.",
+      "submit": "Couldn't send it. Please try again."
+    },
+    "done": {
+      "editStory": "Your story is updated.",
+      "editFriend": "Your letter is updated.",
+      "story": "Your story is on its way."
+    },
+    "draftsHint": "Keep writing anytime from <link>your drafts</link>."
+  },
+  "drafts": {
+    "back": "← Mailbox",
+    "eyebrow": "Letters in progress",
+    "title": "Drafts",
+    "empty": "No saved drafts yet.",
+    "untitled": "Untitled",
+    "story": "Story letter",
+    "friend": "Heart letter",
+    "continue": "Keep writing",
+    "delete": "Delete",
+    "loadError": "Couldn't load your drafts.",
+    "deleteError": "Couldn't delete it. Please try again.",
+    "confirmTitle": "Delete this draft?",
+    "confirmDesc": "‘{title}’ will be deleted.",
+    "loading": "Loading..."
+  }
+}

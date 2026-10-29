@@ -1,0 +1,35 @@
+{
+  "meta": { "title": "Contact us", "detail": "My inquiry | Contact us" },
+  "categories": { "service": "Using Letter", "physical": "Paper letters", "account": "Account", "etc": "Other" },
+  "status": { "open": "Awaiting reply", "answered": "Answered" },
+  "page": {
+    "eyebrow": "Questions or something not working? Let us know",
+    "title": "Contact us",
+    "jumpToMine": "{count, plural, one {See my # inquiry ↓} other {See my # inquiries ↓}}",
+    "mine": "My inquiries",
+    "mineFailed": "We couldn't load your inquiries. Please try again in a moment.",
+    "mineEmpty": "You haven't sent any inquiries yet."
+  },
+  "form": {
+    "category": "Topic",
+    "title": "Subject",
+    "titlePlaceholder": "Briefly, what's going on?",
+    "content": "Message",
+    "contentPlaceholder": "Tell us when it happened and on which screen, and we can help faster.",
+    "email": "You can also email us",
+    "submitting": "Sending",
+    "submit": "Send inquiry",
+    "needCategory": "Please choose a topic.",
+    "needTitle": "Please add a subject.",
+    "needContent": "Please write your message.",
+    "sent": "Got it. You'll find our reply under My inquiries.",
+    "failed": "We couldn't send your inquiry. Please try again."
+  },
+  "detail": {
+    "back": "← My inquiries",
+    "mine": "My inquiry",
+    "answer": "Letter's reply",
+    "from": "From. Letter",
+    "waiting": "Our reply will show up here."
+  }
+}

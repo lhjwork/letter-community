@@ -6,17 +6,20 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import LocaleSwitch from "@/components/LocaleSwitch";
 import LoginDialog from "./LoginDialog";
 import MobileSideMenu from "./MobileSideMenu";
 
 export const NAV = [
-  { href: "/write", label: "편지 쓰기" },
-  { href: "/stories", label: "사연" },
-  { href: "/letter-box", label: "우편함" },
+  { href: "/write", key: "write" },
+  { href: "/stories", key: "stories" },
+  { href: "/letter-box", key: "letterBox" },
 ] as const;
 
 const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
-export function todayLabel(d = new Date()) {
+export function todayLabel(locale: string, d = new Date()) {
+  if (locale !== "ko") return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${DAYS[d.getDay()]}`;
 }
 
@@ -29,6 +32,8 @@ function currentSection(path: string) {
 }
 
 export default function Header() {
+  const t = useTranslations("shared.header");
+  const locale = useLocale();
   const { data: session, status } = useSession();
   const current = currentSection(usePathname() ?? "");
   const loggedIn = status === "authenticated";
@@ -56,20 +61,20 @@ export default function Header() {
     <>
       {/* 데스크톱 헤더 */}
       <header className="mx-auto flex w-full max-w-[1180px] flex-wrap items-center justify-between gap-4 px-6 pb-[18px] pt-[22px] mobile-down:hidden">
-        <Link href={loggedIn ? "/home" : "/"} aria-label="레터 홈" className="flex items-center gap-2">
+        <Link href={loggedIn ? "/home" : "/"} aria-label={t("home")} className="flex items-center gap-2">
           <Image src="/v8/logo.png" alt="" width={66} height={44} className="h-11 w-[66px] object-contain" priority />
           <span className="font-pen text-[34px] leading-none text-ink">Letter</span>
         </Link>
-        <nav aria-label="주 메뉴" className="flex flex-wrap gap-[34px] font-pen text-[22px]">
-          {NAV.map((n) => navItem(n.href, n.label, "inline-flex min-h-11 items-center border-b-2 text-ink hover:text-brick"))}
+        <nav aria-label={t("mainMenu")} className="flex flex-wrap gap-[34px] font-pen text-[22px]">
+          {NAV.map((n) => navItem(n.href, t(`nav.${n.key}`), "inline-flex min-h-11 items-center border-b-2 text-ink hover:text-brick"))}
         </nav>
         <div className="flex items-center gap-[18px]">
           <span className="font-pen text-lg text-ink-3" suppressHydrationWarning>
-            {todayLabel()}
+            {todayLabel(locale)}
           </span>
           {loggedIn ? (
             <Link href="/my-page" className="inline-flex min-h-11 items-center border-b-[1.5px] border-ink font-pen text-xl text-ink hover:text-brick">
-              {session?.user?.name ?? "마이페이지"}
+              {session?.user?.name ?? t("myPage")}
             </Link>
           ) : (
             <button
@@ -77,29 +82,30 @@ export default function Header() {
               onClick={() => openLoginDialog("/")}
               className="inline-flex min-h-11 cursor-pointer items-center border-b-[1.5px] border-ink bg-transparent font-pen text-xl text-ink hover:text-brick"
             >
-              로그인
+              {t("login")}
             </button>
           )}
+          <LocaleSwitch className="inline-flex min-h-11 items-center font-pen text-xl text-ink hover:text-brick" />
         </div>
       </header>
 
       {/* 모바일 헤더 */}
       <header className="hidden w-full items-center justify-between gap-3 px-4 pb-2.5 pt-3 mobile-down:flex">
-        <Link href={loggedIn ? "/home" : "/"} aria-label="레터 홈" className="flex items-center gap-1.5">
+        <Link href={loggedIn ? "/home" : "/"} aria-label={t("home")} className="flex items-center gap-1.5">
           <Image src="/v8/logo.png" alt="" width={54} height={36} className="h-9 w-[54px] object-contain" priority />
           <span className="font-pen text-[30px] leading-none text-ink">Letter</span>
         </Link>
         <div className="flex items-center gap-1">
           {loggedIn ? (
-            <Link href="/letter-box" aria-label="우편함" className="inline-flex h-11 w-11 items-center justify-center">
+            <Link href="/letter-box" aria-label={t("letterBox")} className="inline-flex h-11 w-11 items-center justify-center">
               <MailIcon />
             </Link>
           ) : (
-            <button type="button" aria-label="우편함" onClick={() => openLoginDialog("/letter-box")} className="inline-flex h-11 w-11 items-center justify-center">
+            <button type="button" aria-label={t("letterBox")} onClick={() => openLoginDialog("/letter-box")} className="inline-flex h-11 w-11 items-center justify-center">
               <MailIcon />
             </button>
           )}
-          <button type="button" aria-label="메뉴" onClick={() => setIsMobileMenuOpen(true)} className="inline-flex h-11 w-11 items-center justify-center">
+          <button type="button" aria-label={t("menu")} data-menu-button onClick={() => setIsMobileMenuOpen(true)} className="inline-flex h-11 w-11 items-center justify-center">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="text-ink">
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>

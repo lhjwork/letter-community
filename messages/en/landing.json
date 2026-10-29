@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "title": "Letter Community",
+    "description": "A community for sharing your stories",
+    "ogAlt": "Letter — letters that get a reply"
+  },
+  "hero": {
+    "eyebrow": "Letters that get a reply",
+    "title1": "Someone reads it,",
+    "title2": "someone writes back",
+    "body1": "Instead of words that rush by, letters you write slowly and wait for.",
+    "body2": " Share a story and a reply comes back. Write a letter and it travels as a single link.",
+    "storyCta": "Share a story",
+    "writeCta": "Write a letter",
+    "imageAlt": "A Letter envelope with a Seongsu 26 stamp"
+  },
+  "twoLetters": {
+    "title": "Letter has two kinds of letters",
+    "story": {
+      "stamp": "Story letter",
+      "title": "A reply from someone you don't know",
+      "sub": "Leave the story you couldn't tell anyone.",
+      "cta": "Share a story",
+      "steps": [
+        { "desktop": "Share a story and *Letter always writes you a reply*", "mobile": "*Letter always replies* to your story" },
+        { "desktop": "_Other readers_ write replies too", "mobile": "_Other readers_ reply too" },
+        { "desktop": "*The reply Letter picks* is sent to you", "mobile": "*The reply Letter picks* reaches you" },
+        { "desktop": "If you like, get that reply as a +paper letter+", "mobile": "Get it as a +paper letter+ if you like" }
+      ]
+    },
+    "friend": {
+      "stamp": "Heart letter",
+      "title": "A letter to someone you know",
+      "sub": "To your parents, a friend, someone you haven't seen in a while.",
+      "cta": "Write a letter",
+      "steps": [
+        { "desktop": "Write a _letter_ here", "mobile": "Write a _letter_ and get a *link*" },
+        { "desktop": "Send the *link* by KakaoTalk or text", "mobile": "In chat it shows up _like an envelope_" },
+        { "desktop": "They see the title and first line _like an envelope_", "mobile": "_They_ open it and read" },
+        { "desktop": "They can get it as a +paper letter+ too", "mobile": "Get it as a +paper letter+ if they like" }
+      ]
+    }
+  },
+  "waiting": {
+    "title": "Stories waiting for a reply",
+    "viewAll": "See all stories",
+    "viewAllShort": "All",
+    "replies": "{count, plural, one {# reply} other {# replies}}",
+    "waiting": "Waiting for a reply",
+    "storyLabel": "Story",
+    "defaultRecipient": "Letter"
+  },
+  "linkLetter": {
+    "stamp": "Heart letter",
+    "title1": "A single link",
+    "title2": "becomes an envelope",
+    "body": "Send the link and they see the title and first line first, like an envelope. If they'd like it on paper, they can request it right there.",
+    "cta": "Write a letter",
+    "chat": {
+      "message": "Mom, I wrote you a letter. Read it when you have a moment.",
+      "title": "To Mom, from your 33-year-old daughter",
+      "previewLong": "Mom, I keep thinking of you lately. I'm only now starting to understand why you said what you did back then…",
+      "previewShort": "Mom, I keep thinking of you lately…",
+      "footer": "letter · Open the letter"
+    }
+  },
+  "physical": {
+    "title1": "Turn the letter on your screen",
+    "title2": "into paper",
+    "body": "Whether it's a reply to your story or a letter sent by link, just ask and Letter will copy it onto paper and mail it to you.",
+    "cta": "Read replies and request",
+    "imageAlt": "Illustration of a hand writing a letter and an envelope"
+  },
+  "contact": {
+    "title": "Need help? Reach out anytime",
+    "cta": "Contact us"
+  },
+  "stories": {
+    "metaTitle": "Stories waiting for a reply | Letter",
+    "eyebrow": "Stories from people you don't know",
+    "title": "Stories waiting for a reply",
+    "cta": "Share your story",
+    "ctaMobile": "+ Share a story",
+    "loadError": "We couldn't load the stories."
+  },
+  "notFound": {
+    "message": "We couldn't find the page you were looking for.",
+    "home": "Back to home",
+    "placeholder": "Temporary page — replace the design and content later."
+  },
+  "error": {
+    "title": "Something got in the way",
+    "body": "We couldn't load this page. Please try again in a moment.",
+    "retry": "Try again",
+    "home": "Go home"
+  }
+}

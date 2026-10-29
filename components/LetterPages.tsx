@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 /* 실물 편지지(/v8/letter-paper.png) 한 장 = To. 1줄 + 본문 9줄 + From. 1줄.
  * 본문이 9줄을 넘으면 같은 편지지가 2장, 3장으로 이어 붙는다. 쓰기·읽기 화면 공용.
@@ -102,6 +103,7 @@ function measureBreaks(m: HTMLDivElement, text: string, firstCap: number): numbe
 }
 
 export default function LetterPages({ label, stamp, to, from, title, text, edit, onPages }: Props) {
+  const t = useTranslations("shared.letterPages");
   const firstCap = LINES_PER_PAGE - (title ? 1 : 0);
   const [breaks, setBreaks] = useState<number[]>([]);
   const [tick, setTick] = useState(0); // 폭·폰트가 바뀌거나 커서만 옮길 때 다시 그린다
@@ -237,7 +239,7 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
                   areas.current[i] = el;
                 }}
                 id={first ? edit.id : `${edit.id}-${i + 1}`}
-                aria-label={first ? undefined : `${label} ${i + 1}장`}
+                aria-label={first ? undefined : t("page", { label, n: i + 1 })}
                 placeholder={first ? edit.placeholder : undefined}
                 value={slice}
                 autoComplete="off"
@@ -278,15 +280,15 @@ export default function LetterPages({ label, stamp, to, from, title, text, edit,
       </div>
 
       {pages.length > 1 && (
-        <nav className="flex items-center justify-center gap-4 font-pen text-xl text-ink-2 mobile-down:text-lg" aria-label="편지지 넘기기">
+        <nav className="flex items-center justify-center gap-4 font-pen text-xl text-ink-2 mobile-down:text-lg" aria-label={t("nav")}>
           <button type="button" onClick={() => go(cur - 1)} disabled={cur === 0} className="inline-flex min-h-11 items-center px-2 hover:text-brick disabled:opacity-30">
-            ‹ 앞 장
+            {t("prev")}
           </button>
           <span className="font-anton text-sm tracking-[0.1em] text-ink-3" aria-live="polite">
             {cur + 1} / {pages.length}
           </span>
           <button type="button" onClick={() => go(cur + 1)} disabled={cur === pages.length - 1} className="inline-flex min-h-11 items-center px-2 hover:text-brick disabled:opacity-30">
-            다음 장 ›
+            {t("next")}
           </button>
         </nav>
       )}

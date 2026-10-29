@@ -2,6 +2,7 @@
 
 import { type ReactNode, useLayoutEffect, useRef } from "react";
 import * as D from "@radix-ui/react-dialog";
+import { useTranslations } from "next-intl";
 
 export const V8Title = D.Title;
 export const V8Close = D.Close;
@@ -27,6 +28,7 @@ type Props = {
  */
 export default function V8Dialog({ open, onOpenChange, stamp, stampTone = "text-ink", width = "max-w-[480px]", described = false, children }: Props) {
   // D.Trigger 를 쓰지 않아 Radix 가 닫을 때 돌려보낼 곳을 모른다 → 열기 직전 포커스(연 버튼)를 기억해 둔다
+  const t = useTranslations("shared.dialog");
   const opener = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     if (open) {
@@ -53,7 +55,7 @@ export default function V8Dialog({ open, onOpenChange, stamp, stampTone = "text-
           <div className="airmail absolute inset-x-0 top-0 h-2 mobile-down:hidden" aria-hidden="true" />
           <div className="contents mobile-down:flex mobile-down:items-center mobile-down:justify-between">
             <span className={`stampbox absolute -top-4 left-6 bg-paper mobile-down:static mobile-down:text-[22px] ${stampTone}`}>{stamp}</span>
-            <D.Close aria-label="닫기" className="absolute right-3.5 top-3.5 z-10 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3 mobile-down:static">
+            <D.Close aria-label={t("close")} className="absolute right-3.5 top-3.5 z-10 inline-flex h-11 w-11 items-center justify-center font-pen text-[26px] text-ink-3 mobile-down:static">
               ✕
             </D.Close>
           </div>

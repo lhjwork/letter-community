@@ -1,0 +1,73 @@
+{
+  "meta": { "title": "Mailbox", "likes": "Saved stories", "addresses": "Address book" },
+  "steps": {
+    "label": "Progress",
+    "requested": "Awaiting approval",
+    "rejected": "Declined",
+    "approved": "Approved",
+    "writing": "Being handwritten",
+    "sent": "Sent",
+    "delivered": "Delivered"
+  },
+  "pager": { "label": "Pages", "prev": "Previous", "next": "Next" },
+  "back": "← Mailbox",
+  "loadFailed": "We couldn't load this list.",
+  "home": {
+    "eyebrow": "Your letters, stories, and replies, all in one place",
+    "title": "Mailbox",
+    "newStory": "Share a story",
+    "newLetter": "Write a letter",
+    "tabsLabel": "Mailbox sections",
+    "tabs": { "letters": "My letters", "stories": "My stories", "replies": "Replies" },
+    "likes": "Saved stories",
+    "drafts": "Drafts",
+    "empty": {
+      "letters": "You haven't written any letters yet.",
+      "stories": "You haven't shared any stories yet.",
+      "replies": "No replies yet. Share a story and Letter will write back."
+    },
+    "addressBook": "Address book",
+    "noAddresses": "No saved addresses yet.",
+    "default": "Default",
+    "manageAddresses": "Manage addresses"
+  },
+  "card": {
+    "reply": "Reply",
+    "adopted": "Chosen",
+    "heart": "Heart letter",
+    "physicalRequested": "Paper requested",
+    "story": "Story",
+    "untitled": "Untitled",
+    "replyTo": "Reply to ‘{title}’",
+    "replyFrom": "Reply to ‘{title}’"
+  },
+  "requests": {
+    "title": "Paper letter requests",
+    "requestedOn": "Requested {date}",
+    "envelope": "{name} envelope",
+    "view": "View requests",
+    "none": "No requests yet.",
+    "failed": "We couldn't load your requests."
+  },
+  "likes": {
+    "title": "Saved stories",
+    "empty": "You haven't saved any stories yet.",
+    "browse": "Browse stories"
+  },
+  "addresses": {
+    "title": "Address book",
+    "failed": "We couldn't load your address book.",
+    "eyebrow": "The people who'll get your paper letters",
+    "desc": "When you request a paper letter, you can pull addresses saved here.",
+    "add": "+ Add address",
+    "empty": "No saved addresses yet.",
+    "loginRequired": "Please log in.",
+    "setDefaultFailed": "We couldn't set this as your default address.",
+    "deleteTitle": "Delete this address?",
+    "deleteDesc": "{name}'s address will be removed from your address book.",
+    "delete": "Delete",
+    "deleteFailed": "We couldn't delete it.",
+    "summary": "{total, plural, one {# paper letter request} other {# paper letter requests}} on your letters",
+    "viewStatus": "View request status"
+  }
+}

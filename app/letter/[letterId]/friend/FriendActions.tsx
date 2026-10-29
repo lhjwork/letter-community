@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { track } from "@/lib/analytics/ga";
 import { deleteLetter } from "@/lib/api";
 import { showAlert } from "@/components/ui/AppAlert";
@@ -24,19 +25,18 @@ function useViewTrack(letterId: string, isAuthor: boolean) {
 /** 수신자·비로그인: 종이로 받기(#request) · 링크 복사 · 나도 편지 쓰기 */
 export function ReaderActions({ letterId, canRequest }: { letterId: string; canRequest: boolean }) {
   useViewTrack(letterId, false);
+  const t = useTranslations("letter.friendActions");
   return (
     <div className={ROW}>
       {canRequest && (
         <JumpLink to="request" className="btn btn-brick min-h-14 px-8 text-[28px]">
-          이 편지, 종이로 받기
+          {t("requestPaper")}
         </JumpLink>
       )}
       <div className="contents mobile-down:flex mobile-down:gap-2.5">
         <CopyLinkButton className={SUB} />
         <AuthLink href="/write" className="btn btn-blue mobile-down:flex-1 mobile-down:px-3 mobile-down:text-[22px]">
-          <span>
-            나도 <span className="mobile-down:hidden">편지 </span>쓰기
-          </span>
+          <span>{t.rich("writeToo", { wide: (c) => <span className="mobile-down:hidden">{c}</span> })}</span>
         </AuthLink>
       </div>
     </div>
@@ -46,12 +46,13 @@ export function ReaderActions({ letterId, canRequest }: { letterId: string; canR
 /** 작성자: 링크 복사 · 수정 · 삭제(ConfirmDialog) */
 export function AuthorActions({ letterId }: { letterId: string }) {
   useViewTrack(letterId, true);
+  const t = useTranslations("letter.friendActions");
   const router = useRouter();
   const { data: session } = useSession();
   const [confirm, setConfirm] = useState(false);
 
   const remove = async () => {
-    if (!session?.backendToken) return showAlert("로그인이 필요해요.", { tone: "error" });
+    if (!session?.backendToken) return showAlert(t("loginRequired"), { tone: "error" });
     await deleteLetter(letterId, session.backendToken);
     track("letter_delete", { letter_type: "friend", letter_id: letterId });
     router.push("/letter-box");
@@ -62,13 +63,13 @@ export function AuthorActions({ letterId }: { letterId: string }) {
       <CopyLinkButton className="btn btn-brick min-h-14 px-8 text-[28px]" />
       <div className="contents mobile-down:flex mobile-down:gap-2.5">
         <Link href={`/write?kind=friend&id=${letterId}`} className="btn btn-blue mobile-down:flex-1 mobile-down:px-3 mobile-down:text-[22px]">
-          수정하기
+          {t("edit")}
         </Link>
         <button type="button" onClick={() => setConfirm(true)} className={SUB}>
-          삭제하기
+          {t("delete")}
         </button>
       </div>
-      <ConfirmDialog open={confirm} onOpenChange={setConfirm} title="편지를 삭제할까요?" description="삭제한 편지는 되돌릴 수 없고, 링크로도 열리지 않아요." confirmText="삭제" variant="destructive" onConfirm={remove} />
+      <ConfirmDialog open={confirm} onOpenChange={setConfirm} title={t("deleteTitle")} description={t("deleteDescription")} confirmText={t("deleteConfirm")} variant="destructive" onConfirm={remove} />
     </div>
   );
 }

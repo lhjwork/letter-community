@@ -1,0 +1,8 @@
+{
+  "draft": {
+    "loginRequired": "Please log in.",
+    "empty": "There's nothing to save yet.",
+    "saveFailed": "We couldn't save your draft.",
+    "saveError": "Something went wrong while saving."
+  }
+}

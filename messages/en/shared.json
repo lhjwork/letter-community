@@ -1,0 +1,157 @@
+{
+  "footer": {
+    "tagline": "Letters that get a reply",
+    "instagram": "Letter on Instagram (new window)",
+    "notices": "Notices",
+    "inquiry": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "header": {
+    "nav": {
+      "write": "Write",
+      "stories": "Stories",
+      "letterBox": "Mailbox"
+    },
+    "home": "Letter home",
+    "mainMenu": "Main menu",
+    "myPage": "My page",
+    "login": "Log in",
+    "letterBox": "Mailbox",
+    "menu": "Menu"
+  },
+  "mobileMenu": {
+    "closeMenu": "Close menu",
+    "fullMenu": "Full menu",
+    "close": "Close",
+    "myPage": "My page →",
+    "login": "Log in",
+    "drafts": "Drafts",
+    "leaveStory": "Share a story",
+    "logout": "Log out",
+    "notices": "Notices",
+    "inquiry": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "instagram": "Instagram ↗"
+  },
+  "login": {
+    "stamp": "Log in",
+    "title1": "To write a letter,",
+    "title2": "please log in",
+    "inquiryNoLogin": "To contact us without logging in, send us an email.",
+    "lead": "Your letters and the replies you get are kept in your mailbox.",
+    "kakao": "Continue with Kakao",
+    "naver": "Continue with Naver",
+    "required": "Required",
+    "terms": "I agree to the <link>Terms of Service</link>",
+    "privacy": "I agree to the <link>collection and use of personal information</link>",
+    "expired1": "Your session has expired",
+    "expired2": "Please log in again",
+    "continue1": "Log in to",
+    "continue2": "pick up where you left off"
+  },
+  "letterPages": {
+    "page": "{label}, page {n}",
+    "nav": "Turn pages",
+    "prev": "‹ Previous",
+    "next": "Next ›"
+  },
+  "address": {
+    "stamp": "Address",
+    "title": "Recipient's address",
+    "name": "Name",
+    "namePlaceholder": "Recipient's name",
+    "phone": "Phone",
+    "optional": "(optional)",
+    "address": "Address",
+    "zipPlaceholder": "Postal code",
+    "addressPlaceholder": "Address",
+    "addressLabel": "Street address",
+    "detailPlaceholder": "Apt, unit, etc.",
+    "detailLabel": "Address details",
+    "setDefault": "Set as default",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving",
+    "errName": "Please enter the recipient's name.",
+    "errPhone": "Please use only numbers and - for the phone number.",
+    "errAddress": "Please pick an address using postal code search.",
+    "errSave": "Couldn't save. Please try again.",
+    "defaultBadge": "Default",
+    "makeDefault": "Make default",
+    "noPhone": "No phone number",
+    "edit": "Edit",
+    "editLabel": "Edit {name}'s address",
+    "delete": "Delete",
+    "deleteLabel": "Delete {name}'s address",
+    "postcode": "Find postal code",
+    "postcodeLoading": "Loading",
+    "postcodeFailed": "Couldn't open",
+    "postcodeError": "Couldn't open address search. Please refresh the page."
+  },
+  "share": {
+    "copied": "Link copied",
+    "copyFailed": "Couldn't copy the link. Press and hold the link field to copy it.",
+    "stamp": "Done",
+    "title": "Your letter is in its envelope",
+    "desc1": "Send the link, and it arrives",
+    "desc2": "on their screen like an envelope.",
+    "link": "Share link",
+    "copy": "Copy link",
+    "read": "Read letter"
+  },
+  "dialog": {
+    "close": "Close",
+    "confirmStamp": "Confirm",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "processing": "Working on it"
+  },
+  "stories": {
+    "emptyFiltered": "No stories match these filters.",
+    "empty": "No stories yet.",
+    "loading": "Loading",
+    "more": "More stories",
+    "moreShort": "More",
+    "loadFailed": "Couldn't load. Please tap again.",
+    "searchLabel": "Search stories",
+    "searchPlaceholder": "Search",
+    "categoryGroup": "Feelings",
+    "all": "All",
+    "replies": "{n, plural, one {# reply} other {# replies}}",
+    "waiting": "Awaiting reply",
+    "defaultRecipient": "Letter"
+  },
+  "categories": {
+    "comfort": "Comfort",
+    "family": "Family",
+    "thanks": "Thanks",
+    "love": "Love",
+    "growth": "Growth",
+    "friendship": "Friendship",
+    "memories": "Memories",
+    "other": "Other"
+  },
+  "record": {
+    "label": {
+      "myStory": "My story",
+      "sentReply": "Sent · Reply",
+      "receivedReply": "Received · Reply",
+      "sentHeart": "Sent · Heart letter",
+      "receivedHeart": "Received · Heart letter"
+    },
+    "badge": {
+      "adopted": "Chosen",
+      "reviewing": "In review",
+      "fromLetter": "Reply from Letter",
+      "physical": "Paper requested",
+      "waiting": "Awaiting reply",
+      "replies": "{count, plural, one {# reply} other {# replies}}"
+    },
+    "title": {
+      "wrote": "My reply to ‘{title}’",
+      "received": "Reply to ‘{title}’"
+    }
+  }
+}

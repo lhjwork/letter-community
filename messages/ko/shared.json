@@ -1,0 +1,157 @@
+{
+  "footer": {
+    "tagline": "답장이 있는 편지 플랫폼",
+    "instagram": "레터 인스타그램 (새 창)",
+    "notices": "공지사항",
+    "inquiry": "문의하기",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침"
+  },
+  "header": {
+    "nav": {
+      "write": "편지 쓰기",
+      "stories": "사연",
+      "letterBox": "우편함"
+    },
+    "home": "레터 홈",
+    "mainMenu": "주 메뉴",
+    "myPage": "마이페이지",
+    "login": "로그인",
+    "letterBox": "우편함",
+    "menu": "메뉴"
+  },
+  "mobileMenu": {
+    "closeMenu": "메뉴 닫기",
+    "fullMenu": "전체 메뉴",
+    "close": "닫기",
+    "myPage": "마이페이지 →",
+    "login": "로그인",
+    "drafts": "임시저장",
+    "leaveStory": "사연 남기기",
+    "logout": "로그아웃",
+    "notices": "공지사항",
+    "inquiry": "문의하기",
+    "terms": "이용약관",
+    "privacy": "개인정보처리방침",
+    "instagram": "인스타그램 ↗"
+  },
+  "login": {
+    "stamp": "로그인",
+    "title1": "편지를 쓰려면",
+    "title2": "로그인이 필요해요",
+    "inquiryNoLogin": "로그인 없이 문의하려면 메일로 보내 주세요.",
+    "lead": "쓴 편지와 받은 답장은 우편함에 모여요.",
+    "kakao": "카카오로 시작하기",
+    "naver": "네이버로 시작하기",
+    "required": "필수",
+    "terms": "<link>이용약관</link>에 동의합니다",
+    "privacy": "<link>개인정보 수집·이용</link>에 동의합니다",
+    "expired1": "로그인이 만료됐어요",
+    "expired2": "다시 로그인해 주세요",
+    "continue1": "로그인하면",
+    "continue2": "바로 이어서 볼 수 있어요"
+  },
+  "letterPages": {
+    "page": "{label} {n}장",
+    "nav": "편지지 넘기기",
+    "prev": "‹ 앞 장",
+    "next": "다음 장 ›"
+  },
+  "address": {
+    "stamp": "주소 입력",
+    "title": "받으실 분의 주소",
+    "name": "이름",
+    "namePlaceholder": "수취인 이름",
+    "phone": "연락처",
+    "optional": "(선택)",
+    "address": "주소",
+    "zipPlaceholder": "우편번호",
+    "addressPlaceholder": "주소",
+    "addressLabel": "기본 주소",
+    "detailPlaceholder": "상세주소 (동/호수 등)",
+    "detailLabel": "상세 주소",
+    "setDefault": "기본 배송지로",
+    "cancel": "취소",
+    "save": "저장",
+    "saving": "저장하는 중",
+    "errName": "받으실 분의 이름을 적어 주세요.",
+    "errPhone": "연락처는 숫자와 - 만 적어 주세요.",
+    "errAddress": "우편번호 검색으로 주소를 골라 주세요.",
+    "errSave": "저장하지 못했어요. 다시 시도해 주세요.",
+    "defaultBadge": "기본 배송지",
+    "makeDefault": "기본으로",
+    "noPhone": "연락처 없음",
+    "edit": "수정",
+    "editLabel": "{name} 주소 수정",
+    "delete": "삭제",
+    "deleteLabel": "{name} 주소 삭제",
+    "postcode": "우편번호 검색",
+    "postcodeLoading": "불러오는 중",
+    "postcodeFailed": "열지 못했어요",
+    "postcodeError": "주소 검색을 열지 못했어요. 새로고침해 주세요."
+  },
+  "share": {
+    "copied": "링크를 복사했어요",
+    "copyFailed": "링크를 복사하지 못했어요. 링크 칸을 길게 눌러 복사해 주세요.",
+    "stamp": "편지 완성",
+    "title": "편지가 봉투에 담겼어요",
+    "desc1": "링크를 보내면 받는 사람 화면에",
+    "desc2": "봉투처럼 도착해요.",
+    "link": "공유 링크",
+    "copy": "링크 복사",
+    "read": "편지 읽기"
+  },
+  "dialog": {
+    "close": "닫기",
+    "confirmStamp": "확인",
+    "confirm": "확인",
+    "cancel": "취소",
+    "processing": "처리하는 중"
+  },
+  "stories": {
+    "emptyFiltered": "이 조건에 맞는 사연이 없어요.",
+    "empty": "아직 사연이 없어요.",
+    "loading": "불러오는 중",
+    "more": "사연 더 보기",
+    "moreShort": "더 보기",
+    "loadFailed": "불러오지 못했어요. 다시 눌러 주세요.",
+    "searchLabel": "사연 검색",
+    "searchPlaceholder": "검색",
+    "categoryGroup": "마음",
+    "all": "전체",
+    "replies": "답장 {n}",
+    "waiting": "답장 기다림",
+    "defaultRecipient": "레터"
+  },
+  "categories": {
+    "comfort": "위로",
+    "family": "가족",
+    "thanks": "감사",
+    "love": "사랑",
+    "growth": "성장",
+    "friendship": "우정",
+    "memories": "추억",
+    "other": "기타"
+  },
+  "record": {
+    "label": {
+      "myStory": "나의 사연",
+      "sentReply": "보낸 · 답장",
+      "receivedReply": "받은 · 사연 답장",
+      "sentHeart": "보낸 · 마음 편지",
+      "receivedHeart": "받은 · 마음 편지"
+    },
+    "badge": {
+      "adopted": "채택",
+      "reviewing": "검토 중",
+      "fromLetter": "레터의 답장",
+      "physical": "실물 신청됨",
+      "waiting": "답장 기다림",
+      "replies": "답장 {count}"
+    },
+    "title": {
+      "wrote": "‘{title}’에 쓴 답장",
+      "received": "‘{title}’에 온 답장"
+    }
+  }
+}

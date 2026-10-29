@@ -1,0 +1,506 @@
+{
+  "disclaimer": "This English translation is provided for convenience; the Korean version governs.",
+  "terms": {
+    "metaTitle": "Terms of Service",
+    "title": "Terms of Service",
+    "effective": "Effective date: October 27, 2026",
+    "chapters": [
+      {
+        "title": "Chapter 1. General Provisions",
+        "articles": [
+          {
+            "title": "Article 1 (Purpose)",
+            "p": "These Terms set out the conditions and procedures for using the letter writing and sharing community service provided by the individual operator (the \"Operator\") who runs Letter (the \"Service\"), the rights, obligations, and responsibilities of members and the Operator, and other necessary matters. The Service is run on a non-profit basis by an individual who is not a registered business, and all features are provided free of charge."
+          },
+          {
+            "title": "Article 2 (Definitions)",
+            "p": "1. The terms used in these Terms are defined as follows.",
+            "defs": [
+              "\"Service\" means the online community service, such as writing, reading, and sharing letters, that the Operator provides to users free of charge, and may also refer to the website itself.",
+              "\"Member\" means a person who has registered through social login (Kakao, Naver) and can continue to use the features provided by the Service.",
+              "\"Content\" means all posts, such as letters and comments, written by a member within the Service.",
+              "\"Account\" means the member's unique information linked from a social login provider (Kakao, Naver) for identifying the member and using the Service.",
+              "\"Withdrawal\" means a member terminating the service agreement."
+            ],
+            "after": "2. Terms not defined in these Terms are governed by applicable laws and the Service's guidelines."
+          },
+          {
+            "title": "Article 3 (Effect and Amendment of the Terms)",
+            "items": [
+              "The Operator posts these Terms on the Service's initial screen or a linked screen so that members can easily see them.",
+              "The Operator may amend these Terms to the extent that doing so does not violate applicable laws, such as the Act on the Regulation of Terms and Conditions and the Act on Promotion of Information and Communications Network Utilization and Information Protection.",
+              "When amending the Terms, the Operator announces the effective date and the reason for the amendment within the Service, together with the current Terms, at least 7 days before the effective date. However, if the change is unfavorable to members, it is announced with a notice period of at least 30 days.",
+              "Members have the right to refuse the amended Terms. If you do not agree to the amended Terms, you may stop using the Service and withdraw your membership. However, if you continue to use the Service after the amended Terms take effect, you are deemed to have agreed to the changes."
+            ]
+          },
+          {
+            "title": "Article 4 (Rules Outside These Terms)",
+            "p": "Matters not specified in these Terms are governed by applicable laws, such as the Act on Promotion of Information and Communications Network Utilization and Information Protection and the Personal Information Protection Act."
+          }
+        ]
+      },
+      {
+        "title": "Chapter 2. Service Agreement",
+        "articles": [
+          {
+            "title": "Article 5 (Formation of the Service Agreement)",
+            "items": [
+              "The service agreement is formed when a member agrees to these Terms and applies for use, and the Operator accepts the application.",
+              "Agreement to these Terms is deemed to be expressed by checking the terms agreement box at login and proceeding with social login."
+            ]
+          },
+          {
+            "title": "Article 6 (Applying for the Service)",
+            "items": [
+              "Sign-up is done through Kakao or Naver social login, and is completed with the information provided by the social login provider (nickname, email, profile image).",
+              "Children under 14 cannot sign up. If the Operator learns that a child under 14 has signed up, the Operator will delete that account.",
+              "If someone applies using another person's identity, the account will be deleted and the person may be penalized under applicable laws."
+            ]
+          },
+          {
+            "title": "Article 7 (Acceptance and Restriction of Applications)",
+            "items": [
+              "In principle, the Operator accepts applications in the order received, unless there is an operational or technical obstacle.",
+              {
+                "t": "The Operator may decline an application in any of the following cases.",
+                "sub": [
+                  "The application was made using another person's identity",
+                  "The application was made to undermine public peace, order, or good morals",
+                  "The applicant intends to use the Service for an improper purpose",
+                  "Other application requirements set by the Operator are not met"
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Article 8 (Protection and Use of Personal Information)",
+            "items": [
+              "The Operator makes efforts to protect members' personal information as required by applicable laws. The protection and use of members' personal information are governed by applicable laws and the Operator's Privacy Policy.",
+              "The Operator does not disclose or distribute members' personal information to third parties without their consent. However, this does not apply when a request is made under procedures set by law, such as a request from a government agency under applicable laws or for the purpose of a criminal investigation.",
+              "Members may withdraw their consent to the collection and use of the personal information they provided at any time, and consent is withdrawn by withdrawing membership."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapter 3. Obligations of the Parties",
+        "articles": [
+          {
+            "title": "Article 9 (Obligations of the Operator)",
+            "items": [
+              "The Operator does not engage in acts prohibited by law or these Terms or contrary to public order and morals, and does its best to provide the Service continuously and reliably.",
+              "The Operator builds security systems to protect personal information so that members can use the Service safely, and publishes and complies with the Privacy Policy.",
+              "If an opinion or complaint raised by a user is objectively recognized as justified, the Operator handles it through appropriate procedures. If it cannot be handled immediately, the Operator informs the member of the reason and the schedule."
+            ]
+          },
+          {
+            "title": "Article 10 (Obligations of Members)",
+            "items": [
+              "Members must comply with these Terms, other rules set by the Operator, and notices, and must not interfere with the operation of the Service or damage the Operator's reputation.",
+              "Members may not use the Service for commercial activities without the Operator's prior consent, and the Operator is not responsible for the results of such activities.",
+              {
+                "t": "Members must not do any of the following in connection with using the Service.",
+                "sub": [
+                  "Entering false information or using another person's information when changing member information",
+                  "Posting content that slanders, insults, or defames others",
+                  "Posting or spreading vulgar or obscene content",
+                  "Posting spam or advertising content",
+                  "Uploading or sharing illegal content",
+                  "Collecting, storing, or disclosing others' personal information without permission",
+                  "Impersonating the Operator or anyone involved with the Service",
+                  "Hacking the Service's servers or altering the website or posted information without authorization",
+                  "Harming or intentionally disrupting the Service",
+                  "Infringing the copyright or other intellectual property rights of the Operator or third parties",
+                  "Acts objectively judged to be connected with crime",
+                  "Other acts that violate applicable laws"
+                ]
+              },
+              "If the information provided at sign-up changes, members must update it immediately, and members are responsible for any disadvantage caused by failing to do so."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapter 4. Using the Service",
+        "articles": [
+          {
+            "title": "Article 11 (Provision and Changes of the Service)",
+            "items": [
+              "The Operator provides members with community services such as writing, reading, and sharing letters.",
+              "The Service is run on a non-profit basis by an individual, and all features, including writing and sharing letters and sending physical letters, are provided free of charge. Members are not charged any fees. If paid features are added in the future, they will be announced 30 days before they take effect, and paid features will apply only to members who separately agree to them.",
+              "When the Service changes, the Operator notifies members of the details and the start date of the changed service through notices within the Service."
+            ]
+          },
+          {
+            "title": "Article 12 (Service Hours)",
+            "items": [
+              "In principle, the Service operates 24 hours a day, year-round, unless there is a particular operational or technical obstacle. However, it may be temporarily suspended for regular system maintenance, expansion, or replacement, and planned interruptions are announced in advance.",
+              {
+                "t": "The Operator may restrict or suspend all or part of the Service in any of the following cases.",
+                "sub": [
+                  "Repair, inspection, replacement, or failure of telecommunications equipment",
+                  "When normal use is hindered, such as by a surge in usage",
+                  "National emergencies or other force majeure events"
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Article 13 (Copyright and Management of Posts)",
+            "items": [
+              "Copyright in posts (such as letters) that a member publishes within the Service belongs to that member.",
+              "The Operator may not use posts commercially without the poster's consent. However, the Operator has the right to display them within the scope of operating the Service (such as display within the Service and sharing features).",
+              {
+                "t": "The Operator may delete, move, or refuse to register posts or materials that fall under any of the following without prior notice.",
+                "sub": [
+                  "Content that seriously insults or damages the reputation of other members or third parties",
+                  "Spreading or linking to content that violates public order and good morals",
+                  "Content that encourages piracy or hacking",
+                  "Advertising for profit",
+                  "Content objectively recognized as connected with crime",
+                  "Content that infringes the copyright or other rights of other members or third parties",
+                  "Spam posts",
+                  "Other content judged to violate applicable laws"
+                ]
+              },
+              "Any civil or criminal liability arising from a member's post infringing another person's copyright is borne entirely by that member.",
+              "Copyright and other intellectual property rights in works created by the Operator belong to the Operator."
+            ]
+          },
+          {
+            "title": "Article 14 (Providing Information and Notices)",
+            "items": [
+              "The Operator may provide members with information it considers necessary while using the Service through notices, email, or other means.",
+              "Notices to an unspecified large number of members may replace individual notice by being posted in the Service's notices for at least 7 days."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapter 5. Termination and Restriction of Use",
+        "articles": [
+          {
+            "title": "Article 15 (Termination)",
+            "items": [
+              "Members may apply to terminate the service agreement (withdraw membership) at any time through My Page or the settings menu within the Service, and the Operator processes it immediately as required by law.",
+              "When a member terminates the agreement, the member's personal information is deleted immediately, except where it is retained under applicable laws and the Privacy Policy.",
+              "When a member terminates the agreement, posts written by the member may not be deleted, so if you want them deleted, please delete them yourself before withdrawing."
+            ]
+          },
+          {
+            "title": "Article 16 (Restriction of Use)",
+            "items": [
+              "The Operator may restrict a member's use of the Service if the member violates obligations under these Terms or interferes with the normal operation of the Service.",
+              "Under the restriction rules, measures such as temporary suspension, account deletion, or termination of the service agreement may be taken, and members are liable to compensate the Operator or other members for damages caused by reasons attributable to them."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapter 6. Damages and Other Matters",
+        "articles": [
+          {
+            "title": "Article 17 (Damages)",
+            "p": "In connection with the use of the Service provided free of charge, the Operator is not liable for any damages for matters not covered by the Privacy Policy. However, this does not apply to damages caused by the Operator's intent or gross negligence."
+          },
+          {
+            "title": "Article 18 (Disclaimer)",
+            "items": [
+              "The Operator is exempt from liability when it cannot provide the Service due to natural disasters, war, other force majeure, or causes beyond the Operator's reasonable control.",
+              "The Operator is exempt from liability for damages caused by unavoidable reasons such as repair, replacement, regular maintenance, or construction of service equipment.",
+              "The Operator is not responsible for disruptions or damages to the use of the Service caused by reasons attributable to the user.",
+              "The Operator is not responsible for members failing to obtain or losing the profits they expect from using the Service.",
+              "The Operator is not responsible for the reliability, accuracy, or other aspects of the information, materials, or facts posted by members on the Service.",
+              "The Operator has no obligation to intervene in disputes arising through the Service between members or between members and third parties, and is not liable for damages resulting from them.",
+              "Notwithstanding the other paragraphs of this Article, the Operator is liable for damages caused by the Operator's intent or gross negligence."
+            ]
+          },
+          {
+            "title": "Article 19 (No Transfer)",
+            "p": "Members may not transfer or give their right to use the Service or any other position under the service agreement to another person, or provide it as collateral."
+          },
+          {
+            "title": "Article 20 (Jurisdiction and Governing Law)",
+            "items": [
+              "The laws of the Republic of Korea apply to disputes between the Operator and members arising from the use of the Service.",
+              "Lawsuits concerning disputes between the Operator and members are filed with a court of the Republic of Korea that has jurisdiction under the Civil Procedure Act."
+            ]
+          }
+        ]
+      }
+    ],
+    "footer": {
+      "effective": "Addendum: These Terms take effect on October 27, 2026.",
+      "history": [
+        "Established on August 1, 2026",
+        "Amended on October 27, 2026: stated individual operator and free operation, restricted sign-up for children under 14, added an intent and gross negligence exception to the disclaimer"
+      ]
+    }
+  },
+  "privacy": {
+    "metaTitle": "Privacy Policy",
+    "title": "Privacy Policy",
+    "effective": "Effective date: October 27, 2026",
+    "intro": "The individual operator (the \"Operator\") of Letter (the \"Service\") establishes and discloses this Privacy Policy, in accordance with Article 30 of the Personal Information Protection Act, to protect data subjects' personal information and to handle related concerns promptly and smoothly.",
+    "a1": {
+      "title": "Article 1 (Purposes of Processing Personal Information)",
+      "p": "The Operator processes personal information for the following purposes. Personal information is not used for any other purpose, and if a purpose changes, the Operator will take the necessary measures, such as obtaining separate consent under Article 18 of the Personal Information Protection Act.",
+      "subs": [
+        {
+          "title": "Sign-up and member management",
+          "body": "We process personal information to confirm your intent to sign up, identify and authenticate you for member services, maintain and manage membership, prevent misuse of the Service, and send notices."
+        },
+        {
+          "title": "Providing the Service",
+          "body": "We process personal information to provide letter writing, reading, and sharing, to provide content, and to show letter authors (nickname, profile image)."
+        },
+        {
+          "title": "Sending physical letters",
+          "body": "If you request a physical letter, we process the recipient's name, phone number, and address to copy the letter by hand and send it by mail."
+        },
+        {
+          "title": "Notifications and inquiries",
+          "body": "We process personal information to send emails about new letters and to review and answer inquiries."
+        },
+        {
+          "title": "Visit statistics",
+          "body": "To improve the Service by seeing which pages are used most, we process visit records only as statistics. We do not use the statistics to identify individuals."
+        }
+      ]
+    },
+    "a2": {
+      "title": "Article 2 (Processing and Retention Periods)",
+      "p": "The Operator processes and retains personal information within the retention and use period set by law or agreed to by the data subject at the time of collection.",
+      "head": [
+        "Item",
+        "Retention period"
+      ],
+      "rows": [
+        [
+          "Member information (nickname, email, profile image, real name)",
+          "Deleted immediately upon withdrawal"
+        ],
+        [
+          "Addresses saved in the address book",
+          "Until the member deletes them or withdraws"
+        ],
+        [
+          "Physical letter request information (recipient's name, phone number, address)",
+          "1 year from the request date (to handle resending and lost-mail inquiries). For requests that have been sent or declined, the name, phone number, and address are destroyed afterward"
+        ],
+        [
+          "Inquiry content",
+          "1 year from the date the answer is completed, then destroyed"
+        ],
+        [
+          "Server access logs",
+          "3 months, then deleted"
+        ],
+        [
+          "Visit statistics (Google Analytics)",
+          "Up to 14 months from collection, then automatically deleted by Google"
+        ]
+      ],
+      "note": "Because the Service is run free of charge by an individual, there is no obligation to keep commercial transaction records. When the periods above end, the information is destroyed without delay."
+    },
+    "a3": {
+      "title": "Article 3 (Personal Information Processed)",
+      "p": "The Operator collects and processes the following personal information. Sign-up is only through Kakao or Naver login, and we do not receive passwords.",
+      "head": [
+        "Category",
+        "Items collected",
+        "How collected"
+      ],
+      "rows": [
+        [
+          "Sign-up (required)",
+          "Nickname, email address, profile image, name (real name)",
+          "Provided at Kakao or Naver login. The real name is used only for sending physical letters and is never shown on screen"
+        ],
+        [
+          "Physical letter request and address book (optional)",
+          "Recipient's name, phone number, postal code, address, detailed address, delivery note",
+          "Entered by the user"
+        ],
+        [
+          "Inquiries (optional)",
+          "Inquiry type, title, content",
+          "Entered by the user"
+        ],
+        [
+          "Collected automatically",
+          "Service usage records, access logs, IP address, cookies, visit statistics (pages viewed, device and browser type, approximate region)",
+          "Generated automatically when using the Service. IP addresses for statistics are stored encrypted (hashed) so the original value cannot be known"
+        ]
+      ]
+    },
+    "a3b": {
+      "title": "Article 3-2 (Children Under 14)",
+      "p": "The Service does not accept sign-ups from children under 14. If we learn that a child under 14 has signed up, we delete the account and its personal information without delay."
+    },
+    "a4": {
+      "title": "Article 4 (Provision of Personal Information to Third Parties)",
+      "p": "The Operator processes personal information only within the scope stated in Article 1 (Purposes of Processing Personal Information), and provides personal information to third parties only in cases under Articles 17 and 18 of the Personal Information Protection Act, such as with the data subject's consent or under special provisions of law.",
+      "strong": "The Operator currently does not provide users' personal information to any third party."
+    },
+    "a4b": {
+      "title": "Article 4-2 (Outsourcing and Overseas Transfer of Personal Information)",
+      "p": "To operate the Service, the Operator entrusts personal information processing as follows. Service data is stored on servers and databases located in the Republic of Korea (Seoul).",
+      "head": [
+        "Entrusted to",
+        "Task",
+        "Processing location"
+      ],
+      "rows": [
+        [
+          "Amazon Web Services, Inc.",
+          "Server operation (serving pages and the API)",
+          "Republic of Korea (AWS Seoul Region)"
+        ],
+        [
+          "MongoDB, Inc.",
+          "Database storage (MongoDB Atlas)",
+          "Republic of Korea (AWS Seoul Region)"
+        ],
+        [
+          "Google LLC",
+          "Sending new letter notification emails (Gmail), visit statistics (Google Analytics)",
+          "Google data centers in the United States and elsewhere"
+        ]
+      ],
+      "transferLead": "The overseas transfer to Google LLC is as follows (Article 28-8 of the Personal Information Protection Act).",
+      "transfer": [
+        "Recipient: Google LLC (Google's privacy contact channels, such as privacy-dpo@google.com)",
+        "Countries: the United States and other countries where Google operates data centers",
+        "When and how: transmitted over the network when a notification email is sent and when a page is visited",
+        "Items: notification emails — recipient's email address and letter title. Visit statistics — the visit statistics items in Article 3 and, if logged in, the Service's internal member number (a pseudonymous number that does not reveal your name) and login method. Name, email, and address are not sent",
+        "Purpose: sending notification emails, visit statistics",
+        "Retention: emails follow Google's policy after sending; visit statistics up to 14 months",
+        "How to opt out: if you let us know through the contact page, we will stop sending notification emails. You can opt out of visit statistics using the method in Article 8, and opting out does not affect your use of the Service."
+      ]
+    },
+    "a5": {
+      "title": "Article 5 (Procedure and Method of Destruction)",
+      "p1": "When personal information is no longer needed, such as when the retention period has passed or the purpose of processing has been achieved, the Operator destroys it without delay.",
+      "p2": "If personal information must be kept under other laws even though the agreed retention period has passed or the purpose has been achieved, it is moved to a separate database (DB) or stored in a different location.",
+      "procTitle": "Destruction procedure",
+      "proc": "The Operator selects personal information for which a reason for destruction has arisen and destroys it.",
+      "methodTitle": "Destruction method",
+      "methods": [
+        "Information in electronic files is deleted using technical methods that make the records unrecoverable.",
+        "Personal information printed on paper is destroyed by shredding or incineration."
+      ]
+    },
+    "a6": {
+      "title": "Article 6 (Rights and Obligations of Data Subjects and Legal Representatives, and How to Exercise Them)",
+      "items": [
+        "Data subjects may exercise their rights at any time, such as requesting access to, correction, deletion, or suspension of processing of their personal information.",
+        "The rights in paragraph 1 may be exercised by email or other means under Article 41(1) of the Enforcement Decree of the Personal Information Protection Act, and the Operator will act on them without delay.",
+        "The rights in paragraph 1 may be exercised through a representative, such as the data subject's legal representative or a person authorized by them.",
+        "Requests for access and suspension of processing may be limited under Article 35(4) and Article 37(2) of the Personal Information Protection Act.",
+        "Deletion of personal information cannot be requested if other laws specify that the information must be collected.",
+        "When access, correction, deletion, or suspension is requested, the Operator verifies that the requester is the data subject or a legitimate representative."
+      ]
+    },
+    "a7": {
+      "title": "Article 7 (Measures to Keep Personal Information Safe)",
+      "p": "The Operator takes the following measures to keep personal information safe.",
+      "items": [
+        {
+          "title": "Encryption of personal information",
+          "body": "Users' personal information is stored and managed encrypted, and important data is encrypted in transit."
+        },
+        {
+          "title": "Access control",
+          "body": "We control access to personal information by granting, changing, and revoking access rights to the systems that process it."
+        },
+        {
+          "title": "Keeping access logs and preventing tampering",
+          "body": "We keep and manage records of access to the personal information processing system for at least 1 year, and use security features to prevent access logs from being altered, stolen, or lost."
+        },
+        {
+          "title": "Secure authentication through social login",
+          "body": "The Operator does not store passwords and handles member authentication securely through Kakao and Naver OAuth."
+        }
+      ]
+    },
+    "a8": {
+      "title": "Article 8 (Automatically Collected Information and How to Refuse It)",
+      "p": "The Operator may use 'cookies' to provide the Service. A cookie is a small piece of information that the website's server sends to your browser, and it may be stored on your computer.",
+      "items": [
+        {
+          "label": "a. Purpose of cookies:",
+          "body": "They are used to keep you logged in and to provide an optimized service by understanding how the Service is used."
+        },
+        {
+          "label": "b. Installing, operating, and refusing cookies:",
+          "body": "You can refuse cookies through your browser's Settings > Privacy (Cookies) options."
+        },
+        {
+          "label": "c.",
+          "body": "If you refuse cookies, you may have difficulty using some services that require login."
+        }
+      ],
+      "gaLabel": "d. Visit statistics (Google Analytics):",
+      "gaBefore": "The Operator uses Google's visit statistics tool (Google Analytics) to see which pages are used most. For this, Google cookies are stored. If you are logged in, only the Service's internal member number (a pseudonymous number that does not reveal your name) and login method are sent along with it; your name, email, and address are not sent to Google. To opt out, block cookies in your browser settings or install the opt-out browser add-on provided by Google (",
+      "gaAfter": ")."
+    },
+    "a9": {
+      "title": "Article 9 (Privacy Officer)",
+      "p": "Because the Service is run by an individual, the Operator personally serves as the privacy officer, takes overall responsibility for personal information processing, and directly handles data subjects' complaints and remedies for damages.",
+      "boxTitle": "▶ Privacy Officer",
+      "name": "Name: Letter Operator",
+      "email": "Email: jin.come.up.business@gmail.com",
+      "note": "Data subjects may contact the privacy officer with any questions, complaints, or requests for remedies related to personal information protection that arise while using the Service. The Operator will respond to and handle inquiries without delay."
+    },
+    "a10": {
+      "title": "Article 10 (Requests for Access to Personal Information)",
+      "p": "Data subjects may request access to their personal information under Article 35 of the Personal Information Protection Act through the contact below. The Operator will make every effort to handle access requests promptly.",
+      "boxTitle": "▶ Access requests",
+      "email": "Email: jin.come.up.business@gmail.com"
+    },
+    "a11": {
+      "title": "Article 11 (Remedies for Infringement of Rights)",
+      "p": "To seek remedies for infringement of personal information, data subjects may apply for dispute resolution or counseling at the following organizations (in Korea).",
+      "orgs": [
+        {
+          "name": "Personal Information Dispute Mediation Committee",
+          "lines": [
+            "Handles: personal information dispute mediation, collective dispute mediation",
+            "Website: www.kopico.go.kr / Phone: 1833-6972 (no area code)"
+          ]
+        },
+        {
+          "name": "Korea Internet & Security Agency (KISA) Privacy Infringement Report Center",
+          "lines": [
+            "Handles: reports of personal information infringement, counseling",
+            "Website: privacy.kisa.or.kr / Phone: 118 (no area code)"
+          ]
+        },
+        {
+          "name": "Supreme Prosecutors' Office Cyber Investigation Division",
+          "lines": [
+            "Phone: 1301 (no area code)"
+          ]
+        },
+        {
+          "name": "Korean National Police Agency Cyber Bureau",
+          "lines": [
+            "Website: ecrm.police.go.kr / Phone: 182 (no area code)"
+          ]
+        }
+      ]
+    },
+    "a12": {
+      "title": "Article 12 (Changes to This Privacy Policy)",
+      "p": "If this Privacy Policy changes, we will announce the changes through notices within the Service. The changed policy takes effect 7 days after the announcement."
+    },
+    "footer": {
+      "effective": "This Privacy Policy takes effect on October 27, 2026.",
+      "history": [
+        "Established on August 1, 2026",
+        "Amended on October 27, 2026: stated individual operator; added items collected for physical letters and inquiries, outsourcing and overseas transfer, visit statistics notice, and sign-up restriction for children under 14; organized retention periods"
+      ]
+    }
+  }
+}

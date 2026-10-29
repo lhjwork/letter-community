@@ -1,0 +1,35 @@
+{
+  "meta": { "title": "문의하기", "detail": "내 문의 | 문의하기" },
+  "categories": { "service": "서비스 이용", "physical": "실물 편지", "account": "계정", "etc": "기타" },
+  "status": { "open": "답변 기다림", "answered": "답변 완료" },
+  "page": {
+    "eyebrow": "궁금한 점이나 불편한 점을 남겨 주세요",
+    "title": "문의하기",
+    "jumpToMine": "내 문의 {count}건 보기 ↓",
+    "mine": "내 문의",
+    "mineFailed": "내 문의를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.",
+    "mineEmpty": "아직 남긴 문의가 없어요."
+  },
+  "form": {
+    "category": "분류",
+    "title": "제목",
+    "titlePlaceholder": "어떤 일인지 짧게 적어 주세요",
+    "content": "내용",
+    "contentPlaceholder": "언제, 어떤 화면에서 생긴 일인지 적어 주시면 더 빨리 도와드릴 수 있어요.",
+    "email": "메일로도 받아요",
+    "submitting": "남기는 중",
+    "submit": "문의 남기기",
+    "needCategory": "문의 분류를 골라 주세요.",
+    "needTitle": "제목을 적어 주세요.",
+    "needContent": "문의 내용을 적어 주세요.",
+    "sent": "문의를 남겼어요. 답변은 내 문의에서 볼 수 있어요.",
+    "failed": "문의를 남기지 못했어요. 다시 시도해 주세요."
+  },
+  "detail": {
+    "back": "← 내 문의",
+    "mine": "내 문의",
+    "answer": "레터의 답변",
+    "from": "From. 레터",
+    "waiting": "답변이 오면 여기에 보여요."
+  }
+}

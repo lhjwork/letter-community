@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { getComments, getStoryReplies } from "@/lib/api";
 import { OG_IMAGE } from "@/lib/og";
@@ -35,9 +36,10 @@ async function getLetter(letterId: string, token?: string): Promise<Letter | nul
 export async function generateMetadata({ params }: { params: Promise<{ letterId: string }> }): Promise<Metadata> {
   const { letterId } = await params;
   const letter = await getLetter(letterId);
+  const t = await getTranslations("letter");
 
   if (!letter) {
-    return { title: "편지를 찾을 수 없습니다" };
+    return { title: t("meta.notFoundTitle") };
   }
 
   // 본문 앞 2줄 → 미리보기 설명(저장된 미리보기가 없을 때)
@@ -51,12 +53,12 @@ export async function generateMetadata({ params }: { params: Promise<{ letterId:
     .slice(0, 2)
     .join(" ")
     .slice(0, 120);
-  const title = (letter.replyTo && `‘${letter.replyTo.title || "사연"}’에 온 답장`) || (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || "당신에게 도착한 편지";
+  const title = (letter.replyTo && t("meta.replyTitle", { title: letter.replyTo.title || t("names.storyFallback") })) || (letter.type === "story" && letter.title) || letter.ogTitle || letter.title || t("meta.defaultTitle");
   // OG 이미지는 항공우편 봉투 한 장(정적). 제목·첫 줄은 카톡·SNS 가 이미지 아래에 따로 보여준다
   const ogImageUrl = `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}${OG_IMAGE}`;
   // 카톡·SNS 미리보기 설명: 저장된 미리보기 → 없으면 본문 앞부분. 줄바꿈은 한 줄로
   const oneLine = (s?: string) => (s || "").replace(/\s+/g, " ").trim();
-  const description = (oneLine(letter.ogPreviewText) || previewText).slice(0, 100) || "특별한 편지가 도착했습니다.";
+  const description = (oneLine(letter.ogPreviewText) || previewText).slice(0, 100) || t("meta.defaultDescription");
 
   return {
     title,

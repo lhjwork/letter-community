@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useLocale, useTranslations } from "next-intl";
 import { track } from "@/lib/analytics/ga";
 import { apiRequest } from "@/lib/api";
 import { getAddresses } from "@/lib/address-api";
@@ -23,6 +24,8 @@ function formatPhone(raw: string) {
 
 /** 실물 편지 신청(#request). 로그인 없이도 신청, 신청 뒤 상태 페이지로 */
 export default function RequestForm({ letterId }: { letterId: string }) {
+  const t = useTranslations("letter.requestForm");
+  const locale = useLocale();
   const router = useRouter();
   const { data: session } = useSession();
   const [f, setF] = useState({ name: "", phone: "", zipCode: "", address1: "", address2: "", memo: "" });
@@ -61,9 +64,9 @@ export default function RequestForm({ letterId }: { letterId: string }) {
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const name = f.name.trim();
-    if (name.length < 2 || name.length > 50) return setError("받으실 분의 이름을 2자 이상 적어 주세요.");
-    if (f.phone && !/^01\d-\d{3,4}-\d{4}$/.test(f.phone)) return setError("연락처를 010-0000-0000 형식으로 적어 주세요.");
-    if (!/^\d{5}$/.test(f.zipCode) || f.address1.length < 5) return setError("우편번호 검색으로 주소를 골라 주세요.");
+    if (name.length < 2 || name.length > 50) return setError(t("errorName"));
+    if (f.phone && !/^01\d-\d{3,4}-\d{4}$/.test(f.phone)) return setError(t("errorPhone"));
+    if (!/^\d{5}$/.test(f.zipCode) || f.address1.length < 5) return setError(t("errorAddress"));
     setError("");
     setBusy(true);
     try {
@@ -77,56 +80,59 @@ export default function RequestForm({ letterId }: { letterId: string }) {
       track("physical_request", { letter_id: letterId, anonymous: !session, is_duplicate: isDuplicate });
       router.push(`/letter/${letterId}/request/${requestId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "신청을 보내지 못했어요. 다시 시도해 주세요.");
+      setError(err instanceof Error ? err.message : t("errorSubmit"));
       setBusy(false);
     }
   };
 
   return (
     <form onSubmit={submit} className="flex flex-[1_1_380px] flex-col gap-3.5 mobile-down:mt-1 mobile-down:flex-none mobile-down:gap-3">
+      {/* 배송은 국내만(다음 우편번호 검색·5자리 우편번호). 한국어 화면은 기존 그대로 */}
+      {locale === "en" && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">{t("koreaOnly")}</p>}
       {prev && (
         <a href={`/letter/${letterId}/request/${prev}`} className="inline-flex min-h-11 items-center self-start font-pen text-xl text-ink-2 hover:text-brick">
-          <span className="border-b-[1.5px] border-current">이미 신청한 편지의 진행 보기</span>
+          <span className="border-b-[1.5px] border-current">{t("viewPrevious")}</span>
         </a>
       )}
       {book && book.length > 0 && (
         <button type="button" onClick={() => setPicking(true)} className="btn btn-blue min-h-11 self-start px-4 text-xl">
-          주소록에서 불러오기
+          {t("loadAddressBook")}
         </button>
       )}
-      {book && book.length === 0 && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">자주 쓰는 주소는 우편함 주소록에 저장해 두면 다음에 불러올 수 있어요.</p>}
+      {book && book.length === 0 && <p className="m-0 text-[15px] leading-[1.8] text-ink-2">{t("addressBookHint")}</p>}
       <label className={LABEL}>
-        <span className={LABEL_TXT}>받으실 분의 이름</span>
-        <input type="text" name="name" value={f.name} onChange={set("name")} maxLength={50} autoComplete="name" required className="field" placeholder="받으실 분의 이름" />
+        <span className={LABEL_TXT}>{t("name")}</span>
+        <input type="text" name="name" value={f.name} onChange={set("name")} maxLength={50} autoComplete="name" required className="field" placeholder={t("name")} />
       </label>
       <label className={LABEL}>
         <span className={LABEL_TXT}>
-          연락처 <span className="text-base text-ink-3">(선택)</span>
+          {t("phone")} <span className="text-base text-ink-3">{t("optional")}</span>
         </span>
         <input type="tel" name="phone" value={f.phone} onChange={set("phone")} inputMode="numeric" autoComplete="tel" className="field" placeholder="010-0000-0000" />
       </label>
       <label className={LABEL}>
-        <span className={LABEL_TXT}>주소</span>
+        <span className={LABEL_TXT}>{t("address")}</span>
         <span className="flex flex-wrap gap-2">
-          <input type="text" name="zipCode" value={f.zipCode} readOnly className="field flex-[1_1_120px]" placeholder="우편번호" />
+          <input type="text" name="zipCode" value={f.zipCode} readOnly className="field flex-[1_1_120px]" placeholder={t("zipCode")} />
           <PostcodeSearch
             onComplete={(d) => setF((s) => ({ ...s, zipCode: d.zipCode, address1: d.address }))}
             className="btn btn-ink min-h-12 whitespace-nowrap text-xl mobile-down:px-3.5 mobile-down:text-lg"
             buttonText={
               <span>
-                <span className="mobile-down:hidden">우편번호 </span>검색
+                <span className="mobile-down:hidden">{t("searchPrefix")}</span>
+                {t("search")}
               </span>
             }
           />
         </span>
       </label>
-      <input type="text" name="address1" value={f.address1} readOnly aria-label="기본 주소" className="field" placeholder="기본 주소" />
-      <input type="text" name="address2" value={f.address2} onChange={set("address2")} maxLength={200} aria-label="상세 주소" className="field" placeholder="동, 호수 등 상세주소" />
+      <input type="text" name="address1" value={f.address1} readOnly aria-label={t("address1")} className="field" placeholder={t("address1")} />
+      <input type="text" name="address2" value={f.address2} onChange={set("address2")} maxLength={200} aria-label={t("address2Label")} className="field" placeholder={t("address2Placeholder")} />
       <label className={LABEL}>
         <span className={LABEL_TXT}>
-          참고 사항 <span className="text-base text-ink-3">(선택)</span>
+          {t("memo")} <span className="text-base text-ink-3">{t("optional")}</span>
         </span>
-        <input type="text" name="memo" value={f.memo} onChange={set("memo")} maxLength={500} className="field" placeholder="배송 시 참고할 사항" />
+        <input type="text" name="memo" value={f.memo} onChange={set("memo")} maxLength={500} className="field" placeholder={t("memoPlaceholder")} />
       </label>
       {error && (
         <p role="alert" className="m-0 text-sm leading-[1.8] text-brick">
@@ -134,11 +140,11 @@ export default function RequestForm({ letterId }: { letterId: string }) {
         </p>
       )}
       <button type="submit" disabled={busy} aria-busy={busy} className="btn btn-brick mt-1.5 min-h-14 text-[26px] mobile-down:mt-1">
-        {busy ? "신청하는 중" : "실물 편지 신청"}
+        {busy ? t("submitting") : t("submit")}
       </button>
 
-      <V8Dialog open={picking} onOpenChange={setPicking} stamp="주소록" stampTone="text-airblue" width="max-w-[520px]">
-        <V8Title className="m-0 font-pen text-[30px] font-normal leading-[1.3] mobile-down:text-[28px]">받으실 분을 골라 주세요</V8Title>
+      <V8Dialog open={picking} onOpenChange={setPicking} stamp={t("bookStamp")} stampTone="text-airblue" width="max-w-[520px]">
+        <V8Title className="m-0 font-pen text-[30px] font-normal leading-[1.3] mobile-down:text-[28px]">{t("bookTitle")}</V8Title>
         <ul className="m-0 flex max-h-[min(420px,60dvh)] list-none flex-col gap-2.5 overflow-y-auto p-0 mobile-down:max-h-none mobile-down:overflow-visible">
           {book?.map((a) => (
             <li key={a._id}>
@@ -149,7 +155,7 @@ export default function RequestForm({ letterId }: { letterId: string }) {
               >
                 <span className="flex items-center gap-2">
                   <span className="font-pen text-2xl">{a.recipientName}</span>
-                  {a.isDefault && <span className="badge bg-approve">기본 배송지</span>}
+                  {a.isDefault && <span className="badge bg-approve">{t("defaultAddress")}</span>}
                 </span>
                 <span className="text-[15px] leading-[1.7] text-ink-2">
                   ({a.zipCode}) {a.address}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { getStories, type GetStoriesParams, type Pagination, type Story } from "@/lib/api";
 import StoryBrick from "./StoryBrick";
 
@@ -8,6 +9,7 @@ type Props = { initial: Story[]; pagination: Pagination; params: GetStoriesParam
 
 /** 벽돌식 목록 + "더 보기"(다음 페이지 이어 붙이기). 필터가 바뀌면 부모가 key 로 새로 마운트한다 */
 export default function StoryList({ initial, pagination, params }: Props) {
+  const t = useTranslations("shared.stories");
   const [stories, setStories] = useState(initial);
   const [page, setPage] = useState(pagination.page);
   const [hasNext, setHasNext] = useState(pagination.hasNextPage);
@@ -40,17 +42,17 @@ export default function StoryList({ initial, pagination, params }: Props) {
         <div className="flex flex-col items-center gap-3 pt-3 mobile-down:-mt-7 mobile-down:pt-0">
           <button type="button" className="btn btn-ink" onClick={loadMore} disabled={loading} aria-busy={loading}>
             {loading ? (
-              "불러오는 중"
+              t("loading")
             ) : (
               <>
-                <span className="mobile-down:hidden">사연 더 보기</span>
-                <span className="hidden mobile-down:inline">더 보기</span>
+                <span className="mobile-down:hidden">{t("more")}</span>
+                <span className="hidden mobile-down:inline">{t("moreShort")}</span>
               </>
             )}
           </button>
           {error && (
             <p role="alert" className="m-0 text-base text-brick">
-              불러오지 못했어요. 다시 눌러 주세요.
+              {t("loadFailed")}
             </p>
           )}
         </div>

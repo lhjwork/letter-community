@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import LoginDialog from "./LoginDialog";
 
 /** ?login=<돌아갈 경로>(&expired=1) 이면 로그인 창을 연다. proxy(보호 페이지)·세션 만료가 이 주소로 보낸다 */
 export default function LoginPrompt() {
+  const t = useTranslations("shared.login");
   const params = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -31,15 +33,15 @@ export default function LoginPrompt() {
       title={
         expired ? (
           <>
-            로그인이 만료됐어요
+            {t("expired1")}
             <br />
-            다시 로그인해 주세요
+            {t("expired2")}
           </>
         ) : (
           <>
-            로그인하면
+            {t("continue1")}
             <br />
-            바로 이어서 볼 수 있어요
+            {t("continue2")}
           </>
         )
       }

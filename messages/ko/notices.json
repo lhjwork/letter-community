@@ -1,0 +1,17 @@
+{
+  "list": {
+    "eyebrow": "레터가 전하는 소식",
+    "title": "공지사항",
+    "loadError": "공지를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.",
+    "empty": "아직 올라온 공지가 없어요.",
+    "pinned": "고정"
+  },
+  "detail": {
+    "metaTitle": "{title} | 공지사항",
+    "metaTitleFallback": "공지사항",
+    "back": "← 공지사항 목록",
+    "stamp": "공지",
+    "from": "From. 레터",
+    "backToList": "목록으로"
+  }
+}

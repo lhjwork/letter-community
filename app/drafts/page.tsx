@@ -4,6 +4,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { getDrafts, deleteDraft } from "@/lib/draft-api";
 import type { DraftLetter } from "@/types/draft";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,6 +20,7 @@ function fmt(iso: string) {
 
 /** 임시저장 목록. 우편함 보드 작업 때 그쪽으로 옮길 수 있음 */
 export default function DraftsPage() {
+  const t = useTranslations("write.drafts");
   const { data: session } = useSession();
   const token = session?.backendToken;
   const [drafts, setDrafts] = useState<DraftLetter[] | null>(null);
@@ -31,10 +33,10 @@ export default function DraftsPage() {
       .then((res) => setDrafts(res.data.drafts))
       .catch((e) => {
         console.error("임시저장 목록 실패:", e);
-        setError("임시저장 목록을 불러오지 못했어요.");
+        setError(t("loadError"));
         setDrafts([]);
       });
-  }, [token]);
+  }, [token, t]);
 
   // 성공하면 목록에서 행이 사라지는 것으로 충분하다. 실패만 한 줄로 알린다
   const remove = async (id: string) => {
@@ -45,7 +47,7 @@ export default function DraftsPage() {
       setDrafts((list) => list?.filter((d) => d._id !== id) ?? null);
     } catch (e) {
       console.error("임시저장 삭제 실패:", e);
-      setError("삭제하지 못했어요. 다시 시도해 주세요.");
+      setError(t("deleteError"));
     }
   };
 
@@ -53,12 +55,12 @@ export default function DraftsPage() {
     <main>
       <section className={`${WRAP} pt-3 mobile-down:pt-1`}>
         <Link href="/letter-box" className="inline-flex min-h-11 items-center font-pen text-xl text-ink-3 hover:text-brick mobile-down:text-lg">
-          ← 우편함
+          {t("back")}
         </Link>
       </section>
       <section className={`${WRAP} flex flex-col gap-3 pb-10 pt-5 mobile-down:gap-2 mobile-down:pb-6 mobile-down:pt-3`}>
-        <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">쓰다 만 편지</p>
-        <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">임시저장</h1>
+        <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">{t("eyebrow")}</p>
+        <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">{t("title")}</h1>
       </section>
       <section className={`${WRAP} pb-24`}>
         {error && (
@@ -67,17 +69,17 @@ export default function DraftsPage() {
           </p>
         )}
         {drafts === null ? (
-          <p className="m-0 font-pen text-xl text-ink-3">불러오는 중...</p>
+          <p className="m-0 font-pen text-xl text-ink-3">{t("loading")}</p>
         ) : drafts.length === 0 ? (
-          <p className="m-0 font-pen text-2xl text-ink-2">임시저장한 편지가 없어요.</p>
+          <p className="m-0 font-pen text-2xl text-ink-2">{t("empty")}</p>
         ) : (
           <ul className="m-0 list-none border-t-2 border-ink p-0">
             {drafts.map((d) => (
               <li key={d._id} className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-rule py-4">
                 <div className="flex min-w-0 flex-1 basis-[280px] flex-col gap-1">
-                  <span className="truncate font-pen text-2xl text-ink">{d.title || d.autoTitle || "제목 없음"}</span>
+                  <span className="truncate font-pen text-2xl text-ink">{d.title || d.autoTitle || t("untitled")}</span>
                   <span className="text-sm text-ink-2">
-                    {d.type === "story" ? "사연 편지" : "마음 편지"}
+                    {d.type === "story" ? t("story") : t("friend")}
                     {d.recipientName ? ` · To. ${d.recipientName}` : ""}
                     {" · "}
                     <span className="font-anton text-xs tracking-[0.1em] text-ink-3">{fmt(d.lastSavedAt)}</span>
@@ -85,10 +87,10 @@ export default function DraftsPage() {
                 </div>
                 <div className="flex gap-2.5">
                   <Link href={`/write?draftId=${d._id}`} className="btn btn-blue min-h-11 px-5 text-xl">
-                    이어 쓰기
+                    {t("continue")}
                   </Link>
                   <button type="button" onClick={() => setRemoving(d)} className="btn min-h-11 border-rule px-3.5 text-lg text-ink-3">
-                    삭제
+                    {t("delete")}
                   </button>
                 </div>
               </li>
@@ -99,9 +101,9 @@ export default function DraftsPage() {
       <ConfirmDialog
         open={removing !== null}
         onOpenChange={(o) => !o && setRemoving(null)}
-        title="이 임시저장을 지울까요"
-        description={removing ? `‘${removing.title || removing.autoTitle || "제목 없음"}’ 임시저장이 지워져요.` : ""}
-        confirmText="삭제"
+        title={t("confirmTitle")}
+        description={removing ? t("confirmDesc", { title: removing.title || removing.autoTitle || t("untitled") }) : ""}
+        confirmText={t("delete")}
         variant="destructive"
         onConfirm={() => removing && remove(removing._id)}
       />

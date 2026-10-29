@@ -1,10 +1,13 @@
 import { auth } from "@/auth";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { FLOWS, TABS, getMe, getMyRecords, type Flow, type Tab } from "./api";
 import MyPageView, { MAX, STEP } from "./MyPageView";
 
-export const metadata: Metadata = { title: "마이페이지 | Letter" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("myPage.meta"))("title") };
+}
 
 const pick = <T extends string>(v: string | string[] | undefined, list: readonly { value: T }[], fallback: T) =>
   list.find((o) => o.value === v)?.value ?? fallback;

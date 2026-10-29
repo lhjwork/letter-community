@@ -1,16 +1,8 @@
 import { apiRequest } from "@/lib/api";
 
-export const TABS = [
-  { value: "all", label: "전체" },
-  { value: "sent", label: "보낸 편지" },
-  { value: "received", label: "받은 편지" },
-  { value: "stories", label: "나의 사연" },
-] as const;
-export const FLOWS = [
-  { value: "all", label: "전체" },
-  { value: "story", label: "사연 편지" },
-  { value: "heart", label: "마음 편지" },
-] as const;
+// 문구는 myPage.tabs.<value> / myPage.flows.<value>
+export const TABS = [{ value: "all" }, { value: "sent" }, { value: "received" }, { value: "stories" }] as const;
+export const FLOWS = [{ value: "all" }, { value: "story" }, { value: "heart" }] as const;
 export type Tab = (typeof TABS)[number]["value"];
 export type Flow = (typeof FLOWS)[number]["value"];
 

@@ -1,0 +1,73 @@
+{
+  "meta": { "title": "우편함", "likes": "마음에 담은 사연", "addresses": "주소록" },
+  "steps": {
+    "label": "진행 단계",
+    "requested": "승인 대기",
+    "rejected": "거절됨",
+    "approved": "승인됨",
+    "writing": "손글씨 작성 중",
+    "sent": "발송",
+    "delivered": "배송 완료"
+  },
+  "pager": { "label": "쪽 이동", "prev": "이전", "next": "다음" },
+  "back": "← 우편함",
+  "loadFailed": "목록을 불러오지 못했어요.",
+  "home": {
+    "eyebrow": "쓴 편지와 사연, 받은 답장이 모여요",
+    "title": "우편함",
+    "newStory": "사연 남기기",
+    "newLetter": "편지 쓰기",
+    "tabsLabel": "우편함 구분",
+    "tabs": { "letters": "내가 쓴 편지", "stories": "내 사연", "replies": "받은 답장" },
+    "likes": "마음에 담은 사연",
+    "drafts": "임시저장",
+    "empty": {
+      "letters": "아직 쓴 편지가 없어요.",
+      "stories": "아직 남긴 사연이 없어요.",
+      "replies": "아직 받은 답장이 없어요. 사연을 남기면 레터가 답장해요."
+    },
+    "addressBook": "주소록",
+    "noAddresses": "저장한 주소가 없어요.",
+    "default": "기본",
+    "manageAddresses": "수신자 주소 관리"
+  },
+  "card": {
+    "reply": "답장",
+    "adopted": "채택",
+    "heart": "마음 편지",
+    "physicalRequested": "실물 신청됨",
+    "story": "사연",
+    "untitled": "제목 없음",
+    "replyTo": "‘{title}’⁠에 쓴 답장",
+    "replyFrom": "‘{title}’⁠에 온 답장"
+  },
+  "requests": {
+    "title": "실물 편지 신청 현황",
+    "requestedOn": "{date} 신청",
+    "envelope": "{name} 봉투",
+    "view": "신청 내역 보기",
+    "none": "아직 들어온 신청이 없어요.",
+    "failed": "신청 현황을 불러오지 못했어요."
+  },
+  "likes": {
+    "title": "마음에 담은 사연",
+    "empty": "마음에 담은 사연이 없어요.",
+    "browse": "사연 보러 가기"
+  },
+  "addresses": {
+    "title": "주소록",
+    "failed": "주소록을 불러오지 못했어요.",
+    "eyebrow": "실물 편지를 받을 분들",
+    "desc": "실물 편지를 신청할 때 여기 저장한 주소를 불러올 수 있어요.",
+    "add": "+ 주소 추가",
+    "empty": "저장한 주소가 없어요.",
+    "loginRequired": "로그인이 필요해요.",
+    "setDefaultFailed": "기본 배송지로 바꾸지 못했어요.",
+    "deleteTitle": "이 주소를 지울까요",
+    "deleteDesc": "{name} 님 주소가 주소록에서 지워져요.",
+    "delete": "삭제",
+    "deleteFailed": "삭제하지 못했어요.",
+    "summary": "내 편지에 들어온 실물 신청 {total}건",
+    "viewStatus": "신청 현황 보기"
+  }
+}

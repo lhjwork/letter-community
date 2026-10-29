@@ -1,6 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
+
+// provider 바깥이라 next-intl 훅을 못 쓴다. 브라우저 언어로만 고르고, 서버 렌더는 한국어
+const TEXT = {
+  ko: { title: "앗, 문제가 생겼어요", line1: "일시적인 오류가 발생했습니다.", line2: "잠시 후 다시 시도해주세요.", retry: "다시 시도", home: "홈으로" },
+  en: { title: "Oops, something went wrong", line1: "A temporary error occurred.", line2: "Please try again in a moment.", retry: "Try again", home: "Home" },
+};
+const noop = () => () => {};
 
 export default function GlobalError({
   error,
@@ -9,8 +17,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const lang = useSyncExternalStore(noop, () => (navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en"), () => "ko" as const);
+  const t = TEXT[lang];
   return (
-    <html lang="ko">
+    <html lang={lang}>
       <body>
         <div
           style={{
@@ -31,7 +41,7 @@ export default function GlobalError({
                 fontFamily: "NanumJangMiCe, cursive",
               }}
             >
-              앗, 문제가 생겼어요
+              {t.title}
             </p>
             <p
               style={{
@@ -40,9 +50,9 @@ export default function GlobalError({
                 marginBottom: "32px",
               }}
             >
-              일시적인 오류가 발생했습니다.
+              {t.line1}
               <br />
-              잠시 후 다시 시도해주세요.
+              {t.line2}
             </p>
             <button
               onClick={reset}
@@ -57,7 +67,7 @@ export default function GlobalError({
                 marginRight: "12px",
               }}
             >
-              다시 시도
+              {t.retry}
             </button>
             <Link
               href="/"
@@ -70,7 +80,7 @@ export default function GlobalError({
                 fontSize: "16px",
               }}
             >
-              홈으로
+              {t.home}
             </Link>
           </div>
         </div>

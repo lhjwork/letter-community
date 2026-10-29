@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useStoriesFilter } from "@/hooks/useStoriesFilter";
 
 export const CATEGORIES = ["위로", "가족", "감사", "사랑", "성장", "우정", "추억", "기타"];
+/** 저장값(한국어) → shared.categories 키. 화면에는 t(`categories.${CATEGORY_KEY[c]}`) */
+export const CATEGORY_KEY: Record<string, string> = { 위로: "comfort", 가족: "family", 감사: "thanks", 사랑: "love", 성장: "growth", 우정: "friendship", 추억: "memories", 기타: "other" };
 
 /** 검색 + 마음 칩(정렬은 최신순 고정). 값은 URL 쿼리에 있고, 바뀌면 서버 페이지가 다시 렌더링된다 */
 export default function StoriesFilter() {
+  const t = useTranslations("shared");
   const { search, category, updateFilter } = useStoriesFilter();
   const [q, setQ] = useState(search);
 
@@ -21,15 +25,15 @@ export default function StoriesFilter() {
           }}
         >
           <label htmlFor="q" className="sr-only">
-            사연 검색
+            {t("stories.searchLabel")}
           </label>
-          <input id="q" type="search" className="field" placeholder="검색" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input id="q" type="search" className="field" placeholder={t("stories.searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
         </form>
       </div>
-      <div role="group" aria-label="마음" className="flex flex-wrap gap-2 border-b-2 border-ink pb-6 mobile-down:flex-nowrap mobile-down:gap-2.5 mobile-down:overflow-x-auto mobile-down:pb-4 mobile-down:[scrollbar-width:thin]">
+      <div role="group" aria-label={t("stories.categoryGroup")} className="flex flex-wrap gap-2 border-b-2 border-ink pb-6 mobile-down:flex-nowrap mobile-down:gap-2.5 mobile-down:overflow-x-auto mobile-down:pb-4 mobile-down:[scrollbar-width:thin]">
         {["", ...CATEGORIES].map((c) => (
           <button key={c} type="button" aria-pressed={category === c} className={`chip ${category === c ? "chip-on" : ""}`} onClick={() => updateFilter({ category: c })}>
-            {c || "전체"}
+            {c ? t(`categories.${CATEGORY_KEY[c]}`) : t("stories.all")}
           </button>
         ))}
       </div>

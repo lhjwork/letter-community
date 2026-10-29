@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 // 우선 Report-Only 로 위반만 관찰. 콘솔에 위반이 없으면 Content-Security-Policy 로 승격
 const CSP = [
@@ -38,4 +39,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default createNextIntlPlugin()(nextConfig);

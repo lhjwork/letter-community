@@ -1,0 +1,33 @@
+{
+  "meta": { "title": "마이페이지 | Letter" },
+  "tabs": { "all": "전체", "sent": "보낸 편지", "received": "받은 편지", "stories": "나의 사연" },
+  "flows": { "all": "전체", "story": "사연 편지", "heart": "마음 편지" },
+  "eyebrow": "나의 레터",
+  "title": "마이페이지",
+  "toLetterBox": "우편함으로",
+  "logout": "로그아웃",
+  "joined": "{date} 가입",
+  "email": "이메일",
+  "linkedAccounts": "연동 계정",
+  "records": "기록",
+  "recordsSummary": "보낸 편지 {sent} · 받은 편지 {received} · 사연 {stories} · 실물 {physical}",
+  "short": { "sent": "보낸", "received": "받은", "stories": "사연", "physical": "실물" },
+  "tabsLabel": "내 기록 구분",
+  "empty": "아직 여기 담긴 편지가 없어요.",
+  "write": "편지 쓰기",
+  "more": "더 보기",
+  "limit": "최근 {max}통까지 보여요.",
+  "nickname": {
+    "label": "닉네임",
+    "required": "닉네임을 적어 주세요.",
+    "same": "지금 닉네임과 같아요.",
+    "failed": "닉네임을 바꾸지 못했어요.",
+    "saving": "저장 중",
+    "saved": "저장됨",
+    "save": "저장",
+    "unlockAt": "{date}부터 바꿀 수 있어요.",
+    "rulePrefix": "닉네임은 ",
+    "rule": "한 달에 한 번만 바꿀 수 있어요.",
+    "lastChanged": " 마지막 변경 {date}"
+  }
+}

@@ -1,5 +1,7 @@
 import { seoulParts } from "@/lib/seoulDate";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { useRecordText } from "@/hooks/useRecordText";
 import { FLOWS, TABS, type Flow, type Me, type MyRecords, type RecordItem, type Tab } from "./api";
 import { NAME_CHANGE_MS, ymd } from "./date";
 import LogoutButton from "./LogoutButton";
@@ -17,31 +19,33 @@ const TILT = ["-rotate-[0.6deg]", "rotate-[0.5deg]", "rotate-[0.4deg]", "-rotate
 const BADGE_BG = { blue: "bg-airblue", green: "bg-approve", brick: "bg-brick", muted: "bg-ink-3" } as const;
 
 export default function MyPageView({ me, records, tab, flow, n }: { me: Me; records: MyRecords; tab: Tab; flow: Flow; n: number }) {
+  const t = useTranslations("myPage");
+  const locale = useLocale();
   const { counts } = records;
   const tabCount: Record<Tab, number> = { all: counts.sent + counts.received + counts.stories, sent: counts.sent, received: counts.received, stories: counts.stories };
   const href = (q: { tab?: Tab; flow?: Flow; n?: number }) => {
     const p = new URLSearchParams();
-    const t = q.tab ?? tab;
+    const tb = q.tab ?? tab;
     const f = q.flow ?? flow;
-    if (t !== "all") p.set("tab", t);
+    if (tb !== "all") p.set("tab", tb);
     if (f !== "all") p.set("flow", f);
     if (q.n) p.set("n", String(q.n));
     const s = p.toString();
     return s ? `/my-page?${s}` : "/my-page";
   };
   const providers = me.oauthAccounts.map((a) => a.provider.toUpperCase());
-  const tabLabel = TABS.find((t) => t.value === tab)!.label;
+  const tabLabel = t(`tabs.${tab}`);
 
   return (
     <main>
       <section className={`${WRAP} flex flex-wrap items-end justify-between gap-4 pb-9 pt-5 mobile-down:pb-6 mobile-down:pt-3`}>
         <div className="flex flex-col gap-3 mobile-down:gap-2">
-          <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">나의 레터</p>
-          <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">마이페이지</h1>
+          <p className="m-0 font-pen text-[22px] text-ink-3 mobile-down:text-xl">{t("eyebrow")}</p>
+          <h1 className="m-0 font-pen text-[52px] font-normal leading-[1.25] mobile-down:text-[40px] mobile-down:leading-[1.2]">{t("title")}</h1>
         </div>
         <div className="flex flex-wrap gap-2.5 mobile-down:hidden">
           <Link href="/letter-box" className="btn btn-blue">
-            우편함으로
+            {t("toLetterBox")}
           </Link>
           <LogoutButton className="btn btn-ink" />
         </div>
@@ -60,36 +64,36 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
                   {p}
                 </span>
               ))}
-              {ymd(me.createdAt)} 가입
+              {t("joined", { date: ymd(me.createdAt, locale) })}
             </span>
           </div>
 
           <NicknameForm name={me.name} nameUpdatedAt={me.nameUpdatedAt} unlockAt={unlockAt(me.nameUpdatedAt)} />
 
           <dl className="m-0 grid flex-[1_1_260px] grid-cols-[auto_1fr] content-start gap-x-4 gap-y-2.5 text-[15px] mobile-down:hidden">
-            <dt className="font-pen text-xl text-ink-3">이메일</dt>
+            <dt className="font-pen text-xl text-ink-3">{t("email")}</dt>
             <dd className="m-0 min-w-0 break-all">{me.email}</dd>
-            <dt className="font-pen text-xl text-ink-3">연동 계정</dt>
+            <dt className="font-pen text-xl text-ink-3">{t("linkedAccounts")}</dt>
             <dd className="m-0 flex flex-wrap items-center gap-2">
               {providers.map((p) => (
                 <span key={p} className="badge bg-ink">
                   {p}
                 </span>
               ))}
-              {ymd(me.createdAt)} 가입
+              {t("joined", { date: ymd(me.createdAt, locale) })}
             </dd>
-            <dt className="font-pen text-xl text-ink-3">기록</dt>
+            <dt className="font-pen text-xl text-ink-3">{t("records")}</dt>
             <dd className="m-0">
-              보낸 편지 {counts.sent} · 받은 편지 {counts.received} · 사연 {counts.stories} · 실물 {counts.physical}
+              {t("recordsSummary", { sent: counts.sent, received: counts.received, stories: counts.stories, physical: counts.physical })}
             </dd>
           </dl>
 
           <dl className="m-0 hidden justify-between text-center mobile-down:flex">
             {[
-              ["보낸", counts.sent],
-              ["받은", counts.received],
-              ["사연", counts.stories],
-              ["실물", counts.physical],
+              [t("short.sent"), counts.sent],
+              [t("short.received"), counts.received],
+              [t("short.stories"), counts.stories],
+              [t("short.physical"), counts.physical],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="font-pen text-base text-ink-3">{k}</dt>
@@ -101,19 +105,19 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
       </section>
 
       <section className={`${WRAP} pb-10 mobile-down:pb-6`}>
-        <nav aria-label="내 기록 구분" className="flex flex-wrap border-b-2 border-ink mobile-down:flex-nowrap mobile-down:overflow-x-auto">
-          {TABS.map((t) => {
-            const on = t.value === tab;
+        <nav aria-label={t("tabsLabel")} className="flex flex-wrap border-b-2 border-ink mobile-down:flex-nowrap mobile-down:overflow-x-auto">
+          {TABS.map((tb) => {
+            const on = tb.value === tab;
             return (
               <Link
-                key={t.value}
-                href={href({ tab: t.value })}
+                key={tb.value}
+                href={href({ tab: tb.value })}
                 scroll={false}
                 aria-current={on ? "page" : undefined}
                 className={`inline-flex min-h-[52px] items-center whitespace-nowrap px-5 font-pen text-2xl hover:text-brick mobile-down:min-h-12 mobile-down:px-3.5 mobile-down:text-[21px] ${on ? "-mb-0.5 border-b-4 border-brick text-ink" : "text-ink-3"}`}
               >
-                {t.label}
-                <span className="ml-2 font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:ml-1.5 mobile-down:text-[11px]">{tabCount[t.value]}</span>
+                {t(`tabs.${tb.value}`)}
+                <span className="ml-2 font-anton text-xs tracking-[0.1em] text-ink-3 mobile-down:ml-1.5 mobile-down:text-[11px]">{tabCount[tb.value]}</span>
               </Link>
             );
           })}
@@ -126,7 +130,7 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
           <div className="flex gap-2">
             {FLOWS.map((f) => (
               <Link key={f.value} href={href({ flow: f.value })} scroll={false} aria-current={f.value === flow ? "true" : undefined} className={`chip ${f.value === flow ? "chip-on" : ""}`}>
-                {f.label}
+                {t(`flows.${f.value}`)}
               </Link>
             ))}
           </div>
@@ -134,9 +138,9 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
 
         {records.data.length === 0 ? (
           <div className="flex flex-col items-start gap-4">
-            <p className="m-0 font-pen text-2xl text-ink-2">아직 여기 담긴 편지가 없어요.</p>
+            <p className="m-0 font-pen text-2xl text-ink-2">{t("empty")}</p>
             <Link href="/write" className="btn btn-brick">
-              편지 쓰기
+              {t("write")}
             </Link>
           </div>
         ) : (
@@ -151,10 +155,10 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
 
         {records.total > records.data.length && n < MAX && (
           <Link href={href({ n: n + STEP })} scroll={false} className="btn btn-ink self-center">
-            더 보기
+            {t("more")}
           </Link>
         )}
-        {records.total > records.data.length && n >= MAX && <p className="m-0 self-center text-[13px] text-ink-3">최근 {MAX}통까지 보여요.</p>}
+        {records.total > records.data.length && n >= MAX && <p className="m-0 self-center text-[13px] text-ink-3">{t("limit", { max: MAX })}</p>}
       </section>
 
       <section className={`${WRAP} hidden pb-12 mobile-down:block`}>
@@ -165,17 +169,18 @@ export default function MyPageView({ me, records, tab, flow, n }: { me: Me; reco
 }
 
 function RecordCard({ r, tilt }: { r: RecordItem; tilt: string }) {
+  const rt = useRecordText();
   const labelColor = r.flow === "heart" ? "text-airblue" : r.label === "보낸 · 답장" ? "text-ink" : "text-brick";
   const d = seoulParts(r.createdAt);
   return (
     <Link href={`/letter/${r._id}`} className={`card w-full text-ink hover:text-ink ${tilt}`}>
       <div className="airmail absolute inset-x-0 top-0 h-1.5" aria-hidden="true" />
       <div className="mt-1 flex items-start justify-between gap-2">
-        <span className={`font-pen text-lg leading-none ${labelColor}`}>{r.label}</span>
-        {r.badge && <span className={`badge ${BADGE_BG[r.badge.tone]}`}>{r.badge.text}</span>}
+        <span className={`font-pen text-lg leading-none ${labelColor}`}>{rt.label(r.label)}</span>
+        {r.badge && <span className={`badge ${BADGE_BG[r.badge.tone]}`}>{rt.badge(r.badge.text)}</span>}
       </div>
       {r.recipientName && <span className="mt-2 font-pen text-lg leading-9 text-brick">To. {r.recipientName}</span>}
-      <strong className={`font-pen text-[26px] font-normal leading-9 ${r.recipientName ? "" : "mt-2"}`}>{r.title}</strong>
+      <strong className={`font-pen text-[26px] font-normal leading-9 ${r.recipientName ? "" : "mt-2"}`}>{rt.title(r.title)}</strong>
       <span className="mt-2 font-anton text-xs tracking-[0.1em] text-ink-3">
         {d.mm}.{d.dd} · {d.wd}
       </span>

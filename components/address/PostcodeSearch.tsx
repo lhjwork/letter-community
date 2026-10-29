@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useSyncExternalStore, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * 다음(카카오) 주소 검색 결과 타입
@@ -88,7 +89,8 @@ function loadScript() {
   document.head.appendChild(script);
 }
 
-export default function PostcodeSearch({ onComplete, className, buttonText = "우편번호 검색" }: PostcodeSearchProps) {
+export default function PostcodeSearch({ onComplete, className, buttonText }: PostcodeSearchProps) {
+  const t = useTranslations("shared.address");
   const status = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function PostcodeSearch({ onComplete, className, buttonText = "�
   }, [onComplete]);
 
   const isDisabled = status !== "ready";
-  const displayText = status === "loading" ? "불러오는 중" : status === "error" ? "열지 못했어요" : buttonText;
+  const displayText = status === "loading" ? t("postcodeLoading") : status === "error" ? t("postcodeFailed") : (buttonText ?? t("postcode"));
 
   // 실패 문구는 부모 행(flex-wrap) 아래 줄로 내려간다
   return (
@@ -126,7 +128,7 @@ export default function PostcodeSearch({ onComplete, className, buttonText = "�
       </button>
       {status === "error" && (
         <p role="alert" className="m-0 basis-full text-[15px] text-brick">
-          주소 검색을 열지 못했어요. 새로고침해 주세요.
+          {t("postcodeError")}
         </p>
       )}
     </>

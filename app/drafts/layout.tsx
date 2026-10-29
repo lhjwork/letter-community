@@ -1,8 +1,11 @@
 import SiteShell from "@/components/shareds/SiteShell";
 import { ReactNode } from "react";
-import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = { title: "임시저장" };
+export async function generateMetadata() {
+  const t = await getTranslations("write.meta");
+  return { title: t("drafts") };
+}
 
 export default function DraftsLayout({ children }: { children: ReactNode }) {
   return <SiteShell>{children}</SiteShell>;

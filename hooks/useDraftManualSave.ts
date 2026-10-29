@@ -1,6 +1,7 @@
 import { track } from "@/lib/analytics/ga";
 import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { saveDraft } from "@/lib/draft-api";
 import { DraftSaveState } from "@/types/draft";
 import { handleApiError } from "@/lib/auth-utils";
@@ -20,6 +21,7 @@ interface UseDraftManualSaveProps {
 }
 
 export function useDraftManualSave({ content, contentType, title, type, category, envelope, isAnonymous, recipientName, draftId, onSave, onError }: UseDraftManualSaveProps) {
+  const t = useTranslations("errors.draft");
   const { data: session } = useSession();
   const [saveState, setSaveState] = useState<DraftSaveState>({
     status: "idle",
@@ -38,14 +40,14 @@ export function useDraftManualSave({ content, contentType, title, type, category
     const token = getToken();
 
     if (!token) {
-      const errorMessage = "로그인이 필요합니다.";
+      const errorMessage = t("loginRequired");
       onError?.(errorMessage);
       setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
       return;
     }
 
     if (!content.trim()) {
-      const errorMessage = "저장할 내용이 없습니다.";
+      const errorMessage = t("empty");
       onError?.(errorMessage);
       setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
       return;
@@ -76,10 +78,10 @@ export function useDraftManualSave({ content, contentType, title, type, category
 
         onSave?.(response.data._id);
       } else {
-        throw new Error("저장에 실패했습니다.");
+        throw new Error(t("saveFailed"));
       }
     } catch (error) {
-      let errorMessage = "저장 중 오류가 발생했습니다";
+      let errorMessage = t("saveError");
 
       try {
         await handleApiError(error);
@@ -91,7 +93,7 @@ export function useDraftManualSave({ content, contentType, title, type, category
         onError?.(errorMessage);
       }
     }
-  }, [getToken, content, contentType, title, type, category, envelope, isAnonymous, recipientName, draftId, onSave, onError]);
+  }, [getToken, content, contentType, title, type, category, envelope, isAnonymous, recipientName, draftId, onSave, onError, t]);
 
   return {
     saveState,
