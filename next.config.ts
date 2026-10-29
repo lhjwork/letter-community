@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
   // Add empty turbopack config to silence the warning
   turbopack: {},
 
+  // /en/x 는 같은 페이지 /x 를 영어로(언어는 proxy.ts 가 x-locale 로 정한다)
+  async rewrites() {
+    return [
+      { source: "/en", destination: "/" },
+      { source: "/en/:path*", destination: "/:path*" },
+    ];
+  },
+
   async headers() {
     return [
       {

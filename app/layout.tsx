@@ -9,6 +9,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { OG_IMAGE } from "@/lib/og";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 const myeongjo = Nanum_Myeongjo({ weight: ["400", "700", "800"], subsets: ["latin"], variable: "--font-myeongjo", display: "swap", preload: false });
 const pen = Nanum_Pen_Script({ weight: "400", subsets: ["latin"], variable: "--font-pen", display: "swap", preload: false });
@@ -23,7 +24,12 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("landing.meta");
+  // 같은 페이지의 한국어(/x)·영어(/en/x) 주소를 검색엔진에 알린다. 하위 페이지가 canonical 을 따로 두면 그쪽이 이긴다
+  const h = await headers();
+  const path = h.get("x-pathname") ?? "/";
+  const en = `/en${path === "/" ? "" : path}`;
   return {
+    alternates: { canonical: h.get("x-locale") === "en" ? en : path, languages: { ko: path, en, "x-default": path } },
     metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
     title: t("title"),
     description: t("description"),

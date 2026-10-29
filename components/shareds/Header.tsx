@@ -35,7 +35,7 @@ export default function Header() {
   const t = useTranslations("shared.header");
   const locale = useLocale();
   const { data: session, status } = useSession();
-  const current = currentSection(usePathname() ?? "");
+  const current = currentSection((usePathname() ?? "").replace(/^\/en(?=\/|$)/, ""));
   const loggedIn = status === "authenticated";
   const [loginCallbackUrl, setLoginCallbackUrl] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
