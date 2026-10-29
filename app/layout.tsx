@@ -25,7 +25,10 @@ export const metadata: Metadata = {
   description: "사연을 공유하는 커뮤니티",
   openGraph: { images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Letter — 답장이 있는 편지" }], type: "website" },
   twitter: { card: "summary_large_image", images: [OG_IMAGE] },
-  verification: { google: "LRhuIOX7f2AalDx5wB6oEQJ38I9UeGcaFLZj3WeoKgU" },
+  verification: {
+    google: "LRhuIOX7f2AalDx5wB6oEQJ38I9UeGcaFLZj3WeoKgU",
+    other: { "naver-site-verification": "4bfed1167a4e5e6ca008bfc0650ea80dbbdc3f99" },
+  },
 };
 
 export default function RootLayout({
